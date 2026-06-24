@@ -2,3 +2,4 @@ node_modules/
 css/
 .playwright-mcp/
 .netlify
+dist-docs/
