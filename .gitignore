@@ -3,3 +3,5 @@ css/
 .playwright-mcp/
 .netlify
 dist-docs/
+# Personal knowledge base
+.openkb/PERSONAL/

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "build",
+  "instructions": [
+    ".opencode/SHARED/project-context.md",
+    ".opencode/SHARED/agent-rules.md"
+  ],
+  "references": {
+    "smauii-core": {
+      "path": "../smauii-core",
+      "description": "Backend Laravel — main project"
+    },
+    "smauii-aksesekolah": {
+      "path": "../smauii-aksesekolah",
+      "description": "Monorepo entrypoint — .opencode, .openkb"
+    },
+    "smauii-playbook": {
+      "path": "../smauii-playbook",
+      "description": "SOP, workflow, template, ADR, role definitions"
+    },
+    "kaede": {
+      "path": ".",
+      "description": "KAEDE Power-Up — integrasi Trello MCP & ekosistem AI Agent"
+    }
+  },
+  "agent": {
+    "build": {
+      "description": "Agent utama — maintain Power-Up, dokumentasi, debugging",
+      "mode": "primary",
+      "permission": {
+        "edit": "allow",
+        "bash": "ask"
+      }
+    },
+    "plan": {
+      "description": "Agent perencanaan — analisis sebelum coding",
+      "mode": "primary",
+      "permission": {
+        "edit": "deny"
+      }
+    }
+  },
+  "command": {
+    "dev": {
+      "description": "Jalankan development server + CSS watch",
+      "template": "bun run dev"
+    },
+    "build": {
+      "description": "Build production CSS",
+      "template": "bun run build"
+    },
+    "build-docs": {
+      "description": "Build dokumentasi dari Markdown ke HTML",
+      "template": "node scripts/build-docs.mjs"
+    },
+    "preview": {
+      "description": "Preview production build",
+      "template": "bun run preview"
+    }
+  },
+  "mcp": {
+    "trello": {
+      "type": "local",
+      "command": "bunx",
+      "args": ["@delorenj/mcp-server-trello"],
+      "env": {
+        "TRELLO_API_KEY": "${TRELLO_API_KEY}",
+        "TRELLO_TOKEN": "${TRELLO_TOKEN}"
+      },
+      "enabled": true
+    }
+  }
+}
