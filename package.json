@@ -1,0 +1,19 @@
+{
+  "name": "kaede-powerup",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KAEDE — Koneksi Automated Environment DE (Trello Power-Up)",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run dev:css & bun run serve",
+    "dev:css": "tailwindcss -i src/style.css -o css/style.css --watch",
+    "build": "tailwindcss -i src/style.css -o css/style.css --minify",
+    "serve": "bun x serve . -p 3000 -L",
+    "preview": "bun run build && bun run serve"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "netlify-cli": "^26.1.0",
+    "tailwindcss": "^4.1.0"
+  }
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAEDE — Authorize</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="h-full bg-kaede-surface p-4 font-sans antialiased text-center">
+  <h2 class="text-base font-semibold text-kaede-text mb-2">Authorize KAEDE</h2>
+  <p class="text-sm text-kaede-muted leading-relaxed mb-4">Connect your deployment provider to enable automated environment management.</p>
+  <button type="button" id="kaede-auth-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none bg-kaede-primary text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-kaede-primary-hover">Connect</button>
+
+  <script src="https://p.trellocdn.net/power-up.min.js"></script>
+  <script>
+    TrelloPowerUp.initialize({
+      'authorization-status': function(t) { return { authorized: false }; }
+    });
+
+    document.getElementById('kaede-auth-btn').addEventListener('click', function() {
+      TrelloPowerUp.iframe()
+        .set('board', 'shared', 'auth', { connected: true, provider: 'netlify' })
+        .then(function() {
+          TrelloPowerUp.iframe().closePopup();
+        });
+    });
+  </script>
+</body>
+</html>

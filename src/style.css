@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kaede-bg: #1a1b23;
+  --color-kaede-surface: #22232e;
+  --color-kaede-border: #2e2f3e;
+  --color-kaede-primary: #6c5ce7;
+  --color-kaede-primary-hover: #5a4bd1;
+  --color-kaede-text: #e2e2e8;
+  --color-kaede-muted: #8888a0;
+  --color-kaede-success: #00b894;
+  --color-kaede-warning: #fdcb6e;
+  --color-kaede-danger: #e17055;
+
+  --animate-kaede-pulse: kaede-pulse 1.4s ease-in-out infinite both;
+}
+
+@keyframes kaede-pulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAEDE — Set Environment</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="h-full bg-kaede-surface p-4 font-sans antialiased">
+  <h2 class="text-base font-semibold text-kaede-text mb-3">Set Environment</h2>
+
+  <button type="button" class="env-option w-full text-left px-3.5 py-2.5 mb-1.5 rounded-md border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-[border-color,background] duration-200 hover:border-kaede-primary hover:bg-[rgba(108,92,231,0.08)]" data-env="production">
+    <span class="font-medium">Production</span>
+    <span class="block text-[11px] text-kaede-muted mt-0.5">Live / customer-facing</span>
+  </button>
+  <button type="button" class="env-option w-full text-left px-3.5 py-2.5 mb-1.5 rounded-md border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-[border-color,background] duration-200 hover:border-kaede-primary hover:bg-[rgba(108,92,231,0.08)]" data-env="staging">
+    <span class="font-medium">Staging</span>
+    <span class="block text-[11px] text-kaede-muted mt-0.5">Pre-production testing</span>
+  </button>
+  <button type="button" class="env-option w-full text-left px-3.5 py-2.5 mb-1.5 rounded-md border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-[border-color,background] duration-200 hover:border-kaede-primary hover:bg-[rgba(108,92,231,0.08)]" data-env="development">
+    <span class="font-medium">Development</span>
+    <span class="block text-[11px] text-kaede-muted mt-0.5">Active development branch</span>
+  </button>
+
+  <script src="https://p.trellocdn.net/power-up.min.js"></script>
+  <script>
+    TrelloPowerUp.initialize({'card-buttons': function(t) { return []; }});
+
+    document.querySelectorAll('.env-option').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var env = this.getAttribute('data-env');
+        TrelloPowerUp.util
+          .card('id')
+          .then(function(card) {
+            return TrelloPowerUp.iframe().set('card', 'shared', 'environment', env);
+          })
+          .then(function() {
+            TrelloPowerUp.iframe().closePopup();
+          })
+          .catch(function(err) {
+            console.error('[KAEDE] Failed to set environment:', err);
+          });
+      });
+    });
+  </script>
+</body>
+</html>
