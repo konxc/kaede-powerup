@@ -1,29 +1,37 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="id" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KAEDE — Dashboard</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="h-full bg-kaede-surface p-4 font-sans antialiased">
-  <h2 class="text-base font-semibold text-kaede-text">KAEDE Dashboard</h2>
-  <p class="text-xs text-kaede-muted mt-1 mb-4">Koneksi Automated Environment DE</p>
+<body class="h-full bg-kaede-surface p-4 font-sans antialiased flex flex-col">
+  <div class="flex-1">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-semibold text-kaede-text">KAEDE Dashboard</h2>
+      <span class="flex items-center justify-center size-6 rounded bg-kaede-primary text-white text-[9px] font-bold">K</span>
+    </div>
 
-  <div class="text-[11px] font-semibold text-kaede-text uppercase tracking-wide mb-2">Active Environments</div>
-  <div class="flex flex-col gap-2">
-    <div class="flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md">
-      <span class="text-sm font-medium text-kaede-text">Production</span>
-      <span class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-[rgba(225,112,85,0.15)] text-kaede-danger">2 cards</span>
+    <div class="text-[11px] font-semibold text-kaede-text uppercase tracking-wide mb-2">Active Environments</div>
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md">
+        <span class="text-sm font-medium text-kaede-text">Production</span>
+        <span class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-[rgba(225,112,85,0.15)] text-kaede-danger">2 cards</span>
+      </div>
+      <div class="flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md">
+        <span class="text-sm font-medium text-kaede-text">Staging</span>
+        <span class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-[rgba(253,203,110,0.15)] text-kaede-warning">1 card</span>
+      </div>
+      <div class="flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md">
+        <span class="text-sm font-medium text-kaede-text">Development</span>
+        <span class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-[rgba(0,184,148,0.15)] text-kaede-success">5 cards</span>
+      </div>
     </div>
-    <div class="flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md">
-      <span class="text-sm font-medium text-kaede-text">Staging</span>
-      <span class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-[rgba(253,203,110,0.15)] text-kaede-warning">1 card</span>
-    </div>
-    <div class="flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md">
-      <span class="text-sm font-medium text-kaede-text">Development</span>
-      <span class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-[rgba(0,184,148,0.15)] text-kaede-success">5 cards</span>
-    </div>
+  </div>
+
+  <div class="pt-3 border-t border-kaede-border/50 text-center">
+    <a href="/" target="_blank" rel="noopener" class="text-[10px] text-kaede-muted hover:text-kaede-primary no-underline transition-colors">Tentang Ekosistem KAEDE</a>
   </div>
 
   <script src="https://p.trellocdn.net/power-up.min.js"></script>

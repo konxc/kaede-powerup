@@ -1,15 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="id" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KAEDE — Authorize</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="h-full bg-kaede-surface p-4 font-sans antialiased text-center">
-  <h2 class="text-base font-semibold text-kaede-text mb-2">Authorize KAEDE</h2>
-  <p class="text-sm text-kaede-muted leading-relaxed mb-4">Connect your deployment provider to enable automated environment management.</p>
-  <button type="button" id="kaede-auth-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none bg-kaede-primary text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-kaede-primary-hover">Connect</button>
+<body class="h-full bg-kaede-surface p-4 font-sans antialiased flex flex-col text-center">
+  <div class="flex-1 flex flex-col items-center justify-center">
+    <div class="flex items-center justify-center size-10 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3">
+      <span class="text-sm font-bold">K</span>
+    </div>
+    <h2 class="text-base font-semibold text-kaede-text mb-2">Authorize KAEDE</h2>
+    <p class="text-sm text-kaede-muted leading-relaxed mb-4">Connect your deployment provider to enable automated environment management.</p>
+    <button type="button" id="kaede-auth-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none bg-kaede-primary text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-kaede-primary-hover">Connect</button>
+  </div>
+
+  <div class="pt-3 border-t border-kaede-border/50 text-center">
+    <a href="/" target="_blank" rel="noopener" class="text-[10px] text-kaede-muted hover:text-kaede-primary no-underline transition-colors">Tentang Ekosistem KAEDE</a>
+  </div>
 
   <script src="https://p.trellocdn.net/power-up.min.js"></script>
   <script>

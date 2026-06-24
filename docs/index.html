@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dokumentasi — KAEDE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .prose { max-width: 720px; line-height: 1.7; color: #8888a0; }
+    .prose h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; color: #e2e2e8; }
+    .prose h2 { font-size: 1.25rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; color: #e2e2e8; }
+    .prose p { margin-bottom: 1rem; }
+    .prose ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+    .prose li { margin-bottom: 0.25rem; }
+    .prose strong { color: #e2e2e8; font-weight: 600; }
+    .prose a { color: #6c5ce7; text-decoration: underline; }
+    .prose code { background: #13141a; padding: 0.1em 0.3em; border-radius: 4px; font-size: 0.875em; color: #c0c0d0; }
+  </style>
+</head>
+<body class="bg-kaede-bg font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <nav class="nav-blur fixed top-0 inset-x-0 z-50 border-b border-kaede-border/50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+      <a href="../" class="flex items-center gap-2 no-underline">
+        <span class="flex items-center justify-center size-7 rounded-md bg-kaede-primary text-white text-xs font-bold">K</span>
+        <span class="font-semibold text-sm tracking-wide">KAEDE</span>
+      </a>
+      <div class="flex items-center gap-6 text-xs font-medium text-kaede-muted">
+        <a href="../" class="hover:text-kaede-primary transition-colors no-underline">Beranda</a>
+        <a href="." class="text-kaede-primary no-underline">Dokumentasi</a>
+        <a href="../privacy.html" class="hover:text-kaede-primary transition-colors no-underline">Privacy</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Dokumentasi</span>
+          <a href="." class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">Ikhtisar</a>
+          <a href="api-key" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key &amp; Token</a>
+          <a href="mcp-server" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode Integrasi</a>
+          <a href="tools" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Referensi Tools</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <h1>Dokumentasi KAEDE</h1>
+            <p>
+              Panduan lengkap menghubungkan Trello dengan ekosistem Agentic Development Koneksi —
+              dari mendapatkan API credentials hingga integrasi dengan OpenCode.
+            </p>
+
+            <h2>Mulai Cepat</h2>
+            <p>Ikuti 3 langkah berikut untuk mulai menggunakan Trello MCP:</p>
+            <ol>
+              <li><strong><a href="api-key">Dapatkan API Key &amp; Token</a></strong> — Buat Power-Up Trello dan generate kredensial.</li>
+              <li><strong><a href="mcp-server">Setup MCP Server</a></strong> — Install dan konfigurasi <code>@delorenj/mcp-server-trello</code>.</li>
+              <li><strong><a href="opencode">Integrasi dengan OpenCode</a></strong> — Tambahkan MCP server ke <code>opencode.json</code>.</li>
+            </ol>
+
+            <h2>Daftar Halaman</h2>
+
+            <div class="grid sm:grid-cols-2 gap-4 not-prose">
+              <a href="api-key" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+                <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-2 text-sm font-bold">1</div>
+                <h3 class="text-sm font-semibold text-kaede-text">API Key &amp; Token</h3>
+                <p class="text-xs text-kaede-muted mt-1">Panduan langkah demi langkah mendapatkan Trello API credentials melalui Power-Up admin.</p>
+              </a>
+              <a href="mcp-server" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+                <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-success/20 text-kaede-success mb-2 text-sm font-bold">2</div>
+                <h3 class="text-sm font-semibold text-kaede-text">MCP Server</h3>
+                <p class="text-xs text-kaede-muted mt-1">Install dan konfigurasi Trello MCP server, environment variables, dan manajemen board/workspace.</p>
+              </a>
+              <a href="opencode" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+                <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-warning/20 text-kaede-warning mb-2 text-sm font-bold">3</div>
+                <h3 class="text-sm font-semibold text-kaede-text">OpenCode Integrasi</h3>
+                <p class="text-xs text-kaede-muted mt-1">Cara menambahkan Trello MCP ke file opencode.json dan menggunakan tools dari AI Agent.</p>
+              </a>
+              <a href="tools" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+                <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-danger/20 text-kaede-danger mb-2 text-sm font-bold">4</div>
+                <h3 class="text-sm font-semibold text-kaede-text">Referensi Tools</h3>
+                <p class="text-xs text-kaede-muted mt-1">Daftar lengkap semua MCP tools: cards, lists, checklist, komentar, attachments, custom fields.</p>
+              </a>
+            </div>
+
+            <h2>Tentang Trello MCP</h2>
+            <p>
+              <strong>MCP (Model Context Protocol)</strong> adalah standar terbuka yang memungkinkan AI Agent
+              berkomunikasi dengan tools eksternal. <strong>Trello MCP Server</strong> (<a href="https://github.com/delorenj/mcp-server-trello" target="_blank">delorenj/mcp-server-trello</a>)
+              menyediakan jembatan antara Trello API dan AI Agent — sehingga agent bisa membaca, membuat,
+              dan mengupdate kartu Trello langsung dari percakapan.
+            </p>
+            <p>
+              Server ini menangani rate limiting (300 req/10s per API key, 100 req/10s per token),
+              validasi input, dan error handling secara otomatis.
+            </p>
+
+            <h2>Akses Cepat</h2>
+            <ul>
+              <li><a href="https://trello.com/power-ups/admin" target="_blank">Trello Power-Up Admin</a> — Buat dan kelola Power-Up</li>
+              <li><a href="https://github.com/delorenj/mcp-server-trello" target="_blank">GitHub: delorenj/mcp-server-trello</a> — Repositori utama</li>
+              <li><a href="https://www.npmjs.com/package/@delorenj/mcp-server-trello" target="_blank">npm: @delorenj/mcp-server-trello</a> — Package di npm</li>
+            </ul>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+      <a href="." class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline">
+        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>Ikhtisar</span>
+      </a>
+      <a href="api-key" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text">
+        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        <span>API Key</span>
+      </a>
+      <a href="mcp-server" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text">
+        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+        <span>MCP</span>
+      </a>
+      <a href="opencode" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text">
+        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        <span>OpenCode</span>
+      </a>
+      <a href="tools" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text">
+        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span>Tools</span>
+      </a>
+    </div>
+  </div>
+
+  <footer class="border-t border-kaede-border/50 py-6 px-4 sm:px-6 mb-12 lg:mb-0">
+    <div class="max-w-6xl mx-auto text-center text-xs text-kaede-muted">
+      &copy; 2026 PT Koneksi Jaringan Indonesia &middot; <a href="../privacy.html" class="hover:text-kaede-text no-underline">Privacy</a>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Referensi Tools MCP Trello — KAEDE Docs</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .prose { max-width: 720px; line-height: 1.7; color: #8888a0; }
+    .prose h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; color: #e2e2e8; }
+    .prose h2 { font-size: 1.25rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; color: #e2e2e8; }
+    .prose h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #e2e2e8; }
+    .prose p { margin-bottom: 1rem; }
+    .prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+    .prose ul { list-style: disc; }
+    .prose li { margin-bottom: 0.35rem; }
+    .prose strong { color: #e2e2e8; font-weight: 600; }
+    .prose a { color: #6c5ce7; text-decoration: underline; }
+    .prose code { background: #13141a; padding: 0.1em 0.3em; border-radius: 4px; font-size: 0.875em; color: #c0c0d0; }
+    .code-block { background: #13141a; border: 1px solid #2e2f3e; border-radius: 8px; padding: 1rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.8125rem; line-height: 1.6; overflow-x: auto; color: #c0c0d0; }
+    .code-block .kw { color: #6c5ce7; }
+    .code-block .str { color: #00b894; }
+    .code-block .cm { color: #636380; font-style: italic; }
+    .code-block .fn { color: #fdcb6e; }
+    .tool-group { border-left: 2px solid #2e2f3e; padding-left: 1rem; margin: 1.5rem 0; }
+    .tool-group h3 { margin-top: 0; }
+  </style>
+</head>
+<body class="bg-kaede-bg font-sans antialiased min-h-screen">
+  <nav class="nav-blur fixed top-0 inset-x-0 z-50 border-b border-kaede-border/50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+      <a href="../" class="flex items-center gap-2 no-underline">
+        <span class="flex items-center justify-center size-7 rounded-md bg-kaede-primary text-white text-xs font-bold">K</span>
+        <span class="font-semibold text-sm tracking-wide">KAEDE</span>
+      </a>
+      <div class="flex items-center gap-6 text-xs font-medium text-kaede-muted">
+        <a href="../" class="hover:text-kaede-primary transition-colors no-underline">Beranda</a>
+        <a href="." class="hover:text-kaede-primary transition-colors no-underline">Dokumentasi</a>
+        <a href="../privacy.html" class="hover:text-kaede-primary transition-colors no-underline">Privacy</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Dokumentasi</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Ikhtisar</a>
+          <a href="api-key" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key &amp; Token</a>
+          <a href="mcp-server" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode Integrasi</a>
+          <a href="tools" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">Referensi Tools</a>
+        </nav>
+      </aside>
+
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Dokumentasi</a>
+              <span>/</span>
+              <span>Referensi Tools</span>
+            </p>
+            <h1>Referensi Tools MCP Trello</h1>
+            <p>
+              Berikut daftar lengkap semua tools yang disediakan oleh
+              <code>@delorenj/mcp-server-trello</code>. Tools ini bisa dipanggil oleh
+              AI Agent melalui OpenCode atau MCP client lainnya.
+            </p>
+
+            <div class="not-prose p-4 rounded-xl bg-kaede-primary/10 border border-kaede-primary/20 mb-6">
+              <p class="text-sm text-kaede-primary font-medium">Format Panggilan</p>
+              <p class="text-xs text-kaede-muted mt-1">
+                Cukup minta ke AI Agent dalam bahasa natural. Contoh:
+                <em>"Tolong cari kartu 'Fix login bug' dan pindahkan ke list Done"</em>.
+              </p>
+            </div>
+
+            <!-- Board & Workspace -->
+            <h2>Manajemen Board &amp; Workspace</h2>
+            <div class="tool-group">
+
+              <h3><code>list_boards</code></h3>
+              <p>Menampilkan semua board yang bisa diakses.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"list_boards"</span>, <span class="str">"arguments"</span>: {} }
+              </div>
+
+              <h3><code>set_active_board</code></h3>
+              <p>Mengubah board aktif untuk operasi selanjutnya.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"set_active_board"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"boardId"</span>: <span class="str">"abc123"</span> } }
+              </div>
+
+              <h3><code>get_active_board_info</code></h3>
+              <p>Menampilkan informasi board yang sedang aktif.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_active_board_info"</span>, <span class="str">"arguments"</span>: {} }
+              </div>
+
+              <h3><code>list_workspaces</code></h3>
+              <p>Menampilkan semua workspace.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"list_workspaces"</span>, <span class="str">"arguments"</span>: {} }
+              </div>
+
+              <h3><code>set_active_workspace</code></h3>
+              <p>Mengubah workspace aktif.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"set_active_workspace"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"workspaceId"</span>: <span class="str">"xyz789"</span> } }
+              </div>
+
+              <h3><code>list_boards_in_workspace</code></h3>
+              <p>Menampilkan semua board di workspace tertentu.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"list_boards_in_workspace"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"workspaceId"</span>: <span class="str">"xyz789"</span> } }
+              </div>
+            </div>
+
+            <!-- Cards -->
+            <h2>Manajemen Kartu</h2>
+            <div class="tool-group">
+
+              <h3><code>get_card</code></h3>
+              <p>Mendapatkan detail lengkap kartu — termasuk checklist, attachment, label, member, komentar, cover, badges. Bisa output JSON atau Markdown.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_card"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"FdhbArbK"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"includeMarkdown"</span>: <span class="kw">false</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>get_cards_by_list_id</code></h3>
+              <p>Mendapatkan semua kartu dari list tertentu.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_cards_by_list_id"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"listId"</span>: <span class="str">"list123"</span> } }
+              </div>
+
+              <h3><code>add_card_to_list</code></h3>
+              <p>Membuat kartu baru di list tertentu.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"add_card_to_list"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Setup CI/CD"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"description"</span>: <span class="str">"Implement pipeline"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"dueDate"</span>: <span class="str">"2026-07-01T12:00:00Z"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"labels"</span>: [<span class="str">"label-id-1"</span>]<br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>update_card_details</code></h3>
+              <p>Mengupdate detail kartu — nama, deskripsi, due date, label, dll.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"update_card_details"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"New name"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"dueComplete"</span>: <span class="kw">true</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>move_card</code></h3>
+              <p>Memindahkan kartu ke list lain.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"move_card"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list456"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>archive_card</code></h3>
+              <p>Mengarsipkan kartu.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"archive_card"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"cardId"</span>: <span class="str">"card123"</span> } }
+              </div>
+
+              <h3><code>get_my_cards</code></h3>
+              <p>Mendapatkan semua kartu yang assigned ke user saat ini.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_my_cards"</span>, <span class="str">"arguments"</span>: {} }
+              </div>
+            </div>
+
+            <!-- Lists -->
+            <h2>Manajemen List</h2>
+            <div class="tool-group">
+
+              <h3><code>get_lists</code></h3>
+              <p>Mendapatkan semua list di board.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_lists"</span>, <span class="str">"arguments"</span>: {} }
+              </div>
+
+              <h3><code>add_list_to_board</code></h3>
+              <p>Menambahkan list baru ke board.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"add_list_to_board"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"name"</span>: <span class="str">"Sprint 25"</span> } }
+              </div>
+
+              <h3><code>update_list</code></h3>
+              <p>Mengupdate nama, status archive, atau subscribe list.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"update_list"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"In Review"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>update_list_position</code></h3>
+              <p>Mengubah posisi list di board. Gunakan <code>"top"</code>, <code>"bottom"</code>, atau nilai numerik.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"update_list_position"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"position"</span>: <span class="str">"top"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>archive_list</code></h3>
+              <p>Mengarsipkan list.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"archive_list"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"listId"</span>: <span class="str">"list123"</span> } }
+              </div>
+            </div>
+
+            <!-- Checklist -->
+            <h2>Checklist</h2>
+            <div class="tool-group">
+
+              <h3><code>get_checklist_items</code></h3>
+              <p>Mendapatkan semua item dari checklist berdasarkan nama.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_checklist_items"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"name"</span>: <span class="str">"Acceptance Criteria"</span> } }
+              </div>
+
+              <h3><code>add_checklist_item</code></h3>
+              <p>Menambahkan item ke checklist.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"add_checklist_item"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"text"</span>: <span class="str">"Unit test passed"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checkListName"</span>: <span class="str">"QA Checklist"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>get_checklist_by_name</code></h3>
+              <p>Mendapatkan checklist lengkap dengan persentase completion.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_checklist_by_name"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"name"</span>: <span class="str">"Acceptance Criteria"</span> } }
+              </div>
+
+              <h3><code>update_checklist_item</code></h3>
+              <p>Mengupdate item checklist — nama, status (complete/incomplete), assignee, due date.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"update_checklist_item"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checkItemId"</span>: <span class="str">"item456"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"state"</span>: <span class="str">"complete"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>delete_checklist_item</code></h3>
+              <p>Menghapus item dari checklist.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"delete_checklist_item"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checkItemId"</span>: <span class="str">"item456"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>find_checklist_items_by_description</code></h3>
+              <p>Mencari item checklist berdasarkan teks tertentu.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"find_checklist_items_by_description"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"description"</span>: <span class="str">"login"</span> } }
+              </div>
+
+              <h3><code>get_acceptance_criteria</code></h3>
+              <p>Shortcut untuk mendapatkan semua item dari checklist "Acceptance Criteria".</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_acceptance_criteria"</span>, <span class="str">"arguments"</span>: {} }
+              </div>
+            </div>
+
+            <!-- Comments -->
+            <h2>Komentar</h2>
+            <div class="tool-group">
+
+              <h3><code>add_comment</code></h3>
+              <p>Menambahkan komentar ke kartu.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"add_comment"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"text"</span>: <span class="str">"Sudah di-review, siap merge."</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>update_comment</code></h3>
+              <p>Mengupdate komentar yang sudah ada.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"update_comment"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"commentId"</span>: <span class="str">"comment123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"text"</span>: <span class="str">"Sudah di-review dan di-merge."</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>delete_comment</code></h3>
+              <p>Menghapus komentar dari kartu.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"delete_comment"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"commentId"</span>: <span class="str">"comment123"</span> } }
+              </div>
+
+              <h3><code>get_card_comments</code></h3>
+              <p>Mendapatkan semua komentar dari kartu (tanpa fetch semua data kartu).</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_card_comments"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"cardId"</span>: <span class="str">"card123"</span> } }
+              </div>
+            </div>
+
+            <!-- Attachments -->
+            <h2>Attachment</h2>
+            <div class="tool-group">
+
+              <h3><code>attach_image_to_card</code></h3>
+              <p>Melampirkan gambar ke kartu dari URL.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"attach_image_to_card"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"imageUrl"</span>: <span class="str">"https://example.com/mockup.png"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Mockup v2"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+
+              <h3><code>attach_file_to_card</code></h3>
+              <p>Melampirkan file (PDF, dokumen, video, dll) ke kartu dari URL atau local path (<code>file://</code>).</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"attach_file_to_card"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"fileUrl"</span>: <span class="str">"https://example.com/report.pdf"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Report Q2"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"mimeType"</span>: <span class="str">"application/pdf"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+            </div>
+
+            <!-- Activity -->
+            <h2>Aktivitas</h2>
+            <div class="tool-group">
+
+              <h3><code>get_recent_activity</code></h3>
+              <p>Mendapatkan aktivitas terbaru di board.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_recent_activity"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"limit"</span>: <span class="str">"10"</span> } }
+              </div>
+            </div>
+
+            <!-- Custom Fields -->
+            <h2>Custom Fields <span class="text-[10px] text-kaede-warning font-normal">(Trello Standard+ plan)</span></h2>
+            <div class="tool-group">
+
+              <h3><code>get_board_custom_fields</code></h3>
+              <p>Mendapatkan definisi semua custom field di board (termasuk opsi dropdown).</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"get_board_custom_fields"</span>, <span class="str">"arguments"</span>: {} }
+              </div>
+
+              <h3><code>update_card_custom_field</code></h3>
+              <p>Mengupdate nilai custom field pada kartu. Mendukung tipe: <code>text</code>, <code>number</code>, <code>checkbox</code>, <code>date</code>, <code>list</code>, <code>clear</code>.</p>
+              <div class="code-block text-[11px]">
+                { <span class="str">"name"</span>: <span class="str">"update_card_custom_field"</span>,<br/>
+                &nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"customFieldId"</span>: <span class="str">"field456"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"type"</span>: <span class="str">"text"</span>,<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"value"</span>: <span class="str">"Sprint 24"</span><br/>
+                &nbsp;&nbsp;} }
+              </div>
+            </div>
+
+            <h2>Tips Penggunaan</h2>
+            <ul>
+              <li><strong>Parameter boardId opsional:</strong> Jika tidak diberikan, server menggunakan board yang aktif</li>
+              <li><strong>Date format:</strong> Due date pakai ISO 8601 (<code>2026-07-01T12:00:00Z</code>), start date pakai <code>YYYY-MM-DD</code></li>
+              <li><strong>Label IDs:</strong> Dapatkan dari Trello UI atau via <code>get_board_custom_fields</code></li>
+              <li><strong>File attachment:</strong> Bisa dari URL atau local path pakai <code>file://</code> protocol</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="opencode" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            OpenCode Integrasi
+          </a>
+          <span></span>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+      <a href="." class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Ikhtisar</span></a>
+      <a href="api-key" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key</span></a>
+      <a href="mcp-server" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP</span></a>
+      <a href="opencode" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+      <a href="tools" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg><span>Tools</span></a>
+    </div>
+  </div>
+
+  <footer class="border-t border-kaede-border/50 py-6 px-4 sm:px-6 mb-12 lg:mb-0">
+    <div class="max-w-6xl mx-auto text-center text-xs text-kaede-muted">
+      &copy; 2026 PT Koneksi Jaringan Indonesia &middot; <a href="../privacy.html" class="hover:text-kaede-text no-underline">Privacy</a>
+    </div>
+  </footer>
+</body>
+</html>

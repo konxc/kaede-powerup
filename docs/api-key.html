@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Key &amp; Token Trello — KAEDE Docs</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .prose { max-width: 720px; line-height: 1.7; color: #8888a0; }
+    .prose h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; color: #e2e2e8; }
+    .prose h2 { font-size: 1.25rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; color: #e2e2e8; }
+    .prose h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #e2e2e8; }
+    .prose p { margin-bottom: 1rem; }
+    .prose ol, .prose ul { padding-left: 1.5rem; margin-bottom: 1rem; }
+    .prose ol { list-style: decimal; }
+    .prose ul { list-style: disc; }
+    .prose li { margin-bottom: 0.35rem; }
+    .prose strong { color: #e2e2e8; font-weight: 600; }
+    .prose a { color: #6c5ce7; text-decoration: underline; }
+    .prose code { background: #13141a; padding: 0.1em 0.3em; border-radius: 4px; font-size: 0.875em; color: #c0c0d0; }
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 999px; background: rgba(108,92,231,0.2); color: #6c5ce7; font-size: 12px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+  </style>
+</head>
+<body class="bg-kaede-bg font-sans antialiased min-h-screen">
+  <nav class="nav-blur fixed top-0 inset-x-0 z-50 border-b border-kaede-border/50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+      <a href="../" class="flex items-center gap-2 no-underline">
+        <span class="flex items-center justify-center size-7 rounded-md bg-kaede-primary text-white text-xs font-bold">K</span>
+        <span class="font-semibold text-sm tracking-wide">KAEDE</span>
+      </a>
+      <div class="flex items-center gap-6 text-xs font-medium text-kaede-muted">
+        <a href="../" class="hover:text-kaede-primary transition-colors no-underline">Beranda</a>
+        <a href="." class="hover:text-kaede-primary transition-colors no-underline">Dokumentasi</a>
+        <a href="../privacy.html" class="hover:text-kaede-primary transition-colors no-underline">Privacy</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Dokumentasi</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Ikhtisar</a>
+          <a href="api-key" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">API Key &amp; Token</a>
+          <a href="mcp-server" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode Integrasi</a>
+          <a href="tools" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Referensi Tools</a>
+        </nav>
+      </aside>
+
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Dokumentasi</a>
+              <span>/</span>
+              <span>API Key &amp; Token</span>
+            </p>
+            <h1>Mendapatkan Trello API Key &amp; Token</h1>
+            <p>
+              Untuk menghubungkan AI Agent dengan Trello, kamu memerlukan dua kredensial:
+              <strong>API Key</strong> dan <strong>Token</strong>. Keduanya didapatkan melalui
+              Trello Power-Up Admin.
+            </p>
+
+            <div class="not-prose p-4 rounded-xl bg-kaede-warning/10 border border-kaede-warning/20 mb-6">
+              <p class="text-sm text-kaede-warning font-medium">Prasyarat</p>
+              <ul class="text-xs text-kaede-muted mt-1 space-y-1">
+                <li>Akun Trello (gratis)</li>
+                <li>Akses ke <a href="https://trello.com/power-ups/admin" target="_blank" class="text-kaede-warning underline">Trello Power-Up Admin</a></li>
+              </ul>
+            </div>
+
+            <h2>Metode 1: Melalui Power-Up Admin (Direkomendasikan)</h2>
+
+            <div class="not-prose space-y-4">
+              <div class="flex items-start gap-3">
+                <span class="step-num">1</span>
+                <div>
+                  <p class="text-sm font-medium text-kaede-text">Buka Trello Power-Up Admin</p>
+                  <p class="text-xs text-kaede-muted">Kunjungi <a href="https://trello.com/power-ups/admin" target="_blank" class="text-kaede-primary underline">trello.com/power-ups/admin</a> dan login dengan akun Trello kamu.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="step-num">2</span>
+                <div>
+                  <p class="text-sm font-medium text-kaede-text">Buat Power-Up Baru</p>
+                  <p class="text-xs text-kaede-muted">Klik tombol <strong class="text-kaede-text">New</strong>. Isi formulir:</p>
+                  <ul class="text-xs text-kaede-muted mt-1 space-y-0.5">
+                    <li><strong class="text-kaede-text">Integration Name:</strong> <code class="text-[10px]">KAEDE - Tim Koneksi</code></li>
+                    <li><strong class="text-kaede-text">Email:</strong> Email tim Koneksi</li>
+                    <li><strong class="text-kaede-text">Support:</strong> URL repositori atau email</li>
+                    <li><strong class="text-kaede-text">Name:</strong> Nama Power-Up</li>
+                  </ul>
+                  <p class="text-xs text-kaede-muted mt-1">Pilih Trello instance yang sesuai, lalu klik <strong class="text-kaede-text">Create</strong>.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="step-num">3</span>
+                <div>
+                  <p class="text-sm font-medium text-kaede-text">Generate API Key</p>
+                  <p class="text-xs text-kaede-muted">Di halaman Power-Up yang sudah dibuat, navigasi ke tab <strong class="text-kaede-text">API Key</strong>. Klik tombol <strong class="text-kaede-text">Generate</strong> untuk mendapatkan API Key. <strong class="text-kaede-text">Salin API Key</strong> — kamu akan membutuhkannya nanti.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="step-num">4</span>
+                <div>
+                  <p class="text-sm font-medium text-kaede-text">Generate Token</p>
+                  <p class="text-xs text-kaede-muted">Di halaman yang sama, cari link <strong class="text-kaede-text">manually generate a Token</strong> (biasanya di samping deskripsi API Key). Klik link tersebut.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="step-num">5</span>
+                <div>
+                  <p class="text-sm font-medium text-kaede-text">Authorize</p>
+                  <p class="text-xs text-kaede-muted">Halaman Trello authorization akan terbuka. Klik tombol <strong class="text-kaede-text">Allow</strong> untuk memberikan akses ke akun Trello kamu.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="step-num">6</span>
+                <div>
+                  <p class="text-sm font-medium text-kaede-text">Salin Token</p>
+                  <p class="text-xs text-kaede-muted">Setelah di-allow, kamu akan melihat string Token. <strong class="text-kaede-text">Salin token tersebut</strong> dan simpan bersama API Key.</p>
+                </div>
+              </div>
+            </div>
+
+            <h2>Metode 2: Cara Cepat</h2>
+            <p>Jika sudah punya Power-Up, langsung buka:</p>
+            <ol>
+              <li>Kunjungi <a href="https://trello.com/app-key" target="_blank">trello.com/app-key</a></li>
+              <li>Salin <strong>API Key</strong> dari halaman tersebut</li>
+              <li>Klik link <strong>Token</strong> untuk generate token</li>
+              <li>Klik <strong>Allow</strong> dan salin token yang muncul</li>
+            </ol>
+
+            <h2>Yang Perlu Diingat</h2>
+            <ul>
+              <li><strong>API Key</strong> dan <strong>Token</strong> bersifat rahasia — jangan commit ke git atau bagikan di publik</li>
+              <li>Token bisa di-revoke kapan saja dari halaman Power-Up Admin</li>
+              <li>Jika token expired, ulangi langkah generate token</li>
+              <li>Simpan kredensial di <code class="text-[10px]">.env</code> file atau <code class="text-[10px]">~/.config/dev/*.env</code></li>
+            </ul>
+
+            <div class="not-prose p-4 rounded-xl bg-kaede-surface border border-kaede-border mt-6">
+              <p class="text-xs font-semibold text-kaede-text uppercase tracking-wider mb-2">Contoh .env</p>
+              <div class="code-block text-[11px]">
+                <span class="cm"># Trello API credentials</span><br/>
+                TRELLO_API_KEY=<span class="str">your-api-key-here</span><br/>
+                TRELLO_TOKEN=<span class="str">your-token-here</span>
+              </div>
+            </div>
+
+            <h2>Langkah Selanjutnya</h2>
+            <p>
+              Setelah mendapatkan API Key dan Token, lanjutkan ke panduan
+              <a href="mcp-server">Setup MCP Server</a> untuk mengonfigurasi server Trello MCP.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="." class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Ikhtisar
+          </a>
+          <a href="mcp-server" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            MCP Server
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+      <a href="." class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Ikhtisar</span></a>
+      <a href="api-key" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key</span></a>
+      <a href="mcp-server" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP</span></a>
+      <a href="opencode" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+      <a href="tools" class="flex flex-col items-center gap-0.5 no-underline hover:text-kaede-text"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg><span>Tools</span></a>
+    </div>
+  </div>
+
+  <footer class="border-t border-kaede-border/50 py-6 px-4 sm:px-6 mb-12 lg:mb-0">
+    <div class="max-w-6xl mx-auto text-center text-xs text-kaede-muted">
+      &copy; 2026 PT Koneksi Jaringan Indonesia &middot; <a href="../privacy.html" class="hover:text-kaede-text no-underline">Privacy</a>
+    </div>
+  </footer>
+</body>
+</html>
