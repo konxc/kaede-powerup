@@ -3,5 +3,8 @@ css/
 .playwright-mcp/
 .netlify
 dist-docs/
+# Environment variables (API keys, tokens)
+.env
+secrets.env
 # Personal knowledge base
 .openkb/PERSONAL/
