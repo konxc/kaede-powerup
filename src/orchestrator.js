@@ -10,9 +10,9 @@ import { resolve } from 'path';
 import { TrelloMCPClient } from './trello-client.js';
 
 const SECTION_MAP = {
-  roles: ['peran', 'role', 'roles & responsibilities', 'team roles', 'siapa saja'],
+  roles: ['peran', 'role', 'roles & responsibilities', 'team roles', 'roles', 'siapa saja'],
   workflow: ['alur', 'workflow', 'sprint workflow', 'kanban', 'sprint'],
-  conventions: ['konvensi', 'nama', 'naming', 'standards', 'aturan'],
+  conventions: ['konvensi', 'nama', 'naming', 'standards', 'aturan', 'conventions', 'convention'],
 };
 
 function mapSection(title) {
@@ -49,7 +49,6 @@ export function parsePlaybook(content) {
     const h2 = line.match(/^##\s+(.+)/);
     const h3 = line.match(/^###\s+(.+)/);
     const listItem = line.match(/^[-*]\s+\*\*(.+?)\*\*:\s*(.*)/);
-    const numberedItem = line.match(/^\d+\.\s+\*\*(.+?)\*\*/);
 
     if (h1 && !result.title) {
       result.title = h1[1].trim();
@@ -80,10 +79,13 @@ export function parsePlaybook(content) {
       }
     }
 
-    if (currentSection === 'workflow' && (listItem || numberedItem)) {
-      const listName = (listItem || numberedItem)[1].replace(/^\d+\./, '').trim();
-      if (listName && !result.workflow.lists.includes(listName)) {
-        result.workflow.lists.push(listName);
+    if (currentSection === 'workflow') {
+      const wfListLine = line.match(/^[-*\d]+\.?\s+\*\*(.+?)\*\*/);
+      if (wfListLine) {
+        const listName = wfListLine[1].trim();
+        if (listName && !result.workflow.lists.includes(listName)) {
+          result.workflow.lists.push(listName);
+        }
       }
     }
 

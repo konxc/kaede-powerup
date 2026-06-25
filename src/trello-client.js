@@ -13,13 +13,14 @@ const MAX_RETRIES = 3;
 const BASE_DELAY = 1000;
 
 export class TrelloMCPClient {
-  constructor(serverPath) {
+  constructor(serverPath, timeout = REQUEST_TIMEOUT) {
     this.serverPath = serverPath || resolve(process.cwd(), 'dist', 'mcp-server.js');
     this.rpcId = 0;
     this.pending = new Map();
     this.process = null;
     this.rl = null;
     this._exited = false;
+    this.requestTimeout = timeout;
   }
 
   async connect(retries = MAX_RETRIES) {
@@ -70,8 +71,9 @@ export class TrelloMCPClient {
         this._exited = true;
         if (this.pending.size > 0) {
           const errMsg = `MCP server exited with code ${code}`;
-          for (const [, { reject: rej }] of this.pending) {
-            rej(new Error(errMsg));
+          for (const [, entry] of this.pending) {
+            clearTimeout(entry.timer);
+            entry.reject(new Error(errMsg));
           }
           this.pending.clear();
         }
@@ -93,8 +95,8 @@ export class TrelloMCPClient {
       const id = ++this.rpcId;
       const timer = setTimeout(() => {
         this.pending.delete(id);
-        reject(new Error(`RPC timeout for ${method} (${REQUEST_TIMEOUT}ms)`));
-      }, REQUEST_TIMEOUT);
+        reject(new Error(`RPC timeout for ${method} (${this.requestTimeout}ms)`));
+      }, this.requestTimeout);
       this.pending.set(id, { resolve, reject, timer });
       const msg = { jsonrpc: '2.0', id, method, params };
       this.process.stdin.write(JSON.stringify(msg) + '\n');

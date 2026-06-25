@@ -15,7 +15,10 @@
     "kaede:setup": "node scripts/kaede.mjs setup",
     "kaede:today": "node scripts/kaede.mjs today",
     "kaede:status": "node scripts/kaede.mjs status",
-    "kaede:env": "node scripts/kaede.mjs env"
+    "kaede:env": "node scripts/kaede.mjs env",
+    "test": "node --test test/*.test.js",
+    "test:orchestrator": "node --test test/orchestrator.test.js",
+    "test:trello": "node --test test/trello-client.test.js"
   },
   "bin": {
     "kaede": "./scripts/kaede.mjs"
