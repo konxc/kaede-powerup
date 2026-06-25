@@ -21,3 +21,16 @@ Format:
 **Konsekuensi**:
 - (+) Dokumentasi terpusat untuk management akses
 - (+) Memudahkan onboarding anggota baru
+
+---
+
+## 2026-06-25 — KAEDE Architecture & Roadmap (Dokumentasi Mendalam)
+
+**Status**: Accepted
+**Pemutus**: Sandikodev
+**Konteks**: Setelah eksplorasi penuh codebase KAEDE + pull kerja tim sebelah (MCP server + CLI), dibutuhkan dokumentasi utuh yang menangkap: visi arsitektur, status tiap file, gap analysis, dan roadmap implementasi. Dokumentasi ini akan jadi acuan agent & developer agar tidak tumpang-tindih / salah paham.
+**Keputusan**: Tambahkan entry decision-log ini + buat docs/kaede-architecture.md sebagai referensi teknis lengkap.
+**Konsekuensi**:
+- (+) Semua stakeholder punya referensi tunggal (source of truth)
+- (+) Mencegah duplikasi usaha & misunderstanding arsitektur
+- (+) Memudahkan onboarding developer baru ke project KAEDE
