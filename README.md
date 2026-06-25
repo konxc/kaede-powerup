@@ -64,20 +64,9 @@
 │   ├── mcp-server.md    # Setup Trello MCP Server
 │   ├── opencode.md      # Integrasi OpenCode
 │   ├── tools.md         # Referensi tools MCP
-│   └── privacy.md       # Kebijakan privasi
-├── scripts/
-│   ├── kaede.mjs        # CLI tool (setup, today, init, env, status)
-│   ├── mcp-server.js    # MCP server (source, compiled to dist/)
-│   └── build-docs.mjs   # Build docs: Markdown → HTML
-│
-├── docs/
-│   ├── index.md         # Ikhtisar dokumentasi
-│   ├── api-key.md       # Panduan API Key & Token Trello
-│   ├── mcp-server.md    # Setup Trello MCP Server
-│   ├── opencode.md      # Integrasi dengan Opencode
-│   ├── tools.md         # Referensi tools MCP
 │   ├── role-management.md # Role definitions & AI Agent integration
-│   └── privacy.md       # Kebijakan privasi
+│   ├── kaede-architecture.md # Arsitektur & roadmap lengkap
+│   └── playbook-template.md # Template playbook universal
 │
 ├── .opencode/
 │   ├── opencode.json    # Konfigurasi AI Agent
@@ -86,6 +75,11 @@
 ├── secrets.env          # Trello credentials (gitignored)
 ├── netlify.toml         # Konfigurasi deploy Netlify
 └── package.json         # Build scripts + CLI entry
+=======
+├── scripts/
+│   ├── kaede.mjs        # CLI tool (setup, today, init, push, env, status)
+│   └── build-docs.mjs   # Build docs: Markdown → HTML
+>>>>>>> f9fed721 (feat: replace MCP wrapper with compiled server, add KAEDE CLI)
 ```
 
 ---
