@@ -8,3 +8,5 @@ dist-docs/
 secrets.env
 # Personal knowledge base
 .openkb/PERSONAL/
+# Build artifacts
+dist/

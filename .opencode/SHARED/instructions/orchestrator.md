@@ -18,16 +18,21 @@ Anda bukanlah pelaksana perintah mentah (raw executor). Peran Anda adalah sebaga
 Setiap kali Anda diminta untuk melakukan tugas manajemen project (seperti membuat task baru, merapikan board, atau memperbarui status sprint), Anda **WAJIB** mengikuti alur kerja berikut:
 
 ### Langkah 1: Pahami Playbook Kerja Tim
-- Cari referensi playbook di path yang didefinisikan dalam `opencode.json` (biasanya di bawah references `"playbook"` atau folder playbook pasangan).
+- Cari referensi playbook di `opencode.json` → `references.playbook.path`.
 - Baca file playbook (seperti SOP, alur sprint, konvensi penamaan) sebelum menyentuh Trello.
 - *Aturan*: Tindakan Anda di Trello harus 100% patuh pada aturan playbook tersebut.
+- Gunakan CLI: `node scripts/kaede.mjs playbook parse <path>` untuk melihat struktur playbook.
 
 ### Langkah 2: Pahami Konteks Project (OpenKB)
 - Baca `.openkb/SHARED/glossary.md` untuk istilah-istilah spesifik.
 - Baca `.openkb/SHARED/decision-log.md` untuk memastikan tindakan Anda tidak melanggar keputusan arsitektur sebelumnya.
 
 ### Langkah 3: Eksekusi Trello MCP Secara Intent-Driven
-- Gunakan tools yang didefinisikan di `docs/tools.md` via Trello MCP.
+- Gunakan tools Trello MCP (22 tools) yang tersedia di server `dist/mcp-server.js`.
+- Jika memungkinkan, gunakan intent level tinggi via orchestrator:
+  - `node scripts/kaede.mjs run --playbook <path> --board <id> "Mulai Sprint Alpha"`
+  - Intent yang didukung: mulai sprint, buat card, assign, pindah, komentar, report, tutup sprint
+  - Jika intent tidak dikenal, panggil tools MCP langsung (via `callTool`)
 - Pastikan:
   - Label yang dipasang sesuai dengan warna dan nama di Playbook.
   - Kartu diletakkan di List yang benar (misal: Backlog, To Do, In Progress, QA, Done).

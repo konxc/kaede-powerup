@@ -714,21 +714,8 @@ async function cmdPlaybook() {
   const content = readFileSync(path, 'utf-8');
 
   if (subcmd === 'parse') {
-    // Parse headings and roles
-    const lines = content.split('\n');
-    const sections = [];
-    let current = null;
-    for (const line of lines) {
-      const h2 = line.match(/^##\s+(.+)/);
-      const h3 = line.match(/^###\s+(.+)/);
-      if (h2) {
-        if (current) sections.push(current);
-        current = { type: 'h2', title: h2[1], children: [] };
-      } else if (h3 && current) {
-        current.children.push({ type: 'h3', title: h3[1] });
-      }
-    }
-    if (current) sections.push(current);
+    const { parsePlaybook } = await import(resolve(process.cwd(), 'src', 'orchestrator.js'));
+    const result = parsePlaybook(content);
 
     console.log('');
     console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
@@ -736,14 +723,22 @@ async function cmdPlaybook() {
     console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
     console.log('');
     console.log(`  \x1b[90m  File: ${path}\x1b[0m`);
-    console.log(`  \x1b[90m  Sections: ${sections.length}\x1b[0m`);
+    console.log(`  \x1b[90m  Title: ${result.title || '(none)'}\x1b[0m`);
+    console.log(`  \x1b[90m  Roles: ${result.roles.length}\x1b[0m`);
+    console.log(`  \x1b[90m  Workflow lists: ${result.workflow.lists.length}\x1b[0m`);
+    console.log(`  \x1b[90m  Labels: ${result.conventions.labels.length}\x1b[0m`);
     console.log('');
-    for (const s of sections) {
-      console.log(`  \x1b[36m  ${s.type === 'h2' ? '##' : '###'} ${s.title}\x1b[0m`);
-      if (s.children && s.children.length > 0) {
-        for (const c of s.children) {
-          console.log(`     \x1b[90m  ### ${c.title}\x1b[0m`);
-        }
+    for (const role of result.roles) {
+      console.log(`  \x1b[36m  Role: ${role.name}\x1b[0m`);
+      for (const r of role.responsibilities) {
+        console.log(`     \x1b[90m  • ${r}\x1b[0m`);
+      }
+    }
+    if (result.workflow.lists.length > 0) {
+      console.log('');
+      console.log('  \x1b[36m  Workflow:\x1b[0m');
+      for (const list of result.workflow.lists) {
+        console.log(`     \x1b[90m  ${list}\x1b[0m`);
       }
     }
     console.log('');
@@ -856,19 +851,29 @@ async function cmdRun() {
       console.log('');
       console.log('  \x1b[36m  Executing intent...\x1b[0m');
       
-      const boardId = getOpt('--board');
+      let boardId = getOpt('--board');
       if (!boardId) {
-        console.log('  \x1b[33m  ⚠  No board ID provided. Skipping actual execution.\x1b[0m');
-        console.log('  \x1b[90m     Add --board <boardId> to execute actions.\x1b[0m');
-      } else {
-        const results = await executeIntent(client, intent, playbook, boardId);
-        console.log('');
-        for (const r of results) {
-          if (r.success) {
-            console.log(`  \x1b[32m  ✓ ${r.type}: ${r.name}\x1b[0m`);
-          } else {
-            console.log(`  \x1b[31m  ✗ ${r.type}: ${r.name} — ${r.error}\x1b[0m`);
+        console.log('  \x1b[33m  ⚠  No --board provided. Auto-detecting...\x1b[0m');
+        try {
+          const boards = await client.listBoards();
+          if (boards.length === 0) {
+            console.log('  \x1b[31m  ✗ No boards found. Cannot execute.\x1b[0m');
+            return;
           }
+          boardId = boards[0].id;
+          console.log(`  \x1b[32m  ✓ Using board: ${boards[0].name} (${boardId})\x1b[0m`);
+        } catch (err) {
+          console.log(`  \x1b[31m  ✗ Failed to auto-detect board: ${err.message}\x1b[0m`);
+          return;
+        }
+      }
+      const results = await executeIntent(client, intent, playbook, boardId);
+      console.log('');
+      for (const r of results) {
+        if (r.success) {
+          console.log(`  \x1b[32m  ✓ ${r.type}: ${r.name}\x1b[0m`);
+        } else {
+          console.log(`  \x1b[31m  ✗ ${r.type}: ${r.name} — ${r.error}\x1b[0m`);
         }
       }
       

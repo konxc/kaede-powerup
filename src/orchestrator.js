@@ -1,6 +1,6 @@
 /**
  * KAEDE Orchestrator — Lapisan kecerdasan di atas Trello MCP
- * 
+ *
  * Membaca Playbook untuk memahami workflow, lalu mengeksekusi
  * serangkaian tindakan Trello berdasarkan intent pengguna.
  */
@@ -9,9 +9,24 @@ import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { TrelloMCPClient } from './trello-client.js';
 
+const SECTION_MAP = {
+  roles: ['peran', 'role', 'roles & responsibilities', 'team roles', 'siapa saja'],
+  workflow: ['alur', 'workflow', 'sprint workflow', 'kanban', 'sprint'],
+  conventions: ['konvensi', 'nama', 'naming', 'standards', 'aturan'],
+};
+
+function mapSection(title) {
+  const lower = title.toLowerCase();
+  for (const [key, keywords] of Object.entries(SECTION_MAP)) {
+    if (keywords.some(k => lower.includes(k))) return key;
+  }
+  return null;
+}
+
 export function parsePlaybook(content) {
   const lines = content.split('\n');
   const result = {
+    title: '',
     roles: [],
     workflow: { lists: [] },
     conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
@@ -19,22 +34,30 @@ export function parsePlaybook(content) {
 
   let currentSection = null;
   let currentRole = null;
+  let inCodeBlock = false;
 
-  for (const line of lines) {
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+
+    if (line.startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+
+    const h1 = line.match(/^#\s+(.+)/);
     const h2 = line.match(/^##\s+(.+)/);
     const h3 = line.match(/^###\s+(.+)/);
     const listItem = line.match(/^[-*]\s+\*\*(.+?)\*\*:\s*(.*)/);
-    const codeBlock = line.match(/^```/);
+    const numberedItem = line.match(/^\d+\.\s+\*\*(.+?)\*\*/);
+
+    if (h1 && !result.title) {
+      result.title = h1[1].trim();
+      continue;
+    }
 
     if (h2) {
-      currentSection = h2[1].toLowerCase();
-      if (currentSection.includes('peran') || currentSection.includes('role')) {
-        currentSection = 'roles';
-      } else if (currentSection.includes('alur') || currentSection.includes('workflow')) {
-        currentSection = 'workflow';
-      } else if (currentSection.includes('konvensi') || currentSection.includes('nama')) {
-        currentSection = 'conventions';
-      }
+      currentSection = mapSection(h2[1]);
       continue;
     }
 
@@ -57,27 +80,19 @@ export function parsePlaybook(content) {
       }
     }
 
-    if (currentSection === 'workflow' && (listItem || line.match(/^\d+\.\s+\*\*(.+?)\*\*/))) {
-      let listName = '';
-      if (listItem) {
-        listName = listItem[1].replace(/^\d+\./, '').trim();
-      } else {
-        const numbered = line.match(/^\d+\.\s+\*\*(.+?)\*\*/);
-        if (numbered) listName = numbered[1].trim();
-      }
+    if (currentSection === 'workflow' && (listItem || numberedItem)) {
+      const listName = (listItem || numberedItem)[1].replace(/^\d+\./, '').trim();
       if (listName && !result.workflow.lists.includes(listName)) {
         result.workflow.lists.push(listName);
       }
     }
 
     if (currentSection === 'conventions') {
-      if (line.match(/`feat:|`fix:|`docs:|`chore:/)) {
-        const prefixes = line.match(/`(feat|fix|docs|chore):/g);
-        if (prefixes) {
-          result.conventions.titlePrefixes = prefixes.map(p => p.replace(/`/g, ''));
-        }
+      const prefixMatch = line.match(/`(feat|fix|docs|chore|refactor|test):/g);
+      if (prefixMatch) {
+        result.conventions.titlePrefixes = prefixMatch.map(p => p.replace(/`/g, ''));
       }
-      if (line.match(/Merah:|Kuning:|Hijau:/)) {
+      if (line.match(/merah:|kuning:|hijau:|red:|yellow:|green:/i)) {
         const labelMatch = line.match(/(\w+):\s*(.+)/);
         if (labelMatch) {
           result.conventions.labels.push({ color: labelMatch[1], meaning: labelMatch[2] });
@@ -90,24 +105,158 @@ export function parsePlaybook(content) {
   return result;
 }
 
-export async function executeIntent(client, intent, playbookContext, boardId) {
-  const actions = [];
+// ── Intent Handlers ──
+
+const intentHandlers = [];
+
+function onIntent(patterns, fn) {
+  intentHandlers.push({ patterns: patterns.map(p => p.toLowerCase()), fn });
+}
+
+onIntent(['mulai sprint', 'setup sprint'], async (client, pb, boardId) => {
   const results = [];
-  
-  if (intent.toLowerCase().includes('mulai sprint') || intent.toLowerCase().includes('setup sprint')) {
-    const { lists } = playbookContext.workflow;
-    
-    for (const listName of lists) {
-      try {
-        const result = await client.createList(boardId, listName);
-        results.push({ success: true, type: 'create_list', name: listName, result });
-      } catch (err) {
-        results.push({ success: false, type: 'create_list', name: listName, error: err.message });
-      }
+  for (const listName of pb.workflow.lists) {
+    try {
+      const r = await client.createList(boardId, listName);
+      results.push({ success: true, type: 'create_list', name: listName, result: r });
+    } catch (err) {
+      results.push({ success: false, type: 'create_list', name: listName, error: err.message });
+    }
+  }
+  return results;
+});
+
+onIntent(['buat card', 'buat kartu', 'create card', 'tambah task', 'new task'], async (client, pb, boardId, args) => {
+  const name = args.task || args.name || 'New Task';
+  const desc = args.desc || args.description || '';
+  const listName = args.list || pb.workflow.lists[0];
+  const listId = args.listId || '';
+
+  if (listId) {
+    try {
+      const r = await client.createCard(listId, name, desc);
+      return [{ success: true, type: 'create_card', name: r.name }];
+    } catch (err) {
+      return [{ success: false, type: 'create_card', name, error: err.message }];
     }
   }
 
+  const lists = await client.getLists(boardId);
+  const target = lists.find(l => l.name.toLowerCase() === (listName || '').toLowerCase());
+  if (!target) {
+    return [{ success: false, type: 'create_card', name, error: `List "${listName}" not found` }];
+  }
+  try {
+    const r = await client.createCard(target.id, name, desc);
+    return [{ success: true, type: 'create_card', name: r.name }];
+  } catch (err) {
+    return [{ success: false, type: 'create_card', name, error: err.message }];
+  }
+});
+
+onIntent(['assign', 'tugaskan', 'tambahkan anggota'], async (client, pb, boardId, args) => {
+  const memberId = args.memberId || args.member || '';
+  const cardId = args.cardId || args.card || '';
+
+  if (!memberId || !cardId) {
+    return [{ success: false, type: 'assign_member', name: 'missing args', error: 'memberId and cardId required' }];
+  }
+  try {
+    await client.assignMember(cardId, memberId);
+    return [{ success: true, type: 'assign_member', name: `Member ${memberId} → Card ${cardId}` }];
+  } catch (err) {
+    return [{ success: false, type: 'assign_member', name: `${memberId} → ${cardId}`, error: err.message }];
+  }
+});
+
+onIntent(['tutup sprint', 'close sprint', 'archive sprint'], async (client, pb, boardId) => {
+  const results = [];
+  const lists = await client.getLists(boardId);
+  const toArchive = lists.filter(l =>
+    ['done', 'selesai', 'qa', 'code review', 'qa/code review'].some(k => l.name.toLowerCase().includes(k))
+  );
+  for (const list of toArchive) {
+    try {
+      const cards = await client.callTool('get_cards_by_list_id', { listId: list.id });
+      for (const card of (cards.cards || [])) {
+        try {
+          await client.callTool('archive_card', { cardId: card.id });
+          results.push({ success: true, type: 'archive_card', name: card.name });
+        } catch (err) {
+          results.push({ success: false, type: 'archive_card', name: card.name, error: err.message });
+        }
+      }
+    } catch (err) {
+      results.push({ success: false, type: 'get_cards', name: list.name, error: err.message });
+    }
+  }
   return results;
+});
+
+onIntent(['pindah', 'move card', 'pindahkan'], async (client, pb, boardId, args) => {
+  const cardId = args.cardId || args.card || '';
+  const listId = args.listId || args.list || '';
+  const listName = args.listName || '';
+
+  if (!cardId || (!listId && !listName)) {
+    return [{ success: false, type: 'move_card', name: 'missing args', error: 'cardId and listId/listName required' }];
+  }
+
+  let targetListId = listId;
+  if (!targetListId && listName) {
+    const lists = await client.getLists(boardId);
+    const target = lists.find(l => l.name.toLowerCase() === listName.toLowerCase());
+    if (!target) return [{ success: false, type: 'move_card', name: cardId, error: `List "${listName}" not found` }];
+    targetListId = target.id;
+  }
+
+  try {
+    await client.callTool('move_card', { cardId, listId: targetListId });
+    return [{ success: true, type: 'move_card', name: `Card ${cardId} → List ${targetListId}` }];
+  } catch (err) {
+    return [{ success: false, type: 'move_card', name: cardId, error: err.message }];
+  }
+});
+
+onIntent(['komentar', 'comment', 'tambah komentar'], async (client, pb, boardId, args) => {
+  const cardId = args.cardId || args.card || '';
+  const text = args.text || args.comment || '';
+
+  if (!cardId || !text) {
+    return [{ success: false, type: 'add_comment', name: 'missing args', error: 'cardId and text required' }];
+  }
+  try {
+    await client.callTool('add_comment', { cardId, text });
+    return [{ success: true, type: 'add_comment', name: `Comment on ${cardId}` }];
+  } catch (err) {
+    return [{ success: false, type: 'add_comment', name: cardId, error: err.message }];
+  }
+});
+
+onIntent(['report', 'progress', 'my cards', 'kartu saya'], async (client, pb, boardId) => {
+  try {
+    const r = await client.callTool('get_my_cards', {});
+    const cards = r.cards || [];
+    const grouped = {};
+    for (const c of cards) {
+      const listName = c.listId || 'Unknown';
+      if (!grouped[listName]) grouped[listName] = [];
+      grouped[listName].push(c);
+    }
+    return [{ success: true, type: 'report', name: `Found ${cards.length} cards assigned to you`, detail: grouped }];
+  } catch (err) {
+    return [{ success: false, type: 'report', name: 'failed', error: err.message }];
+  }
+});
+
+export async function executeIntent(client, intent, playbookContext, boardId, extraArgs = {}) {
+  const lower = intent.toLowerCase();
+  for (const h of intentHandlers) {
+    if (h.patterns.some(p => lower.includes(p))) {
+      return h.fn(client, playbookContext, boardId, extraArgs);
+    }
+  }
+  return [{ success: false, type: 'unknown_intent', name: intent, error: 'No handler matched. Try: mulai sprint, buat card, assign, pindah, komentar, report' }];
 }
 
 export function bundleContext(paths) {

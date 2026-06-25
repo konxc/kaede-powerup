@@ -1,12 +1,14 @@
 /**
  * Trello MCP Client — Wrapper untuk komunikasi dengan Trello MCP Server
- * 
+ *
  * Menggunakan stdio JSON-RPC 2.0 untuk berkomunikasi dengan dist/mcp-server.js
  */
 
 import { spawn } from 'child_process';
 import { resolve } from 'path';
 import { createInterface } from 'readline';
+
+const REQUEST_TIMEOUT = 15000;
 
 export class TrelloMCPClient {
   constructor(serverPath) {
@@ -32,7 +34,8 @@ export class TrelloMCPClient {
         try {
           const msg = JSON.parse(line);
           if (msg.id !== undefined && this.pending.has(msg.id)) {
-            const { resolve: res, reject: rej } = this.pending.get(msg.id);
+            const { resolve: res, reject: rej, timer } = this.pending.get(msg.id);
+            clearTimeout(timer);
             this.pending.delete(msg.id);
             if (msg.error) {
               rej(new Error(msg.error.message));
@@ -41,11 +44,21 @@ export class TrelloMCPClient {
             }
           }
         } catch {
+          // non-JSON line — skip silently
         }
       });
 
       this.process.on('error', reject);
-      
+
+      this.process.on('exit', (code) => {
+        if (code !== 0 && this.pending.size > 0) {
+          for (const [, { reject: rej }] of this.pending) {
+            rej(new Error(`MCP server exited with code ${code}`));
+          }
+          this.pending.clear();
+        }
+      });
+
       this.sendRequest('initialize', {
         protocolVersion: '2024-11-05',
         capabilities: {},
@@ -60,7 +73,11 @@ export class TrelloMCPClient {
   sendRequest(method, params = {}) {
     return new Promise((resolve, reject) => {
       const id = ++this.rpcId;
-      this.pending.set(id, { resolve, reject });
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`RPC timeout for ${method} (${REQUEST_TIMEOUT}ms)`));
+      }, REQUEST_TIMEOUT);
+      this.pending.set(id, { resolve, reject, timer });
       const msg = { jsonrpc: '2.0', id, method, params };
       this.process.stdin.write(JSON.stringify(msg) + '\n');
     });
@@ -83,40 +100,104 @@ export class TrelloMCPClient {
     return result;
   }
 
-  async getBoardMembers(boardId) {
-    const result = await this.callTool('get_board_members', { boardId });
-    return result.members || [];
+  // ── Boards ──
+
+  async listBoards() {
+    const r = await this.callTool('list_boards', {});
+    return r.boards || [];
   }
 
-  async getBoardLabels(boardId) {
-    const result = await this.callTool('get_board_labels', { boardId });
-    return result.labels || [];
+  async listWorkspaces() {
+    const r = await this.callTool('list_workspaces', {});
+    return r.workspaces || [];
   }
 
-  async createLabel(boardId, name, color) {
-    const result = await this.callTool('create_label', { boardId, name, color });
-    return result;
+  async createBoard(name, opts = {}) {
+    return this.callTool('create_board', { name, ...opts });
   }
+
+  // ── Lists ──
 
   async getLists(boardId) {
-    const result = await this.callTool('get_lists', { boardId });
-    return result.lists || [];
+    const r = await this.callTool('get_lists', { boardId });
+    return r.lists || [];
   }
 
   async createList(boardId, name) {
-    const result = await this.callTool('add_list_to_board', { boardId, name });
-    return result;
+    return this.callTool('add_list_to_board', { boardId, name });
   }
 
-  async getCard(cardId) {
-    const result = await this.callTool('get_card', { cardId });
-    return result;
+  async archiveList(listId) {
+    return this.callTool('archive_list', { listId });
+  }
+
+  // ── Cards ──
+
+  async getMyCards() {
+    const r = await this.callTool('get_my_cards', {});
+    return r.cards || [];
+  }
+
+  async getCardsByListId(listId, boardId) {
+    const r = await this.callTool('get_cards_by_list_id', { listId, boardId });
+    return r.cards || [];
+  }
+
+  async getCard(cardId, includeMarkdown) {
+    return this.callTool('get_card', { cardId, includeMarkdown });
+  }
+
+  async createCard(listId, name, description = '', labels = []) {
+    return this.callTool('add_card_to_list', { listId, name, description, labels });
   }
 
   async updateCard(cardId, updates) {
-    const result = await this.callTool('update_card_details', { cardId, ...updates });
-    return result;
+    return this.callTool('update_card_details', { cardId, ...updates });
   }
+
+  async moveCard(cardId, listId, boardId) {
+    return this.callTool('move_card', { cardId, listId, boardId });
+  }
+
+  async archiveCard(cardId) {
+    return this.callTool('archive_card', { cardId });
+  }
+
+  // ── Members ──
+
+  async getBoardMembers(boardId) {
+    const r = await this.callTool('get_board_members', { boardId });
+    return r.members || [];
+  }
+
+  async assignMember(cardId, memberId) {
+    return this.callTool('assign_member_to_card', { cardId, memberId });
+  }
+
+  async removeMember(cardId, memberId) {
+    return this.callTool('remove_member_from_card', { cardId, memberId });
+  }
+
+  // ── Labels ──
+
+  async getBoardLabels(boardId) {
+    const r = await this.callTool('get_board_labels', { boardId });
+    return r.labels || [];
+  }
+
+  async createLabel(boardId, name, color) {
+    return this.callTool('create_label', { boardId, name, color });
+  }
+
+  async updateLabel(labelId, name, color) {
+    return this.callTool('update_label', { labelId, name, color });
+  }
+
+  async deleteLabel(labelId) {
+    return this.callTool('delete_label', { labelId });
+  }
+
+  // ── Labels (composite operations) ──
 
   async addLabelToCard(cardId, labelId) {
     const card = await this.getCard(cardId);
@@ -135,14 +216,15 @@ export class TrelloMCPClient {
     await this.updateCard(cardId, { labels: labelIds });
   }
 
-  async createCard(listId, name, description = '', labels = []) {
-    const result = await this.callTool('add_card_to_list', { listId, name, description, labels });
-    return result;
+  // ── Comments ──
+
+  async addComment(cardId, text) {
+    return this.callTool('add_comment', { cardId, text });
   }
 
-  async assignMember(cardId, memberId) {
-    const result = await this.callTool('assign_member_to_card', { cardId, memberId });
-    return result;
+  async getCardComments(cardId, limit) {
+    const r = await this.callTool('get_card_comments', { cardId, limit });
+    return r.comments || [];
   }
 
   close() {
