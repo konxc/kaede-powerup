@@ -691,6 +691,127 @@ async function cmdStatus() {
   }
 }
 
+async function cmdPlaybook() {
+  const args = process.argv.slice(3);
+  const subcmd = args[0];
+  if (!subcmd) {
+    console.error('  \x1b[31m  ✗ Subcommand required.\x1b[0m');
+    console.log('  \x1b[37m  Usage:\x1b[0m node scripts/kaede.mjs playbook \x1b[36m<parse|show>\x1b[0m \x1b[90m<path>\x1b[0m');
+    return;
+  }
+
+  const path = args[1];
+  if (!path) {
+    console.error('  \x1b[31m  ✗ Playbook path required.\x1b[0m');
+    return;
+  }
+
+  if (!existsSync(path)) {
+    console.error('  \x1b[31m  ✗ File not found: ' + path + '\x1b[0m');
+    return;
+  }
+
+  const content = readFileSync(path, 'utf-8');
+
+  if (subcmd === 'parse') {
+    // Parse headings and roles
+    const lines = content.split('\n');
+    const sections = [];
+    let current = null;
+    for (const line of lines) {
+      const h2 = line.match(/^##\s+(.+)/);
+      const h3 = line.match(/^###\s+(.+)/);
+      if (h2) {
+        if (current) sections.push(current);
+        current = { type: 'h2', title: h2[1], children: [] };
+      } else if (h3 && current) {
+        current.children.push({ type: 'h3', title: h3[1] });
+      }
+    }
+    if (current) sections.push(current);
+
+    console.log('');
+    console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+    console.log('  \x1b[35m║    KAEDE — Playbook Parser           ║\x1b[0m');
+    console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+    console.log('');
+    console.log(`  \x1b[90m  File: ${path}\x1b[0m`);
+    console.log(`  \x1b[90m  Sections: ${sections.length}\x1b[0m`);
+    console.log('');
+    for (const s of sections) {
+      console.log(`  \x1b[36m  ${s.type === 'h2' ? '##' : '###'} ${s.title}\x1b[0m`);
+      if (s.children && s.children.length > 0) {
+        for (const c of s.children) {
+          console.log(`     \x1b[90m  ### ${c.title}\x1b[0m`);
+        }
+      }
+    }
+    console.log('');
+    console.log('  \x1b[32m  ✅  Playbook parsed successfully.\x1b[0m');
+  } else if (subcmd === 'show') {
+    console.log('');
+    console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+    console.log('  \x1b[35m║    KAEDE — Playbook Summary          ║\x1b[0m');
+    console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+    console.log('');
+    console.log(content);
+  } else {
+    console.error('  \x1b[31m  ✗ Unknown subcommand: ' + subcmd + '\x1b[0m');
+    console.log('  \x1b[37m  Available: parse, show\x1b[0m');
+  }
+}
+
+async function cmdOrchestrate() {
+  const args = process.argv.slice(3);
+  const getOpt = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : undefined; };
+  const playbookPath = getOpt('--playbook') || args.find(a => !a.startsWith('-'));
+  const openkbDir = getOpt('--openkb') || resolve(process.cwd(), '.openkb');
+  const opencodeDir = getOpt('--opencode') || resolve(process.cwd(), '.opencode');
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║    KAEDE — Orchestration Context     ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('');
+
+  // Load playbook
+  if (playbookPath && existsSync(playbookPath)) {
+    const pb = readFileSync(playbookPath, 'utf-8');
+    console.log(`  \x1b[36m  Playbook:\x1b[0m \x1b[90m${playbookPath}\x1b[0m`);
+    const lines = pb.split('\n').filter(l => l.match(/^##?\s+/)).slice(0, 5);
+    for (const l of lines) console.log(`    \x1b[90m${l.trim()}\x1b[0m`);
+  } else if (playbookPath) {
+    console.log(`  \x1b[31m  ✗  Playbook not found: ${playbookPath}\x1b[0m`);
+  } else {
+    console.log('  \x1b[33m  ⚠  Playbook not provided.\x1b[0m');
+  }
+
+  // Load OpenKB glossary
+  const glossaryPath = resolve(openkbDir, 'SHARED', 'glossary.md');
+  if (existsSync(glossaryPath)) {
+    const gl = readFileSync(glossaryPath, 'utf-8');
+    const terms = gl.split('\n').filter(l => l.match(/^- \*\*/)).length;
+    console.log(`  \x1b[36m  OpenKB Glossary:\x1b[0m \x1b[90m${terms} terms\x1b[0m`);
+  } else {
+    console.log('  \x1b[33m  ⚠  OpenKB glossary not found.\x1b[0m');
+  }
+
+  // Load OpenCode config
+  const opencodeJsonPath = resolve(opencodeDir, 'opencode.json');
+  if (existsSync(opencodeJsonPath)) {
+    const cfg = JSON.parse(readFileSync(opencodeJsonPath, 'utf-8'));
+    const mcpTools = cfg.mcp?.trello ? '✓ Trello MCP' : '✗ No MCP';
+    console.log(`  \x1b[36m  OpenCode Config:\x1b[0m \x1b[90m${mcpTools}\x1b[0m`);
+  } else {
+    console.log('  \x1b[33m  ⚠  OpenCode config not found.\x1b[0m');
+  }
+
+  console.log('');
+  console.log('  \x1b[32m  ✅  Context loaded. Ready for orchestration.\x1b[0m');
+  console.log('  \x1b[90m     Use this context to guide AI Agent execution.\x1b[0m');
+  console.log('');
+}
+
 function cmdHelp() {
   console.log('');
   console.log('  \x1b[35mKAEDE — Koneksi Automated Environment DE\x1b[0m');
@@ -706,6 +827,8 @@ function cmdHelp() {
   console.log('    \x1b[36mpush\x1b[0m      \x1b[90mBuat Trello cards dari file markdown\x1b[0m');
   console.log('    \x1b[36menv\x1b[0m       \x1b[90mExport credentials ke shell environment\x1b[0m');
   console.log('    \x1b[36mstatus\x1b[0m    \x1b[90mCek status konfigurasi KAEDE\x1b[0m');
+  console.log('    \x1b[36mplaybook\x1b[0m  \x1b[90mParse/show playbook (parse <path> | show <path>)\x1b[0m');
+  console.log('    \x1b[36morchestrate\x1b[0m \x1b[90mLoad context (playbook + openkb + opencode)\x1b[0m');
   console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
   console.log('');
   console.log('  \x1b[37mExamples:\x1b[0m');
@@ -716,6 +839,8 @@ function cmdHelp() {
   console.log('    node scripts/kaede.mjs setup');
   console.log('    node scripts/kaede.mjs today');
   console.log('    node scripts/kaede.mjs env | iex                 # Windows PowerShell');
+  console.log('    node scripts/kaede.mjs playbook parse ../playbook/sprint.md');
+  console.log('    node scripts/kaede.mjs orchestrate --openkb ~/.openkb --opencode ./.opencode');
   console.log('');
 }
 
@@ -742,6 +867,12 @@ async function main() {
       break;
     case 'status':
       await cmdStatus();
+      break;
+    case 'playbook':
+      await cmdPlaybook();
+      break;
+    case 'orchestrate':
+      await cmdOrchestrate();
       break;
     case 'help':
     case '--help':

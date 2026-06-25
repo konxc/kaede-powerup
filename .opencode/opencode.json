@@ -3,7 +3,8 @@
   "default_agent": "build",
   "instructions": [
     ".opencode/SHARED/project-context.md",
-    ".opencode/SHARED/agent-rules.md"
+    ".opencode/SHARED/agent-rules.md",
+    ".opencode/SHARED/instructions/orchestrator.md"
   ],
   "references": {
     "docs": {
