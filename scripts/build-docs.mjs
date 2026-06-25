@@ -8,14 +8,29 @@
  */
 
 import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync } from 'fs';
-import { join, dirname, extname } from 'path';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DOCS_DIR = join(ROOT, 'docs');
 const OUT_DIR = join(ROOT, 'dist-docs');
-const CSS_SRC = join(ROOT, 'css', 'style.css');
+
+// ── CSS source resolution ──
+// Prefer compiled Tailwind CSS (public/css/style.css), fallback to source (src/style.css)
+function resolveCss() {
+  const compiledPath = join(ROOT, 'public', 'css', 'style.css');
+  if (existsSync(compiledPath)) return compiledPath;
+
+  const srcPath = join(ROOT, 'src', 'style.css');
+  if (existsSync(srcPath)) {
+    console.warn('⚠ public/css/style.css not found — using src/style.css (uncompiled Tailwind directives may render incorrectly)');
+    return srcPath;
+  }
+
+  console.warn('⚠ No CSS found — documentation will render without styling');
+  return null;
+}
 
 // ── Page registry ──
 // Order here determines sidebar, prev/next nav, and mobile nav
@@ -24,7 +39,8 @@ const PAGES = [
   { id: 'api-key',    label: 'API Key',           icon: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' },
   { id: 'mcp-server', label: 'MCP Server',        icon: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01' },
   { id: 'opencode',   label: 'OpenCode',          icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
-  { id: 'tools',      label: 'Referensi Tools',   icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' },
+  { id: 'tools',          label: 'Referensi Tools',   icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' },
+  { id: 'role-management', label: 'Role Management', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z' },
 ];
 
 const PAGE_IDS = PAGES.map(p => p.id);
@@ -34,6 +50,7 @@ const MOBILE_ICONS = {
   'mcp-server': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>',
   'opencode': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>',
   'tools': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>',
+  'role-management': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>',
 };
 
 // ── Template ──
@@ -45,7 +62,7 @@ function pageTemplate({ title, contentHtml, currentId }) {
   // Sidebar links
   const sidebarLinks = PAGES.map(p => {
     const isActive = p.id === currentId;
-    return `          <a href="${p.id === 'index' ? '.' : p.id + (p.id !== 'index' ? '' : '')}" class="${isActive ? 'text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10' : 'text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors'}">${p.label}</a>`;
+      return `          <a href="${p.id === 'index' ? '.' : p.id + '.html'}" class="${isActive ? 'text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10' : 'text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors'}">${p.label}</a>`;
   }).join('\n');
 
   // Breadcrumb
@@ -195,12 +212,13 @@ async function main() {
   // Ensure output dir
   mkdirSync(join(OUT_DIR, 'css'), { recursive: true });
 
-  // Copy CSS
-  if (existsSync(CSS_SRC)) {
-    cpSync(CSS_SRC, join(OUT_DIR, 'css', 'style.css'));
-    console.log('✓ Copied css/style.css');
+  // Copy CSS (try compiled first, fallback to source)
+  const cssPath = resolveCss();
+  if (cssPath) {
+    cpSync(cssPath, join(OUT_DIR, 'css', 'style.css'));
+    console.log(`✓ Copied css/style.css from ${cssPath.replace(ROOT, '.')}`);
   } else {
-    console.warn('⚠ css/style.css not found — build tailwind first');
+    console.warn('⚠ No CSS source found — documentation will render unstyled');
   }
 
   // Dynamically import marked

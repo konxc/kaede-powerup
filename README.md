@@ -14,14 +14,16 @@
 ## Struktur Repo
 
 ```
-├── index.html           # Landing page + iframe connector (Trello)
-├── board.html           # Dashboard popup
-├── card.html            # Environment manager per kartu
-├── auth.html            # Halaman otorisasi
-├── privacy.html         # Kebijakan privasi
-├── js/kaede.js          # Power-Up capabilities
+├── public/              # Static site (deploy ke Netlify)
+│   ├── index.html       # Landing page + iframe connector (Trello)
+│   ├── board.html       # Dashboard popup
+│   ├── card.html        # Environment manager per kartu
+│   ├── auth.html        # Halaman otorisasi
+│   ├── privacy.html     # Kebijakan privasi
+│   ├── js/kaede.js      # Power-Up capabilities
+│   ├── css/style.css    # Compiled CSS (auto-generated)
+│   └── _redirects       # Netlify redirect rules
 ├── src/style.css        # Source CSS (Tailwind v4 + custom components)
-├── css/style.css        # Compiled CSS (auto-generated)
 ├── netlify.toml         # Konfigurasi deploy Netlify
 ├── package.json         # Build scripts
 │
@@ -81,7 +83,7 @@ node scripts/build-docs.mjs
 Push ke `main` → Netlify auto-deploy:
 
 - **Branch:** `main`
-- **Publish directory:** `.`
+- **Publish directory:** `public`
 - **Build command:** `bun run build`
 - **URL:** `kaede-powerup.netlify.app`
 

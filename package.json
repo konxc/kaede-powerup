@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "bun run dev:css & bun run serve",
-    "dev:css": "tailwindcss -i src/style.css -o css/style.css --watch",
-    "build": "tailwindcss -i src/style.css -o css/style.css --minify",
+    "dev:css": "tailwindcss -i src/style.css -o public/css/style.css --watch",
+    "build": "tailwindcss -i src/style.css -o public/css/style.css --minify",
     "serve": "bun x serve . -p 3000 -L",
     "preview": "bun run build && bun run serve"
   },

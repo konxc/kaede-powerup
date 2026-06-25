@@ -1,5 +1,5 @@
 node_modules/
-css/
+public/css/
 .playwright-mcp/
 .netlify
 dist-docs/

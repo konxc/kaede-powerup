@@ -38,13 +38,20 @@
     document.querySelectorAll('.env-option').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var env = this.getAttribute('data-env');
-        TrelloPowerUp.util
-          .card('id')
-          .then(function(card) {
-            return TrelloPowerUp.iframe().set('card', 'shared', 'environment', env);
+        var t = TrelloPowerUp.iframe();
+
+        t.set('card', 'shared', 'environment', env)
+          .then(function() {
+            // Update board-level env stats
+            return t.get('board', 'shared', 'envStats', {});
+          })
+          .then(function(stats) {
+            // Count cards per env (simplified: store last-set count)
+            stats[env] = (stats[env] || 0) + 1;
+            return t.set('board', 'shared', 'envStats', stats);
           })
           .then(function() {
-            TrelloPowerUp.iframe().closePopup();
+            t.closePopup();
           })
           .catch(function(err) {
             console.error('[KAEDE] Failed to set environment:', err);

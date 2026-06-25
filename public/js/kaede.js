@@ -207,18 +207,22 @@ const capabilities = {
 };
 
 // ===================================================================
-//  Initialize
+//  Initialize (Trello iframe only — skip on standalone site visit)
 // ===================================================================
 
-console.log('[KAEDE] Initializing v%s', KAEDE.version);
+var isIframe = window.self !== window.top;
 
-TrelloPowerUp.initialize(capabilities)
-  .then(function () {
-    var el = document.getElementById('status');
-    if (el) el.textContent = 'KAEDE ready.';
-  })
-  .catch(function (err) {
-    console.error('[KAEDE] Initialization failed:', err);
-    var el = document.getElementById('status');
-    if (el) el.textContent = 'Initialization failed.';
-  });
+if (isIframe) {
+  console.log('[KAEDE] Initializing v%s in Trello iframe', KAEDE.version);
+
+  TrelloPowerUp.initialize(capabilities)
+    .then(function () {
+      var el = document.getElementById('status');
+      if (el) el.textContent = 'KAEDE ready.';
+    })
+    .catch(function (err) {
+      console.error('[KAEDE] Initialization failed:', err);
+      var el = document.getElementById('status');
+      if (el) el.textContent = 'Initialization failed.';
+    });
+}
