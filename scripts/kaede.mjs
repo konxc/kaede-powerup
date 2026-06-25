@@ -839,15 +839,46 @@ async function cmdRun() {
   console.log(`  \x1b[36m  Intent:\x1b[0m \x1b[90m"${intent}"\x1b[0m`);
   
   if (playbookPath && existsSync(playbookPath)) {
-    const { parsePlaybook } = await import(resolve(process.cwd(), 'src', 'orchestrator.js'));
+    const { parsePlaybook, executeIntent } = await import(resolve(process.cwd(), 'src', 'orchestrator.js'));
+    const { TrelloMCPClient } = await import(resolve(process.cwd(), 'src', 'trello-client.js'));
+    
     const content = readFileSync(playbookPath, 'utf-8');
     const playbook = parsePlaybook(content);
     
-    console.log(`  \x1b[36m  Playbook loaded:\x1b[0m \x1b[90m${playbook.workflow.lists.length} lists defined\x1b[0m`);
-    console.log(`  \x1b[36m  Roles:\x1b[0m \x1b[90m${playbook.roles.length} roles defined\x1b[0m`);
+    console.log(`  \x1b[36m  Playbook loaded:\x1b[0m \x1b[90m${playbook.workflow.lists.length} lists, ${playbook.roles.length} roles\x1b[0m`);
     console.log('');
-    console.log('  \x1b[32m  ✅  Ready to execute. (Trello MCP integration pending)\x1b[0m');
-    console.log('  \x1b[90m     Next: Integrate with Trello MCP client for actual execution.\x1b[0m');
+    console.log('  \x1b[36m  Connecting to Trello MCP Server...\x1b[0m');
+    
+    const client = new TrelloMCPClient();
+    try {
+      await client.connect();
+      console.log('  \x1b[32m  ✓ Connected.\x1b[0m');
+      console.log('');
+      console.log('  \x1b[36m  Executing intent...\x1b[0m');
+      
+      const boardId = getOpt('--board');
+      if (!boardId) {
+        console.log('  \x1b[33m  ⚠  No board ID provided. Skipping actual execution.\x1b[0m');
+        console.log('  \x1b[90m     Add --board <boardId> to execute actions.\x1b[0m');
+      } else {
+        const results = await executeIntent(client, intent, playbook, boardId);
+        console.log('');
+        for (const r of results) {
+          if (r.success) {
+            console.log(`  \x1b[32m  ✓ ${r.type}: ${r.name}\x1b[0m`);
+          } else {
+            console.log(`  \x1b[31m  ✗ ${r.type}: ${r.name} — ${r.error}\x1b[0m`);
+          }
+        }
+      }
+      
+      console.log('');
+      console.log('  \x1b[32m  ✅  Intent execution completed.\x1b[0m');
+    } catch (err) {
+      console.error('  \x1b[31m  ✗ Execution failed:\x1b[0m', err.message);
+    } finally {
+      client.close();
+    }
   } else {
     console.log('  \x1b[33m  ⚠  Playbook not provided. Execute with generic defaults.\x1b[0m');
   }

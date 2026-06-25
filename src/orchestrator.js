@@ -7,6 +7,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
+import { TrelloMCPClient } from './trello-client.js';
 
 export function parsePlaybook(content) {
   const lines = content.split('\n');
@@ -89,32 +90,20 @@ export function parsePlaybook(content) {
   return result;
 }
 
-export async function executeIntent(trelloClient, intent, playbookContext) {
+export async function executeIntent(client, intent, playbookContext, boardId) {
   const actions = [];
+  const results = [];
   
   if (intent.toLowerCase().includes('mulai sprint') || intent.toLowerCase().includes('setup sprint')) {
     const { lists } = playbookContext.workflow;
     
     for (const listName of lists) {
-      actions.push({
-        type: 'create_list',
-        name: listName,
-        description: `List otomatis dari Playbook: ${listName}`,
-      });
-    }
-  }
-
-  // Eksekusi tindakan via Trello Client
-  const results = [];
-  for (const action of actions) {
-    try {
-      let result;
-      if (action.type === 'create_list' && action.boardId) {
-        result = await trelloClient.createList(action.boardId, action.name);
+      try {
+        const result = await client.createList(boardId, listName);
+        results.push({ success: true, type: 'create_list', name: listName, result });
+      } catch (err) {
+        results.push({ success: false, type: 'create_list', name: listName, error: err.message });
       }
-      results.push({ success: true, action, result });
-    } catch (err) {
-      results.push({ success: false, action, error: err.message });
     }
   }
 
