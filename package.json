@@ -8,6 +8,7 @@
     "dev": "bun run dev:css & bun run serve",
     "dev:css": "tailwindcss -i src/style.css -o public/css/style.css --watch",
     "build": "tailwindcss -i src/style.css -o public/css/style.css --minify",
+    "build:mcp": "node scripts/build-mcp.mjs",
     "serve": "bun x serve . -p 3000 -L",
     "preview": "bun run build && bun run serve",
     "kaede": "node scripts/kaede.mjs",

@@ -812,6 +812,48 @@ async function cmdOrchestrate() {
   console.log('');
 }
 
+async function cmdRun() {
+  const args = process.argv.slice(3);
+  const getOpt = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : undefined; };
+  const playbookPath = getOpt('--playbook');
+  const openkbDir = getOpt('--openkb') || resolve(process.cwd(), '.openkb');
+  const opencodeDir = getOpt('--opencode') || resolve(process.cwd(), '.opencode');
+  
+  // Find intent: everything after --playbook and its value
+  const playbookIdx = args.indexOf('--playbook');
+  const intentStart = playbookIdx !== -1 ? playbookIdx + 2 : 0;
+  const intent = args.slice(intentStart).join(' ').trim();
+
+  if (!intent) {
+    console.error('  \x1b[31m  ✗ Intent required.\x1b[0m');
+    console.log('  \x1b[37m  Usage:\x1b[0m node scripts/kaede.mjs run \x1b[36m--playbook <path>\x1b[0m \x1b[90m"intent"\x1b[0m');
+    console.log('  \x1b[37m  Example:\x1b[0m node scripts/kaede.mjs run --playbook playbook/sprint.md "Mulai Sprint Alpha"');
+    return;
+  }
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║    KAEDE — Execute Intent            ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('');
+  console.log(`  \x1b[36m  Intent:\x1b[0m \x1b[90m"${intent}"\x1b[0m`);
+  
+  if (playbookPath && existsSync(playbookPath)) {
+    const { parsePlaybook } = await import(resolve(process.cwd(), 'src', 'orchestrator.js'));
+    const content = readFileSync(playbookPath, 'utf-8');
+    const playbook = parsePlaybook(content);
+    
+    console.log(`  \x1b[36m  Playbook loaded:\x1b[0m \x1b[90m${playbook.workflow.lists.length} lists defined\x1b[0m`);
+    console.log(`  \x1b[36m  Roles:\x1b[0m \x1b[90m${playbook.roles.length} roles defined\x1b[0m`);
+    console.log('');
+    console.log('  \x1b[32m  ✅  Ready to execute. (Trello MCP integration pending)\x1b[0m');
+    console.log('  \x1b[90m     Next: Integrate with Trello MCP client for actual execution.\x1b[0m');
+  } else {
+    console.log('  \x1b[33m  ⚠  Playbook not provided. Execute with generic defaults.\x1b[0m');
+  }
+  console.log('');
+}
+
 function cmdHelp() {
   console.log('');
   console.log('  \x1b[35mKAEDE — Koneksi Automated Environment DE\x1b[0m');
@@ -829,6 +871,7 @@ function cmdHelp() {
   console.log('    \x1b[36mstatus\x1b[0m    \x1b[90mCek status konfigurasi KAEDE\x1b[0m');
   console.log('    \x1b[36mplaybook\x1b[0m  \x1b[90mParse/show playbook (parse <path> | show <path>)\x1b[0m');
   console.log('    \x1b[36morchestrate\x1b[0m \x1b[90mLoad context (playbook + openkb + opencode)\x1b[0m');
+  console.log('    \x1b[36mrun\x1b[0m       \x1b[90mExecute intent (run --playbook <path> "intent")\x1b[0m');
   console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
   console.log('');
   console.log('  \x1b[37mExamples:\x1b[0m');
@@ -841,6 +884,7 @@ function cmdHelp() {
   console.log('    node scripts/kaede.mjs env | iex                 # Windows PowerShell');
   console.log('    node scripts/kaede.mjs playbook parse ../playbook/sprint.md');
   console.log('    node scripts/kaede.mjs orchestrate --openkb ~/.openkb --opencode ./.opencode');
+  console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md "Mulai Sprint Alpha"');
   console.log('');
 }
 
@@ -873,6 +917,9 @@ async function main() {
       break;
     case 'orchestrate':
       await cmdOrchestrate();
+      break;
+    case 'run':
+      await cmdRun();
       break;
     case 'help':
     case '--help':
