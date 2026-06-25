@@ -7,10 +7,10 @@
   --color-kaede-primary: #6c5ce7;
   --color-kaede-primary-hover: #5a4bd1;
   --color-kaede-text: #e2e2e8;
-  --color-kaede-muted: #8888a0;
+  --color-kaede-muted: #9fa0b2;
   --color-kaede-success: #00b894;
   --color-kaede-warning: #fdcb6e;
-  --color-kaede-danger: #e17055;
+  --color-kaede-danger: #ff7675;
 
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
@@ -74,16 +74,16 @@
     overflow-x: auto;
     color: #c0c0d0;
   }
-  .code-block .kw { color: #6c5ce7; }
+  .code-block .kw { color: #818cf8; }
   .code-block .str { color: #00b894; }
-  .code-block .cm { color: #636380; font-style: italic; }
+  .code-block .cm { color: #7c809b; font-style: italic; }
   .code-block .fn { color: #fdcb6e; }
 
   /* Prose — documentation content */
   .prose {
     max-width: 720px;
     line-height: 1.7;
-    color: #8888a0;
+    color: #9fa0b2;
   }
   .prose h1 {
     font-size: 1.75rem;
@@ -110,14 +110,35 @@
   .prose ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
   .prose li { margin-bottom: 0.35rem; }
   .prose strong { color: #e2e2e8; font-weight: 600; }
-  .prose a { color: #6c5ce7; text-decoration: underline; }
-  .prose a:hover { color: #5a4bd1; }
+  .prose a { color: #818cf8; text-decoration: underline; }
+  .prose a:hover { color: #a5b4fc; }
   .prose code {
     background: #13141a;
     padding: 0.1em 0.3em;
     border-radius: 4px;
     font-size: 0.875em;
     color: #c0c0d0;
+  }
+
+  /* Fenced code blocks inside prose (rendered from markdown ``` blocks) */
+  .prose pre {
+    background: #13141a;
+    border: 1px solid #2e2f3e;
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    color: #c0c0d0;
+    margin: 1.5rem 0;
+  }
+  .prose pre code {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    color: inherit;
   }
 
   /* Step number circle */

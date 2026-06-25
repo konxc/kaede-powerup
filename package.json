@@ -15,5 +15,8 @@
     "@tailwindcss/cli": "^4.1.0",
     "netlify-cli": "^26.1.0",
     "tailwindcss": "^4.1.0"
+  },
+  "dependencies": {
+    "marked": "^18.0.5"
   }
 }

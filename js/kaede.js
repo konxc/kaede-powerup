@@ -146,7 +146,7 @@ const capabilities = {
           detail: [
             '<div style="padding:12px 0">',
             '  <div style="font-size:11px;font-weight:600;color:#8888a0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Environment</div>',
-            '  <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;background:' + (env === 'production' ? 'rgba(225,112,85,0.15);color:#e17055' : env === 'staging' ? 'rgba(253,203,110,0.15);color:#fdcb6e' : 'rgba(0,184,148,0.15);color:#00b894') + '">' + env.toUpperCase() + '</span>',
+            '  <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;background:' + (env === 'production' ? 'rgba(255,118,117,0.15);color:#ff7675' : env === 'staging' ? 'rgba(253,203,110,0.15);color:#fdcb6e' : env === 'development' ? 'rgba(0,184,148,0.15);color:#00b894' : 'rgba(159,160,178,0.15);color:#9fa0b2') + '">' + env.toUpperCase() + '</span>',
             '</div>',
             (deployUrl ? [
               '<div style="padding:12px 0">',

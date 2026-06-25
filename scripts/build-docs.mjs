@@ -86,7 +86,7 @@ function pageTemplate({ title, contentHtml, currentId }) {
   <title>${title}</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="bg-kaede-bg font-sans antialiased min-h-screen">
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
   <!-- Nav -->
   <nav class="nav-blur fixed top-0 inset-x-0 z-50 border-b border-kaede-border/50">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
@@ -156,7 +156,7 @@ function privacyTemplate({ title, contentHtml }) {
   <title>${title}</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="bg-kaede-bg font-sans antialiased min-h-screen">
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
   <nav class="nav-blur fixed top-0 inset-x-0 z-50 border-b border-kaede-border/50">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
       <a href="." class="flex items-center gap-2 no-underline">
