@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { resolve, dirname, basename } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { homedir, hostname } from 'os';
 import { createInterface } from 'readline';
 
@@ -714,7 +714,7 @@ async function cmdPlaybook() {
   const content = readFileSync(path, 'utf-8');
 
   if (subcmd === 'parse') {
-    const { parsePlaybook } = await import(resolve(process.cwd(), 'src', 'orchestrator.js'));
+    const { parsePlaybook } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'orchestrator.js')).href);
     const result = parsePlaybook(content);
 
     console.log('');
@@ -759,9 +759,18 @@ async function cmdPlaybook() {
 async function cmdOrchestrate() {
   const args = process.argv.slice(3);
   const getOpt = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : undefined; };
-  const playbookPath = getOpt('--playbook') || args.find(a => !a.startsWith('-'));
+  const playbookPath = getOpt('--playbook');
   const openkbDir = getOpt('--openkb') || resolve(process.cwd(), '.openkb');
   const opencodeDir = getOpt('--opencode') || resolve(process.cwd(), '.opencode');
+  const detail = args.includes('--detail') || args.includes('-d');
+
+  const { bundleContext } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'orchestrator.js')).href);
+
+  const ctx = bundleContext({
+    playbook: playbookPath,
+    openkb: openkbDir,
+    opencode: opencodeDir,
+  });
 
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
@@ -769,41 +778,25 @@ async function cmdOrchestrate() {
   console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
   console.log('');
 
-  // Load playbook
-  if (playbookPath && existsSync(playbookPath)) {
-    const pb = readFileSync(playbookPath, 'utf-8');
-    console.log(`  \x1b[36m  Playbook:\x1b[0m \x1b[90m${playbookPath}\x1b[0m`);
-    const lines = pb.split('\n').filter(l => l.match(/^##?\s+/)).slice(0, 5);
-    for (const l of lines) console.log(`    \x1b[90m${l.trim()}\x1b[0m`);
-  } else if (playbookPath) {
-    console.log(`  \x1b[31m  ✗  Playbook not found: ${playbookPath}\x1b[0m`);
+  if (ctx.playbook) {
+    console.log(`  \x1b[36m  Playbook:\x1b[0m \x1b[90m${ctx.playbook.title}\x1b[0m`);
+    console.log(`  \x1b[90m    ${ctx.playbook.roles.length} roles · ${ctx.playbook.workflow.lists.length} lists · ${ctx.playbook.conventions.labels.length} labels\x1b[0m`);
+    if (detail) {
+      for (const r of ctx.playbook.roles) {
+        console.log(`    \x1b[90m  Role: ${r.name}\x1b[0m`);
+        for (const resp of r.responsibilities) console.log(`      \x1b[90m• ${resp}\x1b[0m`);
+      }
+      console.log(`    \x1b[90m  Lists: ${ctx.playbook.workflow.lists.join(' → ')}\x1b[0m`);
+    }
   } else {
-    console.log('  \x1b[33m  ⚠  Playbook not provided.\x1b[0m');
+    console.log('  \x1b[33m  ⚠  Playbook not found or not provided.\x1b[0m');
   }
 
-  // Load OpenKB glossary
-  const glossaryPath = resolve(openkbDir, 'SHARED', 'glossary.md');
-  if (existsSync(glossaryPath)) {
-    const gl = readFileSync(glossaryPath, 'utf-8');
-    const terms = gl.split('\n').filter(l => l.match(/^- \*\*/)).length;
-    console.log(`  \x1b[36m  OpenKB Glossary:\x1b[0m \x1b[90m${terms} terms\x1b[0m`);
-  } else {
-    console.log('  \x1b[33m  ⚠  OpenKB glossary not found.\x1b[0m');
-  }
-
-  // Load OpenCode config
-  const opencodeJsonPath = resolve(opencodeDir, 'opencode.json');
-  if (existsSync(opencodeJsonPath)) {
-    const cfg = JSON.parse(readFileSync(opencodeJsonPath, 'utf-8'));
-    const mcpTools = cfg.mcp?.trello ? '✓ Trello MCP' : '✗ No MCP';
-    console.log(`  \x1b[36m  OpenCode Config:\x1b[0m \x1b[90m${mcpTools}\x1b[0m`);
-  } else {
-    console.log('  \x1b[33m  ⚠  OpenCode config not found.\x1b[0m');
-  }
+  console.log(`  \x1b[36m  OpenKB Glossary:\x1b[0m \x1b[90m${ctx.openkb.glossary.length} terms\x1b[0m`);
+  console.log(`  \x1b[36m  OpenCode Config:\x1b[0m \x1b[90m${ctx.opencode?.mcp?.trello ? '✓ Trello MCP' : '✗ No MCP'}\x1b[0m`);
 
   console.log('');
   console.log('  \x1b[32m  ✅  Context loaded. Ready for orchestration.\x1b[0m');
-  console.log('  \x1b[90m     Use this context to guide AI Agent execution.\x1b[0m');
   console.log('');
 }
 
@@ -811,13 +804,19 @@ async function cmdRun() {
   const args = process.argv.slice(3);
   const getOpt = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : undefined; };
   const playbookPath = getOpt('--playbook');
-  const openkbDir = getOpt('--openkb') || resolve(process.cwd(), '.openkb');
-  const opencodeDir = getOpt('--opencode') || resolve(process.cwd(), '.opencode');
-  
-  // Find intent: everything after --playbook and its value
-  const playbookIdx = args.indexOf('--playbook');
-  const intentStart = playbookIdx !== -1 ? playbookIdx + 2 : 0;
-  const intent = args.slice(intentStart).join(' ').trim();
+  const isDryRun = args.includes('--dry-run') || args.includes('-n');
+
+  // Find intent: skip all --flags and their values
+  let intent = '';
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--') || args[i].startsWith('-')) {
+      if (args[i] === '--playbook' || args[i] === '--board' || args[i] === '--openkb' || args[i] === '--opencode') {
+        i++; // skip next arg (value)
+      }
+      continue;
+    }
+    intent += (intent ? ' ' : '') + args[i];
+  }
 
   if (!intent) {
     console.error('  \x1b[31m  ✗ Intent required.\x1b[0m');
@@ -832,25 +831,40 @@ async function cmdRun() {
   console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
   console.log('');
   console.log(`  \x1b[36m  Intent:\x1b[0m \x1b[90m"${intent}"\x1b[0m`);
-  
+  if (isDryRun) {
+    console.log('  \x1b[33m  ⚠  DRY RUN — no changes will be made.\x1b[0m');
+  }
+
   if (playbookPath && existsSync(playbookPath)) {
-    const { parsePlaybook, executeIntent } = await import(resolve(process.cwd(), 'src', 'orchestrator.js'));
-    const { TrelloMCPClient } = await import(resolve(process.cwd(), 'src', 'trello-client.js'));
-    
+    const { parsePlaybook, executeIntent } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'orchestrator.js')).href);
+    const { TrelloMCPClient } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'trello-client.js')).href);
+
     const content = readFileSync(playbookPath, 'utf-8');
     const playbook = parsePlaybook(content);
-    
+
     console.log(`  \x1b[36m  Playbook loaded:\x1b[0m \x1b[90m${playbook.workflow.lists.length} lists, ${playbook.roles.length} roles\x1b[0m`);
+
+    if (isDryRun) {
+      console.log('');
+      console.log('  \x1b[36m  Would execute:\x1b[0m \x1b[90m"' + intent + '"\x1b[0m');
+      console.log(`  \x1b[36m  Intents available:\x1b[0m \x1b[90mmulai sprint, buat card, assign, pindah, komentar, report, tutup sprint\x1b[0m`);
+      console.log(`  \x1b[36m  Workflow lists:\x1b[0m \x1b[90m${playbook.workflow.lists.join(', ')}\x1b[0m`);
+      console.log('');
+      console.log('  \x1b[32m  ✅  Dry run complete. Pass --board <id> to execute.\x1b[0m');
+      console.log('');
+      return;
+    }
+
     console.log('');
     console.log('  \x1b[36m  Connecting to Trello MCP Server...\x1b[0m');
-    
+
     const client = new TrelloMCPClient();
     try {
       await client.connect();
       console.log('  \x1b[32m  ✓ Connected.\x1b[0m');
       console.log('');
       console.log('  \x1b[36m  Executing intent...\x1b[0m');
-      
+
       let boardId = getOpt('--board');
       if (!boardId) {
         console.log('  \x1b[33m  ⚠  No --board provided. Auto-detecting...\x1b[0m');
@@ -876,9 +890,9 @@ async function cmdRun() {
           console.log(`  \x1b[31m  ✗ ${r.type}: ${r.name} — ${r.error}\x1b[0m`);
         }
       }
-      
+
       console.log('');
-      console.log('  \x1b[32m  ✅  Intent execution completed.\x1b[0m');
+      console.log('  \x1b[32m  \u2705  Intent execution completed.\x1b[0m');
     } catch (err) {
       console.error('  \x1b[31m  ✗ Execution failed:\x1b[0m', err.message);
     } finally {
@@ -906,8 +920,8 @@ function cmdHelp() {
   console.log('    \x1b[36menv\x1b[0m       \x1b[90mExport credentials ke shell environment\x1b[0m');
   console.log('    \x1b[36mstatus\x1b[0m    \x1b[90mCek status konfigurasi KAEDE\x1b[0m');
   console.log('    \x1b[36mplaybook\x1b[0m  \x1b[90mParse/show playbook (parse <path> | show <path>)\x1b[0m');
-  console.log('    \x1b[36morchestrate\x1b[0m \x1b[90mLoad context (playbook + openkb + opencode)\x1b[0m');
-  console.log('    \x1b[36mrun\x1b[0m       \x1b[90mExecute intent (run --playbook <path> "intent")\x1b[0m');
+  console.log('    \x1b[36morchestrate\x1b[0m \x1b[90mLoad context (--playbook <path> [--detail])\x1b[0m');
+  console.log('    \x1b[36mrun\x1b[0m       \x1b[90mExecute intent (--playbook <path> [--board <id>] [--dry-run] "intent")\x1b[0m');
   console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
   console.log('');
   console.log('  \x1b[37mExamples:\x1b[0m');
@@ -919,8 +933,9 @@ function cmdHelp() {
   console.log('    node scripts/kaede.mjs today');
   console.log('    node scripts/kaede.mjs env | iex                 # Windows PowerShell');
   console.log('    node scripts/kaede.mjs playbook parse ../playbook/sprint.md');
-  console.log('    node scripts/kaede.mjs orchestrate --openkb ~/.openkb --opencode ./.opencode');
-  console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md "Mulai Sprint Alpha"');
+  console.log('    node scripts/kaede.mjs orchestrate --playbook ../playbook/sprint.md --detail');
+  console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md -n "Mulai Sprint Alpha"');
+  console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --board abc123 "Mulai Sprint Alpha"');
   console.log('');
 }
 

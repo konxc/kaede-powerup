@@ -90,13 +90,16 @@ export function parsePlaybook(content) {
     if (currentSection === 'conventions') {
       const prefixMatch = line.match(/`(feat|fix|docs|chore|refactor|test):/g);
       if (prefixMatch) {
-        result.conventions.titlePrefixes = prefixMatch.map(p => p.replace(/`/g, ''));
-      }
-      if (line.match(/merah:|kuning:|hijau:|red:|yellow:|green:/i)) {
-        const labelMatch = line.match(/(\w+):\s*(.+)/);
-        if (labelMatch) {
-          result.conventions.labels.push({ color: labelMatch[1], meaning: labelMatch[2] });
+        for (const p of prefixMatch) {
+          const cleaned = p.replace(/`/g, '');
+          if (!result.conventions.titlePrefixes.includes(cleaned)) {
+            result.conventions.titlePrefixes.push(cleaned);
+          }
         }
+      }
+      const labelColorMatch = line.match(/\*{0,2}(merah|kuning|hijau|red|yellow|green)\*{0,2}\s*:\s*(.+)/i);
+      if (labelColorMatch) {
+        result.conventions.labels.push({ color: labelColorMatch[1], meaning: labelColorMatch[2].trim() });
       }
     }
   }
@@ -287,7 +290,11 @@ export function bundleContext(paths) {
   if (paths.opencode) {
     const configPath = resolve(paths.opencode, 'opencode.json');
     if (existsSync(configPath)) {
-      context.opencode = JSON.parse(readFileSync(configPath, 'utf-8'));
+      try {
+        context.opencode = JSON.parse(readFileSync(configPath, 'utf-8'));
+      } catch {
+        context.opencode = null;
+      }
     }
   }
 

@@ -9,6 +9,8 @@ import { resolve } from 'path';
 import { createInterface } from 'readline';
 
 const REQUEST_TIMEOUT = 15000;
+const MAX_RETRIES = 3;
+const BASE_DELAY = 1000;
 
 export class TrelloMCPClient {
   constructor(serverPath) {
@@ -17,10 +19,24 @@ export class TrelloMCPClient {
     this.pending = new Map();
     this.process = null;
     this.rl = null;
+    this._exited = false;
   }
 
-  async connect() {
+  async connect(retries = MAX_RETRIES) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        return await this._connectOnce();
+      } catch (err) {
+        if (attempt === retries) throw err;
+        const delay = BASE_DELAY * Math.pow(2, attempt - 1);
+        await new Promise(r => setTimeout(r, delay));
+      }
+    }
+  }
+
+  _connectOnce() {
     return new Promise((resolve, reject) => {
+      this._exited = false;
       this.process = spawn('bun', [this.serverPath], {
         stdio: ['pipe', 'pipe', 'pipe'],
       });
@@ -51,9 +67,11 @@ export class TrelloMCPClient {
       this.process.on('error', reject);
 
       this.process.on('exit', (code) => {
-        if (code !== 0 && this.pending.size > 0) {
+        this._exited = true;
+        if (this.pending.size > 0) {
+          const errMsg = `MCP server exited with code ${code}`;
           for (const [, { reject: rej }] of this.pending) {
-            rej(new Error(`MCP server exited with code ${code}`));
+            rej(new Error(errMsg));
           }
           this.pending.clear();
         }
