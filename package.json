@@ -1,15 +1,23 @@
 {
-  "name": "kaede-powerup",
+  "name": "kaede",
   "version": "1.0.0",
   "private": true,
-  "description": "KAEDE — Koneksi Automated Environment DE (Trello Power-Up)",
+  "description": "KAEDE — Trello Power-Up & CLI tool untuk AI Agent ecosystem (by PT Koneksi Jaringan Indonesia)",
   "type": "module",
   "scripts": {
     "dev": "bun run dev:css & bun run serve",
     "dev:css": "tailwindcss -i src/style.css -o public/css/style.css --watch",
     "build": "tailwindcss -i src/style.css -o public/css/style.css --minify",
     "serve": "bun x serve . -p 3000 -L",
-    "preview": "bun run build && bun run serve"
+    "preview": "bun run build && bun run serve",
+    "kaede": "node scripts/kaede.mjs",
+    "kaede:setup": "node scripts/kaede.mjs setup",
+    "kaede:today": "node scripts/kaede.mjs today",
+    "kaede:status": "node scripts/kaede.mjs status",
+    "kaede:env": "node scripts/kaede.mjs env"
+  },
+  "bin": {
+    "kaede": "./scripts/kaede.mjs"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.0",

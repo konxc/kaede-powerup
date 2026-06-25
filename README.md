@@ -1,6 +1,6 @@
 # KAEDE — Koneksi Automated Environment DE
 
-**Trello Power-Up** untuk manajemen environment staging/produksi langsung dari kartu Trello.
+**Trello Power-Up** + **CLI Tool** untuk menghubungkan perencanaan tim di Trello dengan ekosistem AI Agent.
 
 | | |
 |---|---|
@@ -8,6 +8,29 @@
 | **Dokumentasi** | [`konxc.github.io/kaede`](https://konxc.github.io/kaede) |
 | **Repo** | `github.com/konxc/kaede-powerup` |
 | **Stack** | Tailwind CSS v4 + Bun |
+| **License** | Proprietary — PT Koneksi Jaringan Indonesia |
+
+---
+
+## Fitur
+
+### Trello Power-Up
+- **Environment Manager** — Atur label Production/Staging/Development per kartu Trello
+- **Dashboard Board** — Lihat statistik lingkungan di setiap board
+- **Badge Kartu** — Status environment muncul langsung di muka kartu
+- **Otorisasi** — Koneksi aman ke penyedia deployment
+
+### CLI Tool (`kaede`)
+- **`kaede setup`** — Setup Trello API Key & Token interaktif
+- **`kaede today`** — Lihat task Trello yang ditugaskan untuk hari ini
+- **`kaede init`** — Inisialisasi KAEDE di project (konfigurasi MCP Trello)
+- **`kaede env`** — Export credentials ke environment variable
+- **`kaede status`** — Cek status konfigurasi
+
+### Integrasi MCP
+- **MCP Trello Server** — AI Agent bisa membaca/menulis Trello langsung
+- **Wrapper otomatis** — Baca credentials dari `secrets.env`, tanpa env var manual
+- **Netral** — Bisa dipakai di project Laravel, Node.js, Python, apa pun
 
 ---
 
@@ -23,9 +46,17 @@
 │   ├── js/kaede.js      # Power-Up capabilities
 │   ├── css/style.css    # Compiled CSS (auto-generated)
 │   └── _redirects       # Netlify redirect rules
-├── src/style.css        # Source CSS (Tailwind v4 + custom components)
+├── src/
+│   ├── mcp-server.js    # MCP Trello server (source)
+│   └── style.css        # Source CSS (Tailwind v4 + custom components)
+├── dist/
+│   └── mcp-server.js    # MCP Trello server (compiled, --target bun)
+├── scripts/
+│   ├── kaede.mjs        # CLI tool (setup, today, init, push, env, status)
+│   ├── build-docs.mjs   # Build docs: Markdown → HTML
+│   └── build-mcp.mjs    # Compile MCP server via bun build
 ├── netlify.toml         # Konfigurasi deploy Netlify
-├── package.json         # Build scripts
+├── package.json         # Build scripts & entry points
 │
 ├── docs/                # Dokumentasi (sumber: Markdown)
 │   ├── index.md         # Ikhtisar
@@ -34,22 +65,78 @@
 │   ├── opencode.md      # Integrasi OpenCode
 │   ├── tools.md         # Referensi tools MCP
 │   └── privacy.md       # Kebijakan privasi
-│
 ├── scripts/
-│   └── build-docs.mjs   # Build docs: Markdown → HTML statis
+│   ├── kaede.mjs        # CLI tool (setup, today, init, env, status)
+│   ├── mcp-server.js    # MCP server (source, compiled to dist/)
+│   └── build-docs.mjs   # Build docs: Markdown → HTML
 │
-└── .github/workflows/
-    └── docs.yml         # Auto-deploy docs ke gh-pages (GitHub Pages)
+├── docs/
+│   ├── index.md         # Ikhtisar dokumentasi
+│   ├── api-key.md       # Panduan API Key & Token Trello
+│   ├── mcp-server.md    # Setup Trello MCP Server
+│   ├── opencode.md      # Integrasi dengan Opencode
+│   ├── tools.md         # Referensi tools MCP
+│   ├── role-management.md # Role definitions & AI Agent integration
+│   └── privacy.md       # Kebijakan privasi
+│
+├── .opencode/
+│   ├── opencode.json    # Konfigurasi AI Agent
+│   └── SHARED/          # Project context & agent rules
+│
+├── secrets.env          # Trello credentials (gitignored)
+├── netlify.toml         # Konfigurasi deploy Netlify
+└── package.json         # Build scripts + CLI entry
 ```
 
-## Cara Kerja
+---
 
-KAEDE adalah Trello Power-Up yang:
+## Quick Start
 
-1. **Connector** — `index.html` terhubung ke Trello via iframe
-2. **Dashboard** — `board.html` menampilkan status environment
-3. **Card Badge** — Badge pada kartu menunjukkan environment aktif
-4. **Card Button** — Buka environment manager dari kartu
+### 1. Setup Credentials
+
+```bash
+# Interaktif — masukkan API Key & Token Trello
+node scripts/kaede.mjs setup
+```
+
+Atau buat `secrets.env` manual:
+
+```env
+TRELLO_API_KEY=your-api-key
+TRELLO_TOKEN=your-token
+```
+
+### 2. Lihat Task Hari Ini
+
+```bash
+node scripts/kaede.mjs today
+```
+
+### 3. Inisialisasi di Project Lain
+
+```bash
+# Dari dalam project target
+node path/to/kaede/scripts/kaede.mjs init .
+```
+
+Ini akan menambahkan konfigurasi MCP Trello ke `.opencode/opencode.json` project kamu.
+
+### 4. Integrasi dengan Opencode
+
+KAEDE sudah siap digunakan dengan Opencode. MCP Trello dikonfigurasi via wrapper yang otomatis membaca credentials dari `secrets.env` — tanpa perlu set env variable manual.
+
+```bash
+# Cek status konfigurasi
+node scripts/kaede.mjs status
+
+# Export credentials ke session (PowerShell)
+node scripts/kaede.mjs env | iex
+
+# Export credentials ke session (Bash)
+eval $(node scripts/kaede.mjs env)
+```
+
+---
 
 ## Dev
 
@@ -64,17 +151,18 @@ bun run dev
 bun run build
 
 # Preview
-bun run preview   # build + serve
+bun run preview
 ```
 
-### Build Docs
+### KAEDE CLI (dev)
 
 ```bash
-# Render Markdown → HTML (butuh marked)
-npm install marked
-node scripts/build-docs.mjs
-# Output: dist-docs/
+bun run kaede -- setup
+bun run kaede -- today
+bun run kaede -- status
 ```
+
+---
 
 ## Deploy
 
@@ -91,17 +179,10 @@ Push ke `main` → Netlify auto-deploy:
 
 Dokumentasi di `docs/*.md` auto-build ke `gh-pages` branch via GitHub Actions.
 
-- **Branch:** `gh-pages` (auto-generated)
 - **URL (default):** `konxc.github.io/kaede-powerup`
-- **URL (target — butuh rename repo):** `konxc.github.io/kaede`
+- **URL (target):** `konxc.github.io/kaede` (rename repo → `kaede`)
 
-Setelah push ke `main`, workflow `.github/workflows/docs.yml`:
-
-1. Render semua Markdown → HTML (KAEDE theme)
-2. Deploy ke `gh-pages` branch
-3. GitHub Pages serve dari `gh-pages`
-
-> **Catatan:** Untuk mencapai URL `konxc.github.io/kaede`, repositori perlu di-rename dari `kaede-powerup` menjadi `kaede` di GitHub (Settings → General → Repository name). URL GitHub Pages project site selalu `{org}.github.io/{nama-repo}` dan tidak bisa diubah subpath-nya.
+---
 
 ## Stack
 
@@ -109,6 +190,30 @@ Setelah push ke `main`, workflow `.github/workflows/docs.yml`:
 |---|---|
 | [Tailwind CSS](https://tailwindcss.com) | v4 |
 | [Bun](https://bun.sh) | v1 |
-| [delorenj/mcp-server-trello](https://github.com/delorenj/mcp-server-trello) | v1.6.1 |
-| [Marked](https://marked.js.org) | (build-time only) |
+| [delorenj/mcp-server-trello](https://github.com/delorenj/mcp-server-trello) | v1.6.1+ |
+| [Marked](https://marked.js.org) | build-time |
 | [peaceiris/actions-gh-pages](https://github.com/peaceiris/actions-gh-pages) | v4 |
+
+---
+
+## Ekosistem
+
+KAEDE adalah bagian dari ekosistem pengembangan PT Koneksi Jaringan Indonesia:
+
+```
+Playbook → OpenKB → OpenCode → KAEDE → Trello
+  (SOP)    (KB)    (AI Agent)  (Bridge) (Board)
+```
+
+- **Playbook** — Panduan manusia ke manusia (SOP, workflow)
+- **OpenKB** — Knowledge base (AI ↔ Human communication)
+- **OpenCode** — Konfigurasi AI Agent
+- **KAEDE** — Jembatan Trello ↔ MCP
+
+---
+
+## Lisensi
+
+Proprietary — &copy; 2026 PT Koneksi Jaringan Indonesia.
+
+KAEDE dapat digunakan dan dimodifikasi untuk project internal. Redistribusi komersial tanpa izin tidak diizinkan.

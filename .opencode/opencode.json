@@ -6,26 +6,22 @@
     ".opencode/SHARED/agent-rules.md"
   ],
   "references": {
-    "smauii-core": {
-      "path": "../smauii-core",
-      "description": "Backend Laravel — main project"
-    },
-    "smauii-aksesekolah": {
-      "path": "../smauii-aksesekolah",
-      "description": "Monorepo entrypoint — .opencode, .openkb"
-    },
-    "smauii-playbook": {
-      "path": "../smauii-playbook",
-      "description": "SOP, workflow, template, ADR, role definitions"
+    "docs": {
+      "path": "docs",
+      "description": "Dokumentasi Power-Up, MCP, integrasi, role management"
     },
     "kaede": {
       "path": ".",
-      "description": "KAEDE Power-Up — integrasi Trello MCP & ekosistem AI Agent"
+      "description": "KAEDE — Trello Power-Up & CLI tool untuk AI Agent ecosystem"
+    },
+    "playbook": {
+      "path": "../smauii-playbook",
+      "description": "Playbook partner — ganti path ini sesuai project"
     }
   },
   "agent": {
     "build": {
-      "description": "Agent utama — maintain Power-Up, dokumentasi, debugging",
+      "description": "Agent utama — maintain Power-Up, CLI, dokumentasi",
       "mode": "primary",
       "permission": {
         "edit": "allow",
@@ -33,7 +29,7 @@
       }
     },
     "plan": {
-      "description": "Agent perencanaan — analisis sebelum coding",
+      "description": "Agent perencanaan — arsitektur, desain sebelum coding",
       "mode": "primary",
       "permission": {
         "edit": "deny"
@@ -41,33 +37,49 @@
     }
   },
   "command": {
+    "kaede-setup": {
+      "description": "Setup Trello API Key & Token interaktif",
+      "template": "node scripts/kaede.mjs setup"
+    },
+    "kaede-today": {
+      "description": "Tampilkan task Trello untuk hari ini",
+      "template": "node scripts/kaede.mjs today"
+    },
+    "kaede-status": {
+      "description": "Cek status konfigurasi KAEDE",
+      "template": "node scripts/kaede.mjs status"
+    },
+    "kaede-init": {
+      "description": "Inisialisasi KAEDE di project lain",
+      "template": "node scripts/kaede.mjs init $ARGUMENTS"
+    },
     "dev": {
-      "description": "Jalankan development server + CSS watch",
+      "description": "Development server + CSS watch",
       "template": "bun run dev"
     },
     "build": {
       "description": "Build production CSS",
       "template": "bun run build"
     },
-    "build-docs": {
-      "description": "Build dokumentasi dari Markdown ke HTML",
-      "template": "node scripts/build-docs.mjs"
-    },
     "preview": {
-      "description": "Preview production build",
+      "description": "Preview build + serve",
       "template": "bun run preview"
+    },
+    "kaede-push": {
+      "description": "Buat Trello cards dari file markdown (.md)",
+      "template": "node scripts/kaede.mjs push $ARGUMENTS"
+    },
+    "build-docs": {
+      "description": "Build dokumentasi Markdown → HTML",
+      "template": "node scripts/build-docs.mjs"
     }
   },
   "mcp": {
     "trello": {
       "type": "local",
-      "command": "bunx",
-      "args": ["@delorenj/mcp-server-trello"],
-      "env": {
-        "TRELLO_API_KEY": "${TRELLO_API_KEY}",
-        "TRELLO_TOKEN": "${TRELLO_TOKEN}"
-      },
-      "enabled": true
+      "command": ["bun", "dist/mcp-server.js"],
+      "enabled": true,
+      "timeout": 30000
     }
   }
 }
