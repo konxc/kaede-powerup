@@ -256,6 +256,37 @@ Menghapus label.
 
 </div>
 
+## Checklist
+
+<div class="tool-group">
+
+### `create_checklist`
+
+Membuat checklist baru di kartu.
+
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"create_checklist"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"QA Checklist"</span><br/>
+&nbsp;&nbsp;} }
+</div>
+
+### `add_checklist_item`
+
+Menambahkan item ke checklist.
+
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_checklist_item"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checklistId"</span>: <span class="str">"checklist123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Test login flow"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checked"</span>: <span class="kw">false</span><br/>
+&nbsp;&nbsp;} }
+</div>
+
+</div>
+
 ## Komentar
 
 <div class="tool-group">

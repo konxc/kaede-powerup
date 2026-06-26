@@ -17,11 +17,6 @@
 | Role Management | `docs/role-management.md` |
 | Privacy Policy | `privacy.html` |
 
-## Related Repos
-- [smauii-aksesekolah](https://github.com/SMA-UII-Yogyakarta/aksesekolah)
-- [smauii-core](https://github.com/SMA-UII-Yogyakarta/core)
-- [smauii-playbook](https://github.com/SMA-UII-Yogyakarta/playbook)
-
 ## Tools & Services
 | Tool | URL |
 |---|---|

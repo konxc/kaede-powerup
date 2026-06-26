@@ -198,6 +198,37 @@ onIntent(['tutup sprint', 'close sprint', 'archive sprint'], async (client, pb, 
   return results;
 });
 
+onIntent(['pindah semua', 'move all', 'pindahkan semua'], async (client, pb, boardId, args) => {
+  const fromListName = args.dari || args.from || args.listName || '';
+  const toListName = args.ke || args.to || args.listNameTarget || '';
+
+  if (!fromListName || !toListName) {
+    return [{ success: false, type: 'move_all_cards', name: 'missing args', error: 'from and to list names required' }];
+  }
+
+  try {
+    const lists = await client.getLists(boardId);
+    const fromList = lists.find(l => l.name.toLowerCase().includes(fromListName.toLowerCase()));
+    const toList = lists.find(l => l.name.toLowerCase().includes(toListName.toLowerCase()));
+    if (!fromList) return [{ success: false, type: 'move_all_cards', name: fromListName, error: `List "${fromListName}" not found` }];
+    if (!toList) return [{ success: false, type: 'move_all_cards', name: toListName, error: `List "${toListName}" not found` }];
+
+    const cards = await client.getCardsByListId(fromList.id, boardId);
+    const results = [];
+    for (const card of cards) {
+      try {
+        await client.callTool('move_card', { cardId: card.id, listId: toList.id });
+        results.push({ success: true, type: 'move_card', name: card.name });
+      } catch (err) {
+        results.push({ success: false, type: 'move_card', name: card.name, error: err.message });
+      }
+    }
+    return results;
+  } catch (err) {
+    return [{ success: false, type: 'move_all_cards', name: fromListName, error: err.message }];
+  }
+});
+
 onIntent(['pindah', 'move card', 'pindahkan'], async (client, pb, boardId, args) => {
   const cardId = args.cardId || args.card || '';
   const listId = args.listId || args.list || '';
@@ -238,6 +269,157 @@ onIntent(['komentar', 'comment', 'tambah komentar'], async (client, pb, boardId,
   }
 });
 
+onIntent(['buat label', 'create label', 'tambah label baru'], async (client, pb, boardId, args) => {
+  const colorName = args.color || args.warna || '';
+  const labelName = args.name || args.nama || '';
+  let targetColor = colorName.toLowerCase();
+
+  const colorMap = {
+    merah: 'red', kuning: 'yellow', hijau: 'green',
+    biru: 'blue', orange: 'orange', ungu: 'purple',
+    pink: 'pink', abu: 'gray',
+    red: 'red', yellow: 'yellow', green: 'green',
+    blue: 'blue', orange: 'orange', purple: 'purple',
+    gray: 'gray',
+  };
+  targetColor = colorMap[targetColor] || targetColor;
+
+  if (!targetColor || !['red','yellow','green','blue','orange','purple','pink','gray'].includes(targetColor)) {
+    return [{ success: false, type: 'create_label', name: labelName || '(no name)', error: `Invalid color "${colorName}". Gunakan: merah/kuning/hijau/biru/orange/ungu/pink/abu` }];
+  }
+
+  const displayName = labelName || targetColor;
+  try {
+    const r = await client.createLabel(boardId, displayName, targetColor);
+    return [{ success: true, type: 'create_label', name: displayName, result: r }];
+  } catch (err) {
+    return [{ success: false, type: 'create_label', name: displayName, error: err.message }];
+  }
+});
+
+onIntent(['arsip list', 'archive list', 'hapus list'], async (client, pb, boardId, args) => {
+  const listName = args.nama || args.name || '';
+  const listId = args.listId || '';
+
+  if (!listId && !listName) {
+    return [{ success: false, type: 'archive_list', name: 'missing args', error: 'listId or name required' }];
+  }
+
+  let targetListId = listId;
+  if (!targetListId && listName) {
+    const lists = await client.getLists(boardId);
+    const target = lists.find(l => l.name.toLowerCase() === listName.toLowerCase());
+    if (!target) return [{ success: false, type: 'archive_list', name: listName, error: `List "${listName}" not found` }];
+    targetListId = target.id;
+  }
+
+  try {
+    await client.archiveList(targetListId);
+    return [{ success: true, type: 'archive_list', name: `List ${listName || targetListId} archived` }];
+  } catch (err) {
+    return [{ success: false, type: 'archive_list', name: listName, error: err.message }];
+  }
+});
+
+onIntent(['arsipkan', 'archive card', 'hapus card', 'delete card'], async (client, pb, boardId, args) => {
+  const cardId = args.cardId || args.card || '';
+  if (!cardId) {
+    return [{ success: false, type: 'archive_card', name: 'missing args', error: 'cardId required' }];
+  }
+  try {
+    await client.archiveCard(cardId);
+    return [{ success: true, type: 'archive_card', name: `Archived ${cardId}` }];
+  } catch (err) {
+    return [{ success: false, type: 'archive_card', name: cardId, error: err.message }];
+  }
+});
+
+onIntent(['update card', 'ubah kartu', 'edit card', 'update kartu'], async (client, pb, boardId, args) => {
+  const cardId = args.cardId || args.card || '';
+  if (!cardId) {
+    return [{ success: false, type: 'update_card', name: 'missing args', error: 'cardId required' }];
+  }
+
+  const updates = {};
+  if (args.name) updates.name = args.name;
+  if (args.description || args.desc) updates.description = args.description || args.desc;
+  if (args.dueDate) updates.dueDate = args.dueDate;
+  if (args.start) updates.start = args.start;
+  if (args.dueComplete !== undefined) updates.dueComplete = args.dueComplete;
+  if (args.labels) updates.labels = args.labels;
+
+  try {
+    await client.updateCard(cardId, updates);
+    return [{ success: true, type: 'update_card', name: `Card ${cardId} updated` }];
+  } catch (err) {
+    return [{ success: false, type: 'update_card', name: cardId, error: err.message }];
+  }
+});
+
+onIntent(['buat checklist', 'add checklist', 'tambah checklist'], async (client, pb, boardId, args) => {
+  const cardId = args.cardId || args.card || '';
+  const name = args.name || args.nama || 'Checklist';
+  const items = args.items || [];
+
+  if (!cardId) {
+    return [{ success: false, type: 'create_checklist', name: 'missing args', error: 'cardId required' }];
+  }
+
+  try {
+    const r = await client.createChecklist(cardId, name);
+    const results = [{ success: true, type: 'create_checklist', name: r.name, result: r }];
+    for (const item of items) {
+      try {
+        const ir = await client.addChecklistItem(r.id, item);
+        results.push({ success: true, type: 'add_checklist_item', name: item, result: ir });
+      } catch (err) {
+        results.push({ success: false, type: 'add_checklist_item', name: item, error: err.message });
+      }
+    }
+    return results;
+  } catch (err) {
+    return [{ success: false, type: 'create_checklist', name, error: err.message }];
+  }
+});
+
+onIntent(['buat board', 'create board', 'new board'], async (client, pb, boardId, args) => {
+  const name = args.name || args.nama || 'New Board';
+  try {
+    const r = await client.createBoard(name, {});
+    return [{ success: true, type: 'create_board', name, result: r }];
+  } catch (err) {
+    return [{ success: false, type: 'create_board', name, error: err.message }];
+  }
+});
+
+onIntent(['hapus anggota', 'remove member', 'keluarkan anggota'], async (client, pb, boardId, args) => {
+  const cardId = args.cardId || args.card || '';
+  const memberId = args.memberId || args.member || '';
+  if (!cardId || !memberId) {
+    return [{ success: false, type: 'remove_member', name: 'missing args', error: 'cardId and memberId required' }];
+  }
+  try {
+    await client.removeMember(cardId, memberId);
+    return [{ success: true, type: 'remove_member', name: `${memberId} removed from ${cardId}` }];
+  } catch (err) {
+    return [{ success: false, type: 'remove_member', name: cardId, error: err.message }];
+  }
+});
+
+onIntent(['tambah label ke card', 'add label to card', 'pasang label'], async (client, pb, boardId, args) => {
+  const cardId = args.cardId || args.card || '';
+  const labelId = args.labelId || args.label || '';
+  if (!cardId || !labelId) {
+    return [{ success: false, type: 'add_label_to_card', name: 'missing args', error: 'cardId and labelId required' }];
+  }
+  try {
+    await client.addLabelToCard(cardId, labelId);
+    return [{ success: true, type: 'add_label_to_card', name: `Label ${labelId} → Card ${cardId}` }];
+  } catch (err) {
+    return [{ success: false, type: 'add_label_to_card', name: cardId, error: err.message }];
+  }
+});
+
 onIntent(['report', 'progress', 'my cards', 'kartu saya'], async (client, pb, boardId) => {
   try {
     const r = await client.callTool('get_my_cards', {});
@@ -261,7 +443,7 @@ export async function executeIntent(client, intent, playbookContext, boardId, ex
       return h.fn(client, playbookContext, boardId, extraArgs);
     }
   }
-  return [{ success: false, type: 'unknown_intent', name: intent, error: 'No handler matched. Try: mulai sprint, buat card, assign, pindah, komentar, report' }];
+  return [{ success: false, type: 'unknown_intent', name: intent, error: 'No handler matched. Try: mulai sprint, buat card, assign, buat label, arsipkan, arsip list, pindah semua, buat board, update card, buat checklist, komentar, report, tutup sprint' }];
 }
 
 export function bundleContext(paths) {

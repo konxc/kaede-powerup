@@ -267,6 +267,18 @@ async function handleToolsCall(name, args) {
       return { success: true, labelId: args.labelId };
     }
 
+    // ─── Checklists ───
+    case 'create_checklist': {
+      const checklist = await trelloPost(`/cards/${args.cardId}/checklists`, { name: args.name });
+      return { id: checklist.id, name: checklist.name };
+    }
+    case 'add_checklist_item': {
+      const body = { name: args.name };
+      if (args.checked !== undefined) body.checked = args.checked;
+      const item = await trelloPost(`/checklists/${args.checklistId}/checkItems`, body);
+      return { id: item.id, name: item.name };
+    }
+
     // ─── Comments ───
     case 'add_comment': {
       const comment = await trelloPost(`/cards/${args.cardId}/actions/comments`, { text: args.text });
@@ -379,6 +391,16 @@ const TOOLS = [
     cardId: { type: 'string', description: 'ID of the card' },
     limit: { type: 'number', description: 'Max comments (default 100)' },
   }, ['cardId']),
+
+  toolSchema('create_checklist', 'Create a checklist on a card', {
+    cardId: { type: 'string', description: 'ID of the card' },
+    name: { type: 'string', description: 'Checklist name' },
+  }, ['cardId', 'name']),
+  toolSchema('add_checklist_item', 'Add an item to a checklist', {
+    checklistId: { type: 'string', description: 'ID of the checklist' },
+    name: { type: 'string', description: 'Item name' },
+    checked: { type: 'boolean', description: 'Mark as completed' },
+  }, ['checklistId', 'name']),
 ];
 
 // ─── Main ───

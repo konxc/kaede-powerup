@@ -16,8 +16,8 @@
       "description": "KAEDE — Trello Power-Up & CLI tool untuk AI Agent ecosystem"
     },
     "playbook": {
-      "path": "../konxc-playbook",
-      "description": "Master playbook — SOP, workflow, standar (ganti sesuai project)"
+      "path": "docs/playbook-template.md",
+      "description": "Template playbook — SOP, workflow, standar. Ganti sesuai project."
     }
   },
   "agent": {

@@ -1,3 +1,5 @@
-# Netlify _redirects
-# All routes → index.html (SPA fallback)
-/*  /index.html  200
+# Netlify _redirects — specific rules before catch-all
+/install       /install.sh      200
+/install.ps1   /install.ps1     200
+# All other routes → index.html (SPA fallback)
+/*             /index.html      200

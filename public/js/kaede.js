@@ -85,7 +85,7 @@ const capabilities = {
   },
 
   // ---------------------------------------------------------------
-  //  Card Buttons — actions per-card
+  //  Card Buttons — Environment & MCP actions
   // ---------------------------------------------------------------
   'card-buttons': function (t) {
     return [
@@ -97,6 +97,18 @@ const capabilities = {
             title: 'Environment Manager',
             url: 'card.html',
             height: 300,
+          });
+        },
+        condition: 'edit',
+      },
+      {
+        icon: KAEDE.iconFallback.light,
+        text: 'KAEDE: MCP',
+        callback: async function (t) {
+          return t.popup({
+            title: 'MCP Control',
+            url: 'mcp.html',
+            height: 480,
           });
         },
         condition: 'edit',

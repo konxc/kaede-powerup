@@ -236,6 +236,18 @@ export class TrelloMCPClient {
     await this.updateCard(cardId, { labels: labelIds });
   }
 
+  // ── Checklists ──
+
+  async createChecklist(cardId, name) {
+    return this.callTool('create_checklist', { cardId, name });
+  }
+
+  async addChecklistItem(checklistId, name, checked) {
+    const args = { checklistId, name };
+    if (checked !== undefined) args.checked = checked;
+    return this.callTool('add_checklist_item', args);
+  }
+
   // ── Comments ──
 
   async addComment(cardId, text) {

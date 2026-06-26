@@ -2,7 +2,7 @@
   "name": "kaede",
   "version": "1.0.0",
   "private": true,
-  "description": "KAEDE — Trello Power-Up & CLI tool untuk AI Agent ecosystem (by PT Koneksi Jaringan Indonesia)",
+  "description": "KAEDE — Trello Power-Up, MCP Server & CLI Orchestrator for AI Agent ecosystem",
   "type": "module",
   "scripts": {
     "dev": "bun run dev:css & bun run serve",
@@ -18,7 +18,9 @@
     "kaede:env": "node scripts/kaede.mjs env",
     "test": "node --test test/*.test.js",
     "test:orchestrator": "node --test test/orchestrator.test.js",
-    "test:trello": "node --test test/trello-client.test.js"
+    "test:trello": "node --test test/trello-client.test.js",
+    "test:e2e": "node --test test/e2e-orchestrator.test.js",
+    "test:all": "node --test test/*.test.js"
   },
   "bin": {
     "kaede": "./scripts/kaede.mjs"

@@ -613,17 +613,26 @@
     </div>
 
     <div class="mt-10 glass rounded-xl p-6 sm:p-8 text-center">
-      <h3 class="text-sm font-semibold">Integrasi MCP (Coming Soon)</h3>
+      <h3 class="text-sm font-semibold flex items-center justify-center gap-2">
+        Integrasi MCP
+        <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-success/20 text-kaede-success">Live</span>
+      </h3>
       <p class="text-xs text-kaede-muted mt-2 leading-relaxed max-w-lg mx-auto">
-        Ke depan, KAEDE akan menyediakan MCP Server yang memungkinkan AI Agent
-        di OpenCode untuk membaca dan menulis Trello secara langsung —
-        membuat kartu, mengubah label, mengecek assignment, dan lainnya.
+        KAEDE MCP Server sudah aktif. AI Agent di OpenCode bisa membaca dan menulis
+        Trello secara langsung — semua 22 tools sudah tersedia melalui
+        <code class="text-[10px]">dist/mcp-server.js</code>.
       </p>
       <div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-kaede-muted">
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Baca Trello</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Buat Kartu</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Update Label</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Cek Assignment</span>
+        <span class="px-2.5 py-1 rounded bg-kaede-success/20 text-kaede-success">22 Tools</span>
+        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Boards</span>
+        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Lists</span>
+        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Cards</span>
+        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Members</span>
+        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Labels</span>
+        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Comments</span>
+      </div>
+      <div class="mt-4 text-[11px] text-kaede-muted">
+        <code class="text-[10px] px-2 py-1 rounded bg-kaede-surface">bun dist/mcp-server.js</code>
       </div>
     </div>
   </section>

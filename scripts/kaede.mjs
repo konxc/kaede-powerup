@@ -6,7 +6,9 @@ import { homedir, hostname } from 'os';
 import { createInterface } from 'readline';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const KAEDE_DIR = resolve(__dirname, '..');
+const KAEDE_DIR = process.env.KAEDE_DIR
+  ? resolve(process.env.KAEDE_DIR)
+  : resolve(__dirname, '..');
 
 function loadEnv(filePath) {
   if (!existsSync(filePath)) return {};
@@ -211,6 +213,7 @@ async function cmdInit() {
   const optName = getOpt('--name');
   const optTech = getOpt('--tech');
   const optDb = getOpt('--db');
+  const optPlaybook = getOpt('--playbook');
   const interactive = !optTech || !optDb; // skip prompts when --tech & --db given
 
   const projectName = optName || basename(targetDir);
@@ -373,6 +376,15 @@ async function cmdInit() {
     };
   }
 
+  // Add playbook reference if --playbook given
+  if (optPlaybook && !config.references.playbook) {
+    const playbookRel = relative(targetDir, resolve(targetDir, optPlaybook)).replace(/\\/g, '/');
+    config.references.playbook = {
+      path: playbookRel.startsWith('..') ? playbookRel : playbookRel,
+      description: 'Playbook — SOP, workflow, standar tim',
+    };
+  }
+
   // Agents
   if (!config.agent) {
     config.agent = {
@@ -463,8 +475,12 @@ async function cmdInit() {
   console.log('');
   console.log('  \x1b[90m  Next steps:\x1b[0m');
   console.log('  \x1b[90m  1. Edit .opencode/SHARED/project-context.md dengan info project\x1b[0m');
-  console.log('  \x1b[90m  2. Jalankan \x1b[0m\x1b[36mopencode\x1b[0m\x1b[90m untuk mulai menggunakan AI Agent\x1b[0m');
-  console.log(`  \x1b[90m  3. Cek task Trello: \x1b[0m\x1b[36mnode ${kaedeScripts}/kaede.mjs today\x1b[0m`);
+  console.log('  \x1b[90m  2. Copy & edit playbook: \x1b[0m\x1b[90mcp kaede/docs/playbook-template.md ./playbook.md\x1b[0m');
+  if (!optPlaybook) {
+    console.log('  \x1b[90m     Lalu jalankan ulang: \x1b[0m\x1b[36mkaede init . --playbook playbook.md\x1b[0m');
+  }
+  console.log('  \x1b[90m  3. Jalankan \x1b[0m\x1b[36mopencode\x1b[0m\x1b[90m untuk mulai menggunakan AI Agent\x1b[0m');
+  console.log(`  \x1b[90m  4. Cek task Trello: \x1b[0m\x1b[36mnode ${kaedeScripts}/kaede.mjs today\x1b[0m`);
   console.log('');
 }
 
@@ -658,11 +674,39 @@ async function cmdEnv() {
   }
 }
 
-async function cmdStatus() {
-  const secrets = getSecrets();
+async function cmdBuild() {
+  const args = process.argv.slice(3);
+  const isMcp = args.includes('--mcp') || args.includes('-m') || args.length === 0;
+
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
-  console.log('  \x1b[35m║         KAEDE — Status               ║\x1b[0m');
+  console.log('  \x1b[35m║         KAEDE — Build                ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('');
+
+  if (isMcp) {
+    const buildScript = resolve(KAEDE_DIR, 'scripts', 'build-mcp.mjs');
+    if (!existsSync(buildScript)) {
+      console.error('  \x1b[31m  ✗ scripts/build-mcp.mjs not found\x1b[0m');
+      return;
+    }
+    const { execSync } = await import('child_process');
+    try {
+      execSync(`bun ${buildScript}`, { cwd: KAEDE_DIR, stdio: 'inherit' });
+    } catch (err) {
+      console.error('  \x1b[31m  ✗ Build failed:\x1b[0m', err.message);
+    }
+  }
+}
+
+async function cmdStatus() {
+  const secrets = getSecrets();
+  const args = process.argv.slice(3);
+  const checkMcp = args.includes('--mcp') || args.includes('-m');
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║         KAEDE — Status               \x1b[0m');
   console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
   console.log('');
 
@@ -683,6 +727,21 @@ async function cmdStatus() {
     ? readFileSync(opencodeJson, 'utf-8').includes('"mcp"')
     : false;
   console.log(`  MCP configured  ${hasMcp ? '\x1b[32m✓\x1b[0m' : '\x1b[33mnot in this project\x1b[0m'}  \x1b[90m${opencodeJson}\x1b[0m`);
+
+  if (checkMcp && apiKeyOk && tokenOk) {
+    console.log('');
+    console.log('  \x1b[36m  Testing MCP connection...\x1b[0m');
+    try {
+      const { TrelloMCPClient } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'trello-client.js')).href);
+      const client = new TrelloMCPClient();
+      await client.connect();
+      const boards = await client.listBoards();
+      console.log(`  MCP server      \x1b[32m✓ responding\x1b[0m \x1b[90m(${boards.length} boards)\x1b[0m`);
+      client.close();
+    } catch (err) {
+      console.log(`  MCP server      \x1b[31m✗ ${err.message.slice(0, 60)}\x1b[0m`);
+    }
+  }
 
   console.log('');
   if (!apiKeyOk || !tokenOk) {
@@ -847,7 +906,7 @@ async function cmdRun() {
     if (isDryRun) {
       console.log('');
       console.log('  \x1b[36m  Would execute:\x1b[0m \x1b[90m"' + intent + '"\x1b[0m');
-      console.log(`  \x1b[36m  Intents available:\x1b[0m \x1b[90mmulai sprint, buat card, assign, pindah, komentar, report, tutup sprint\x1b[0m`);
+      console.log(`  \x1b[36m  Intents available:\x1b[0m \x1b[90mmulai sprint, buat card, assign, buat label, arsipkan, pindah semua, buat board, komentar, report, tutup sprint\x1b[0m`);
       console.log(`  \x1b[36m  Workflow lists:\x1b[0m \x1b[90m${playbook.workflow.lists.join(', ')}\x1b[0m`);
       console.log('');
       console.log('  \x1b[32m  ✅  Dry run complete. Pass --board <id> to execute.\x1b[0m');
@@ -904,6 +963,129 @@ async function cmdRun() {
   console.log('');
 }
 
+async function cmdInstall() {
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║      KAEDE — Global Install          ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('');
+
+  // 1. Build MCP server
+  console.log('  \x1b[36m  Building MCP server...\x1b[0m');
+  const { execSync } = await import('child_process');
+  try {
+    execSync('bun build --target bun src/mcp-server.js --outfile dist/mcp-server.js', {
+      cwd: KAEDE_DIR,
+      stdio: 'inherit',
+    });
+    console.log('  \x1b[32m  ✓ MCP server built\x1b[0m');
+  } catch {
+    console.log('  \x1b[33m  ⚠  MCP build skipped (bun not found?)\x1b[0m');
+  }
+
+  // 2. npm link
+  console.log('  \x1b[36m  Linking globally via npm link...\x1b[0m');
+  try {
+    execSync('npm link', { cwd: KAEDE_DIR, stdio: 'inherit' });
+    console.log('  \x1b[32m  ✓ KAEDE linked globally\x1b[0m');
+  } catch {
+    console.log('  \x1b[33m  ⚠  npm link failed (try: cd kaede-powerup && npm link)\x1b[0m');
+  }
+
+  // 3. Setup global secrets directory
+  const configDir = resolve(homedir(), '.config', 'kaede');
+  if (!existsSync(configDir)) {
+    mkdirSync(configDir, { recursive: true });
+    console.log('  \x1b[32m  ✓ Created ~/.config/kaede/\x1b[0m');
+  }
+
+  console.log('');
+  console.log('  \x1b[32m  ✅  KAEDE installed globally!\x1b[0m');
+  console.log('');
+  console.log('  \x1b[90m     Usage:\x1b[0m');
+  console.log('  \x1b[90m       kaede setup          — setup Trello API key\x1b[0m');
+  console.log('  \x1b[90m       kaede init ../project — init project\x1b[0m');
+  console.log('  \x1b[90m       kaede today          — today\'s tasks\x1b[0m');
+  console.log('  \x1b[90m       kaede status --mcp   — check MCP health\x1b[0m');
+  console.log('');
+  console.log('  \x1b[90m     Or set KAEDE_DIR env var if not in PATH:\x1b[0m');
+  console.log(`  \x1b[90m       export KAEDE_DIR=${KAEDE_DIR.replace(/\\/g, '/')}\x1b[0m`);
+  console.log('');
+}
+
+async function cmdStart() {
+  const { startApiServer } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'api-server.mjs')).href);
+  const server = await startApiServer(parseInt(process.argv[3], 10) || 3456);
+
+  process.on('SIGINT', () => {
+    console.log('\n  \x1b[33m  Shutting down API server...\x1b[0m');
+    server.close();
+    process.exit(0);
+  });
+  process.on('SIGTERM', () => {
+    server.close();
+    process.exit(0);
+  });
+}
+
+async function cmdTestTools() {
+  const secrets = getSecrets();
+  if (!secrets.TRELLO_API_KEY || !secrets.TRELLO_TOKEN) {
+    console.error('  \x1b[31m  ✗ Trello credentials not found.\x1b[0m');
+    console.error('  \x1b[33m  Run `node scripts/kaede.mjs setup` first.\x1b[0m');
+    return;
+  }
+
+  const { TrelloMCPClient } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'trello-client.js')).href);
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║     KAEDE — Test MCP Tools           ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('');
+
+  const tools = [
+    ['list_workspaces', {}],
+    ['list_boards', {}],
+    ['get_my_cards', {}],
+  ];
+
+  const client = new TrelloMCPClient();
+  try {
+    const timeout = setTimeout(() => { throw new Error('Connection timed out (30s)'); }, 30000);
+    await client.connect();
+    clearTimeout(timeout);
+    console.log(`  \x1b[32m  ✓ Connected to MCP Server\x1b[0m`);
+    console.log('');
+
+    let passed = 0;
+    let failed = 0;
+
+    for (const [tool, params] of tools) {
+      try {
+        const result = await client.callTool(tool, params);
+        const summary = Object.keys(result).slice(0, 3).map(k => `${k}: ${Array.isArray(result[k]) ? result[k].length : typeof result[k]}`).join(', ');
+        console.log(`  \x1b[32m  ✓ ${tool}\x1b[0m \x1b[90m(${summary})\x1b[0m`);
+        passed++;
+      } catch (err) {
+        console.log(`  \x1b[31m  ✗ ${tool}\x1b[0m \x1b[90m— ${err.message.slice(0, 80)}\x1b[0m`);
+        failed++;
+      }
+    }
+
+    console.log('');
+    console.log(`  \x1b[36m  Result: ${passed} passed, ${failed} failed\x1b[0m`);
+    if (passed === tools.length) {
+      console.log('  \x1b[32m  ✅  All MCP tools responding.\x1b[0m');
+    }
+  } catch (err) {
+    console.error(`  \x1b[31m  ✗ ${err.message}\x1b[0m`);
+  } finally {
+    client.close();
+  }
+  console.log('');
+}
+
 function cmdHelp() {
   console.log('');
   console.log('  \x1b[35mKAEDE — Koneksi Automated Environment DE\x1b[0m');
@@ -915,18 +1097,23 @@ function cmdHelp() {
   console.log('  \x1b[37mCommands:\x1b[0m');
   console.log('    \x1b[36msetup\x1b[0m     \x1b[90mKonfigurasi Trello API Key & Token\x1b[0m');
   console.log('    \x1b[36mtoday\x1b[0m     \x1b[90mTampilkan task Trello hari ini\x1b[0m');
-  console.log('    \x1b[36minit\x1b[0m      \x1b[90mInit KAEDE di project — .opencode/ + credentials\x1b[0m');
+  console.log('    \x1b[36minit\x1b[0m      \x1b[90mInit KAEDE di project. Flags: --playbook <path>, --tech <stack>, --db <type>\x1b[0m');
   console.log('    \x1b[36mpush\x1b[0m      \x1b[90mBuat Trello cards dari file markdown\x1b[0m');
   console.log('    \x1b[36menv\x1b[0m       \x1b[90mExport credentials ke shell environment\x1b[0m');
-  console.log('    \x1b[36mstatus\x1b[0m    \x1b[90mCek status konfigurasi KAEDE\x1b[0m');
+  console.log('    \x1b[36mstatus\x1b[0m    \x1b[90mCek status konfigurasi KAEDE (--mcp untuk test koneksi)\x1b[0m');
   console.log('    \x1b[36mplaybook\x1b[0m  \x1b[90mParse/show playbook (parse <path> | show <path>)\x1b[0m');
   console.log('    \x1b[36morchestrate\x1b[0m \x1b[90mLoad context (--playbook <path> [--detail])\x1b[0m');
   console.log('    \x1b[36mrun\x1b[0m       \x1b[90mExecute intent (--playbook <path> [--board <id>] [--dry-run] "intent")\x1b[0m');
-  console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
-  console.log('');
-  console.log('  \x1b[37mExamples:\x1b[0m');
-  console.log('    node scripts/kaede.mjs init                              # interactive');
-  console.log('    node scripts/kaede.mjs init ../project --tech Laravel --db MySQL');
+  console.log('    \x1b[36mbuild\x1b[0m     \x1b[90mBuild MCP server (dist/mcp-server.js)\x1b[0m');
+    console.log('    \x1b[36mstart\x1b[0m     \x1b[90mStart API server (HTTP bridge for frontend) [port]\x1b[0m');
+    console.log('    \x1b[36mtest-tools\x1b[0m \x1b[90mUji koneksi 22 MCP tools (butuh Trello credentials)\x1b[0m');
+    console.log('    \x1b[36minstall\x1b[0m   \x1b[90mInstall KAEDE globally via npm link\x1b[0m');
+    console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
+    console.log('');
+    console.log('  \x1b[37mExamples:\x1b[0m');
+    console.log('    node scripts/kaede.mjs init                              # interactive');
+    console.log('    node scripts/kaede.mjs init ../project --tech Laravel --db MySQL');
+    console.log('    node scripts/kaede.mjs init . --playbook playbook.md    # init + playbook ref');
   console.log('    node scripts/kaede.mjs push tasks.md                     # file mode');
   console.log('    node scripts/kaede.mjs push tasks.md --board "My Board" --list "To Do"');
   console.log('    node scripts/kaede.mjs setup');
@@ -936,7 +1123,16 @@ function cmdHelp() {
   console.log('    node scripts/kaede.mjs orchestrate --playbook ../playbook/sprint.md --detail');
   console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md -n "Mulai Sprint Alpha"');
   console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --board abc123 "Mulai Sprint Alpha"');
-  console.log('');
+  console.log('    node scripts/kaede.mjs status --mcp');
+    console.log('    node scripts/kaede.mjs build');
+    console.log('    node scripts/kaede.mjs start');
+    console.log('    node scripts/kaede.mjs start 8080');
+    console.log('    node scripts/kaede.mjs test-tools');
+    console.log('    node scripts/kaede.mjs install');
+    console.log('');
+    console.log('  \x1b[37mEnv:\x1b[0m');
+    console.log('    \x1b[36mKAEDE_DIR\x1b[0m   \x1b[90mOverride path ke instalasi KAEDE (default: auto-detect)\x1b[0m');
+    console.log('');
 }
 
 // ─── Main ───
@@ -971,6 +1167,18 @@ async function main() {
       break;
     case 'run':
       await cmdRun();
+      break;
+    case 'build':
+      await cmdBuild();
+      break;
+    case 'install':
+      await cmdInstall();
+      break;
+    case 'start':
+      await cmdStart();
+      break;
+    case 'test-tools':
+      await cmdTestTools();
       break;
     case 'help':
     case '--help':
