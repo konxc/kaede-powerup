@@ -28,14 +28,12 @@ function loadEnv(filePath) {
 }
 
 function getSecrets() {
-  const searchPaths = [
-    resolve(KAEDE_DIR, 'secrets.env'),
-    resolve(KAEDE_DIR, '..', 'secrets.env'),
-    resolve(homedir(), '.config', 'kaede', 'secrets.env'),
-    resolve(process.cwd(), 'secrets.env'),
-  ];
+  const global = resolve(homedir(), '.config', 'kaede', 'secrets.env');
+  const local = resolve(process.cwd(), 'secrets.env');
+  const dev = resolve(KAEDE_DIR, 'secrets.env');
+
   let merged = {};
-  for (const p of searchPaths) {
+  for (const p of [dev, local, global]) {
     merged = { ...merged, ...loadEnv(p) };
   }
   return merged;
@@ -702,11 +700,13 @@ async function cmdStatus() {
   console.log(`  Trello API Key  ${apiKeyOk ? '\x1b[32m✓ configured\x1b[0m' : '\x1b[31m✗ missing\x1b[0m'}`);
   console.log(`  Trello Token    ${tokenOk ? '\x1b[32m✓ configured\x1b[0m' : '\x1b[31m✗ missing\x1b[0m'}`);
 
-  const configDir = resolve(homedir(), '.config', 'kaede', 'secrets.env');
-  console.log(`  Global config   ${existsSync(configDir) ? '\x1b[32m✓\x1b[0m' : '\x1b[33mnot set\x1b[0m'}  \x1b[90m${configDir}\x1b[0m`);
+  const globalPath = resolve(homedir(), '.config', 'kaede', 'secrets.env');
+  console.log(`  Global secrets  ${existsSync(globalPath) ? '\x1b[32m✓\x1b[0m' : '\x1b[33mnot set\x1b[0m'}  \x1b[90m${globalPath}\x1b[0m`);
 
-  const localPath = resolve(KAEDE_DIR, 'secrets.env');
-  console.log(`  Local config    ${existsSync(localPath) ? '\x1b[32m✓\x1b[0m' : '\x1b[33mnot set\x1b[0m'}  \x1b[90m${localPath}\x1b[0m`);
+  const devPath = resolve(KAEDE_DIR, 'secrets.env');
+  if (existsSync(devPath)) {
+    console.log(`  Dev secrets     \x1b[33m⚠\x1b[0m  \x1b[90m${devPath} (for dev/testing only)\x1b[0m`);
+  }
 
   const globalOc = resolve(homedir(), '.config', 'opencode', 'opencode.json');
   const projectOc = resolve(process.cwd(), '.opencode', 'opencode.json');
