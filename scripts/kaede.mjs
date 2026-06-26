@@ -712,8 +712,17 @@ async function cmdStatus() {
   const projectOc = resolve(process.cwd(), '.opencode', 'opencode.json');
   const hasGlobalMcp = existsSync(globalOc) && readFileSync(globalOc, 'utf-8').includes('"mcp"');
   const hasProjectMcp = existsSync(projectOc) && readFileSync(projectOc, 'utf-8').includes('"mcp"');
+
+  let globalMcpNames = [];
   if (hasGlobalMcp) {
+    try {
+      const cfg = JSON.parse(readFileSync(globalOc, 'utf-8'));
+      globalMcpNames = Object.keys(cfg.mcp || {});
+    } catch {}
     console.log(`  MCP configured  \x1b[32m✓\x1b[0m  \x1b[90m${globalOc} (global)\x1b[0m`);
+    if (globalMcpNames.length > 0) {
+      console.log(`  MCP servers     \x1b[90m${globalMcpNames.join(', ')}\x1b[0m`);
+    }
   } else if (hasProjectMcp) {
     console.log(`  MCP configured  \x1b[32m✓\x1b[0m  \x1b[90m${projectOc}\x1b[0m`);
   } else {
@@ -982,16 +991,21 @@ async function cmdInstall() {
   const opencodeConfigDir = resolve(homedir(), '.config', 'opencode');
   const opencodeConfigPath = resolve(opencodeConfigDir, 'opencode.json');
 
-  // 1. Build MCP server
-  console.log('  \x1b[36m  Building MCP server...\x1b[0m');
-  try {
-    execSync('bun build --target bun src/mcp-server.js --outfile dist/mcp-server.js', {
-      cwd: KAEDE_DIR,
-      stdio: 'inherit',
-    });
-    console.log('  \x1b[32m  ✓ MCP server built\x1b[0m');
-  } catch {
-    console.log('  \x1b[33m  ⚠  MCP build skipped (bun not found?)\x1b[0m');
+  // 1. Build MCP servers
+  for (const [label, src, out] of [
+    ['Trello MCP', 'src/mcp-server.js', 'dist/mcp-server.js'],
+    ['KAEDE Orchestrator MCP', 'src/kaede-mcp-server.js', 'dist/kaede-mcp-server.js'],
+  ]) {
+    console.log(`  \x1b[36m  Building ${label}...\x1b[0m`);
+    try {
+      execSync(`bun build --target bun ${src} --outfile ${out}`, {
+        cwd: KAEDE_DIR,
+        stdio: 'inherit',
+      });
+      console.log(`  \x1b[32m  ✓ ${label} built\x1b[0m`);
+    } catch {
+      console.log(`  \x1b[33m  ⚠  ${label} build skipped (bun not found?)\x1b[0m`);
+    }
   }
 
   // 2. Copy files to ~/.kaede/
@@ -1006,6 +1020,7 @@ async function cmdInstall() {
       writeFileSync(resolve(globalDir, dest), content, 'utf-8');
     };
     cp('dist/mcp-server.js', 'dist/mcp-server.js');
+    cp('dist/kaede-mcp-server.js', 'dist/kaede-mcp-server.js');
     cp('scripts/kaede.mjs', 'scripts/kaede.mjs');
     cp('docs/playbook-template.md', 'docs/playbook-template.md');
     console.log('  \x1b[32m  ✓ Files copied to ~/.kaede/\x1b[0m');
@@ -1040,19 +1055,30 @@ async function cmdInstall() {
     } catch {}
   }
 
-  const mcpServerPath = resolve(globalDir, 'dist', 'mcp-server.js').replace(/\\/g, '/');
+  const trelloPath = resolve(globalDir, 'dist', 'mcp-server.js').replace(/\\/g, '/');
+  const kaedePath = resolve(globalDir, 'dist', 'kaede-mcp-server.js').replace(/\\/g, '/');
   opencodeConfig.mcp = opencodeConfig.mcp || {};
+
   if (!opencodeConfig.mcp.trello) {
     opencodeConfig.mcp.trello = {
       type: 'local',
-      command: ['bun', mcpServerPath],
+      command: ['bun', trelloPath],
       enabled: true,
       timeout: 30000,
     };
   }
 
+  if (!opencodeConfig.mcp.kaede) {
+    opencodeConfig.mcp.kaede = {
+      type: 'local',
+      command: ['bun', kaedePath],
+      enabled: true,
+      timeout: 60000,
+    };
+  }
+
   writeFileSync(opencodeConfigPath, JSON.stringify(opencodeConfig, null, 2) + '\n', 'utf-8');
-  console.log(`  \x1b[32m  ✓ MCP trello added to global OpenCode config\x1b[0m`);
+  console.log('  \x1b[32m  ✓ MCP trello & kaede added to global OpenCode config\x1b[0m');
 
   // 5. Setup credentials directory
   mkdirSync(kaedeConfigDir, { recursive: true });
@@ -1067,8 +1093,10 @@ async function cmdInstall() {
   console.log('  \x1b[90m       \x1b[36mkaede status --mcp\x1b[0m   — check MCP connection');
   console.log('  \x1b[90m       \x1b[36mkaede run\x1b[0m "intent"   — execute intent from playbook');
   console.log('');
-  console.log('  \x1b[90m     MCP trello is now available in ALL OpenCode projects via\x1b[0m');
-  console.log(`  \x1b[90m     ~/.config/opencode/opencode.json (global config)\x1b[0m`);
+  console.log('  \x1b[90m     Two MCP servers registered globally in\x1b[0m');
+  console.log('  \x1b[90m     ~/.config/opencode/opencode.json:\x1b[0m');
+  console.log('  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    — 24 raw Trello tools\x1b[0m');
+  console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     — 5 orchestration tools\x1b[0m');
   console.log('');
 }
 
