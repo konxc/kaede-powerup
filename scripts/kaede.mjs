@@ -100,17 +100,13 @@ async function cmdSetup() {
     '',
   ].join('\n');
 
-  const secretsPath = resolve(KAEDE_DIR, 'secrets.env');
-  writeFileSync(secretsPath, envContent, 'utf-8');
-  console.log(`  \x1b[32m  ✓ Saved to ${secretsPath}\x1b[0m`);
-
   const configDir = resolve(homedir(), '.config', 'kaede');
   if (!existsSync(configDir)) {
     mkdirSync(configDir, { recursive: true });
   }
   const globalPath = resolve(configDir, 'secrets.env');
   writeFileSync(globalPath, envContent, 'utf-8');
-  console.log(`  \x1b[32m  ✓ Saved to ${globalPath} (global)\x1b[0m`);
+  console.log(`  \x1b[32m  ✓ Saved to ${globalPath} (global config)\x1b[0m`);
 
   console.log('');
   console.log('  \x1b[32m  ✅  KAEDE credentials configured!\x1b[0m');
