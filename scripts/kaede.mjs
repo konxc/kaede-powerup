@@ -1096,7 +1096,7 @@ async function cmdInstall() {
   console.log('  \x1b[90m     Two MCP servers registered globally in\x1b[0m');
   console.log('  \x1b[90m     ~/.config/opencode/opencode.json:\x1b[0m');
   console.log('  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    — 24 raw Trello tools\x1b[0m');
-  console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     — 5 orchestration tools\x1b[0m');
+  console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     — 4 orchestration tools\x1b[0m');
   console.log('');
 }
 

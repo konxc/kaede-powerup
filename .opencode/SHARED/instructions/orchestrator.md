@@ -27,16 +27,25 @@ Setiap kali Anda diminta untuk melakukan tugas manajemen project (seperti membua
 - Baca `.openkb/SHARED/glossary.md` untuk istilah-istilah spesifik.
 - Baca `.openkb/SHARED/decision-log.md` untuk memastikan tindakan Anda tidak melanggar keputusan arsitektur sebelumnya.
 
-### Langkah 3: Eksekusi Trello MCP Secara Intent-Driven
-- Gunakan tools Trello MCP (22 tools) yang tersedia di server `dist/mcp-server.js`.
-- Jika memungkinkan, gunakan intent level tinggi via orchestrator:
-  - `node scripts/kaede.mjs run --playbook <path> --board <id> "Mulai Sprint Alpha"`
-  - Intent yang didukung: mulai sprint, buat card, assign, pindah, komentar, report, tutup sprint
-  - Jika intent tidak dikenal, panggil tools MCP langsung (via `callTool`)
-- Pastikan:
-  - Label yang dipasang sesuai dengan warna dan nama di Playbook.
-  - Kartu diletakkan di List yang benar (misal: Backlog, To Do, In Progress, QA, Done).
-  - Deskripsi kartu menggunakan format terstruktur (User Story, Acceptance Criteria, Tech Notes).
+### Langkah 3: Generate Plan via mcp.kaede
+Sebelum menyentuh Trello, gunakan `mcp.kaede` untuk menghasilkan rencana eksekusi:
+- Panggil tool `mcp.kaede.generate_plan` dengan goal & playbook.
+- Output: array of `ActionStep` dengan action + params (nama saja, tanpa ID Trello).
+- Tool `mcp.kaede.parse_playbook` untuk parse playbook jika belum ada.
+- Gunakan `mcp.kaede.bundle_context` untuk menggabungkan playbook + openkb + opencode config.
+
+### Langkah 4: Eksekusi via mcp.trello
+Setelah dapat plan dari `mcp.kaede`, eksekusi setiap step ke Trello:
+- Gunakan tools `mcp.trello` (24 tools) yang tersedia di `dist/mcp-server.js`.
+- Resolve nama member/list/board via `mcp.trello` tools (`search_members`, `get_board_lists`, dll).
+- Jika plan gagal di satu step, lanjutkan ke step berikutnya.
+- Untuk eksekusi cepat bisa juga via CLI: `node scripts/kaede.mjs run --playbook <path> --board <id> "Mulai Sprint Alpha"`
+- Intent yang didukung CLI: mulai sprint, buat card, assign, pindah, komentar, report, tutup sprint
+
+Pastikan:
+- Label yang dipasang sesuai dengan warna dan nama di Playbook.
+- Kartu diletakkan di List yang benar (misal: Backlog, To Do, In Progress, QA, Done).
+- Deskripsi kartu menggunakan format terstruktur (User Story, Acceptance Criteria, Tech Notes).
 
 ---
 

@@ -41,21 +41,27 @@ Sistem kolaboratif di dalam ekosistem PT Koneksi Jaringan Indonesia diatur dalam
                                     │ Mengarahkan eksekusi
                                     ▼
         ┌────────────────────────────────────────────────────────┐
-        │                  KAEDE ORCHESTRATOR                    │
-        │            (Trello Power-Up & CLI Tool)                │
-        └───────────────────────────┬────────────────────────────┘
-                                    │ Eksekusi Intent-Driven
-                                    ▼
+        │                  MCP.KAEDE (Pure Context)              │
+        │        (kaede-mcp-server.js — 4 context tools)         │
+        │   parse_playbook, bundle_context, generate_plan, status │
+        └──────────────────────┬─────────────────────────────────┘
+                               │ Plan (ActionStep[] with names)
+                               ▼
         ┌────────────────────────────────────────────────────────┐
-        │                   MCP TRELLO SERVER                    │
-        │               (src/mcp-server.js — 24 tools)           │
-        └───────────────────────────┬────────────────────────────┘
-                                    │ stdio JSON-RPC
-                                    ▼
+        │                  MCP.TRELLO (Executor)                 │
+        │            (mcp-server.js — 24 Trello tools)           │
+        └──────────────────────┬─────────────────────────────────┘
+                              │ stdio JSON-RPC
+                              ▼
         ┌────────────────────────────────────────────────────────┐
         │                        TRELLO                          │
         │              (Board, Lists, Cards, Labels)             │
         └────────────────────────────────────────────────────────┘
+
+        Kedua MCP server (mcp.kaede & mcp.trello) terdaftar di
+        ~/.config/opencode/opencode.json sebagai entry terpisah.
+        AI Agent memanggil mcp.kaede untuk context & plan,
+        lalu mcp.trello untuk eksekusi ke Trello.
 ```
 
 ### Penjelasan Detil Aliran:
@@ -106,7 +112,7 @@ powerup-konxc/
 └── src/
     ├── mcp-server.js            # Sumber kode Trello MCP Server (24 tools)
     ├── api-server.mjs           # HTTP API server (port 3456)
-    ├── orchestrator.js          # Orchestrator — parsePlaybook, executeIntent, bundleContext
+    ├── orchestrator.js          # Orchestrator — parsePlaybook, executeIntent, bundleContext, generatePlan
     ├── trello-client.js         # MCP Client — 24 tool wrappers + timeout + reconnect
     ├── style.css                # CSS Source (Tailwind v4 + custom utility)
     └── index.html               # Landing page (deployed to Netlify)
@@ -125,9 +131,16 @@ powerup-konxc/
 * 15+ commands: `playbook parse/show`, `orchestrate`, `run` (+dry-run), `build`, `start`, `install`, `init`, `setup`, `today`, `status` (+--mcp), `test-tools`, `env`, `push`.
 * *Gap*: Belum ada integrasi langsung dengan Google Calendar / jadwal akademik untuk auto-sync sprint timeline.
 
-#### C. MCP Server (`src/mcp-server.js`)
-* Menyediakan implementasi protokol MCP mandiri dengan 24 Trello tools esensial (22 original + 2 checklist) tanpa ketergantungan framework eksternal yang berat.
-  * *Gap*: Belum mengimplementasikan fitur pembacaan Playbook dinamis untuk mengotomatisasi serangkaian tindakan (multi-tool calls) secara cerdas.
+#### C.1. MCP Trello Server (`src/mcp-server.js`) — Executor
+* Menyediakan implementasi protokol MCP mandiri dengan 24 Trello tools esensial (22 original + 2 checklist). Fungsinya murni sebagai executor — menerima perintah dengan ID Trello dan mengeksekusinya.
+  * *Gap*: Belum ada fitur multi-tool chaining. Untuk itu, gunakan layer context di atasnya (`mcp.kaede`).
+
+#### C.2. KAEDE Orchestrator MCP (`src/kaede-mcp-server.js`) — Pure Context
+* Server MCP kedua yang berdiri sendiri sebagai penyedia konteks murni. Tidak memiliki akses ke Trello.
+* **4 tools**: `parse_playbook` (parse playbook → structured), `bundle_context` (gabung playbook + openkb + opencode), `generate_plan` (intent → ActionStep[] dengan nama), `status` (cek path playbook & openkb).
+* Dirancang untuk dipanggil AI Agent sebagai langkah pertama: `mcp.kaede.generate_plan` → terima plan → resolve ID via `mcp.trello.*` → eksekusi.
+* Tidak mengimpor `trello-client.js`, tidak ada dependency Trello sama sekali.
+* *Gap*: Belum ada validasi otomatis bahwa ID Trello yang di-resolve benar sebelum eksekusi.
 
 ---
 
@@ -135,7 +148,7 @@ powerup-konxc/
 
 | Fitur / Dimensi | Kondisi Sekarang (As-Is) | Target Visi (To-Be) | Gaps | Prioritas |
 |---|---|---|---|---|
-| **Eksekusi Trello** | Intent-driven (16 handler — playbook parse → execute via TrelloClient) | Orkestrasi otomatis multi-langkah (Cukup 1 intent, eksekusi berantai) | Handler masih standalone, belum ada pipeline/chaining | **🟡 Sedang** |
+| **Eksekusi Trello** | Plan via `mcp.kaede.generate_plan` (16 intent → ActionStep[]), eksekusi via `mcp.trello.*` (24 tools) | Orkestrasi otomatis multi-langkah (Cukup 1 intent, eksekusi berantai) | Plan → execute masih manual (AI agent chain), belum auto-chaining di server | **🟡 Sedang** |
 | **Playbook Integration** | Parse aktif (Markdown → section map → bundle context) | Di-parse + ditegakkan secara real-time oleh AI Agent | Output parse masih dictionary, belum fully structured untuk auto-enforcement | **🟡 Sedang** |
 | **Trello State Sync** | MCP langsung (via trello-client.js wrapper, 24 tools) | Real-time Label & Metadata Sync via Trello API langsung | Power-Up frontend masih pakai Shared Storage, belum via MCP | **🟡 Sedang** |
 | **API Server** | HTTP bridge aktif (port 3456, endpoint /api/mcp & /api/health) | Dashboard visual dengan metrik sprint real-time | Hanya REST proxy, belum ada UI dashboard | **🟡 Sedang** |
@@ -149,12 +162,15 @@ powerup-konxc/
 2. **✅ Kompilasi Otomatis**: `scripts/build-mcp.mjs` + `kaede build` command untuk build MCP server.
 3. **✅ Playbook Parser**: `parsePlaybook` di `src/orchestrator.js` — shared antara CLI dan orchestrator.
 4. **✅ Intent-Driven Orchestrator**: `executeIntent` dengan 16 handler (7 original + 9 tambahan: buat label, arsipkan, pindah semua, buat board, hapus anggota, tambah label, arsip list, update card, buat checklist).
-5. **✅ 55 Unit & E2E Tests**: 30 unit (13 parsePlaybook + 17 TrelloClient) + 25 E2E dengan MockClient.
+5. **✅ generatePlan()**: 16 intent pattern handlers → mengembalikan ActionStep[] dengan nama (tanpa ID Trello).
+6. **✅ Pure Context Refactor**: `mcp.kaede` dipisah dari Trello — 4 tools, zero dependency Trello.
 
-### 🟡 Fase 2 — Playbook Parser & Lapisan Orkestrator (BERTAHAP)
+### 🟡 Fase 2 — Playbook Parser & Pure Context Refactor (BERTAHAP)
 1. **✅ Upgrade KAEDE CLI**: `kaede playbook parse`, `kaede orchestrate`, `kaede run` (+dry-run), `kaede build`, `kaede start`, `kaede install`, `kaede test-tools`, `kaede status --mcp`.
-2. **⬜ Orkestrasi Multi-Langkah**: Chaining intent handler — sequencing multi-step workflows dari 1 intent kompleks.
-3. **⬜ Real E2E Test with Trello**: Butuh Trello credentials untuk live test.
+2. **✅ Pure Context Refactor**: `mcp.kaede` dipisah dari Trello — menjadi pure context provider dengan 4 tools (`parse_playbook`, `bundle_context`, `generate_plan`, `status`). Tidak ada dependency `trello-client.js`. AI agent chain: `mcp.kaede.generate_plan` → `mcp.trello.*`.
+3. **✅ generatePlan()**: 16 intent pattern handlers di `orchestrator.js` — mengembalikan `ActionStep[]` dengan nama (bukan ID Trello).
+4. **⬜ Orkestrasi Multi-Langkah**: Auto-chaining plan → execute di sisi server (tanpa perlu AI agent manual chain).
+5. **⬜ Real E2E Test with Trello**: Butuh Trello credentials untuk live test.
 
 ### 🟡 Fase 3 — Integrasi Frontend Power-Up (BERTAHAP)
 1. **✅ API Server**: `src/api-server.mjs` — HTTP bridge port 3456, endpoints `/api/health` & `/api/mcp`.

@@ -2,7 +2,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -36,24 +36,6 @@ function toolSchema(name, description, properties = {}, required = []) {
 }
 
 const TOOLS = [
-  toolSchema('execute_intent', 'Execute a KAEDE orchestration intent (buat card, mulai sprint, assign, etc.) against a Trello board', {
-    intent: { type: 'string', description: 'Natural language intent. Examples: "buat card", "mulai sprint", "buat board", "assign", "pindah", "komentar", "buat label", "arsipkan", "tutup sprint", "report", "buat checklist"' },
-    boardId: { type: 'string', description: 'Trello board ID (auto-detected if not provided)' },
-    playbook: { type: 'string', description: 'Playbook markdown content for context-aware execution' },
-    task: { type: 'string', description: 'Task/card name for "buat card"' },
-    name: { type: 'string', description: 'Name for "buat board", "buat label"' },
-    desc: { type: 'string', description: 'Description for "buat card"' },
-    list: { type: 'string', description: 'Target list name for "buat card", "pindah"' },
-    member: { type: 'string', description: 'Member ID for "assign"' },
-    memberId: { type: 'string', description: 'Member ID for "hapus anggota"' },
-    color: { type: 'string', description: 'Color for "buat label" (red, orange, yellow, green, blue, purple, pink, lime, sky, black)' },
-    cardId: { type: 'string', description: 'Card ID for "pindah", "arsipkan", "komentar", "update card"' },
-    text: { type: 'string', description: 'Comment text for "komentar"' },
-    from: { type: 'string', description: 'Source list name for "pindah semua"' },
-    to: { type: 'string', description: 'Target list name for "pindah semua"' },
-    items: { type: 'array', items: { type: 'string' }, description: 'Checklist items for "buat checklist"' },
-  }, ['intent']),
-
   toolSchema('parse_playbook', 'Parse a playbook markdown document into structured data (roles, workflow lists, conventions, labels)', {
     content: { type: 'string', description: 'Playbook markdown content' },
   }, ['content']),
@@ -64,58 +46,47 @@ const TOOLS = [
     opencodePath: { type: 'string', description: 'Path to .opencode directory' },
   }),
 
-  toolSchema('boards', 'List all Trello boards accessible via KAEDE', {
-    detail: { type: 'boolean', description: 'Include lists in each board' },
-  }),
+  toolSchema('generate_plan', 'Generate a context-aware execution plan from a natural language goal and playbook. Returns action steps with names only (no IDs) — chain with mcp.trello for execution', {
+    goal: { type: 'string', description: 'Natural language goal/intent. Examples: "mulai sprint", "buat card", "buat board", "assign", "pindah", "komentar", "buat label", "arsipkan", "tutup sprint", "report", "buat checklist"' },
+    playbook: { type: 'string', description: 'Playbook markdown content for context-aware planning' },
+    task: { type: 'string', description: 'Task/card name for "buat card"' },
+    name: { type: 'string', description: 'Name for "buat board", "buat label"' },
+    desc: { type: 'string', description: 'Description for "buat card"' },
+    list: { type: 'string', description: 'Target list name for "buat card", "pindah"' },
+    member: { type: 'string', description: 'Member name/ID for "assign"' },
+    memberId: { type: 'string', description: 'Member ID for "hapus anggota"' },
+    color: { type: 'string', description: 'Color for "buat label" (red, orange, yellow, green, blue, purple, pink, lime, sky, black)' },
+    cardId: { type: 'string', description: 'Card name/ID for "pindah", "arsipkan", "komentar", "update card"' },
+    text: { type: 'string', description: 'Comment text for "komentar"' },
+    from: { type: 'string', description: 'Source list name for "pindah semua"' },
+    to: { type: 'string', description: 'Target list name for "pindah semua"' },
+    items: { type: 'array', items: { type: 'string' }, description: 'Checklist items for "buat checklist"' },
+  }, ['goal']),
 
-  toolSchema('status', 'Check KAEDE orchestration status — version, Trello connection, available boards count'),
+  toolSchema('status', 'Check KAEDE status — version, playbook/openkb paths accessibility'),
 ];
 
 async function handleToolsCall(name, args) {
   if (name === 'status') {
-    const { TrelloMCPClient } = await import(resolve(ROOT, 'src', 'trello-client.js'));
-    let boardCount = 0;
-    let connected = false;
-    let errorMsg = null;
-    try {
-      const client = new TrelloMCPClient();
-      await client.connect();
-      const boards = await client.listBoards();
-      boardCount = boards.length;
-      connected = true;
-      client.close();
-    } catch (err) {
-      errorMsg = err.message;
+    let playbookOk = false;
+    let openkbOk = false;
+    if (args.playbookPath) {
+      playbookOk = existsSync(args.playbookPath);
     }
-    return { server: SERVER, connected, boardCount, error: errorMsg };
-  }
-
-  if (name === 'boards') {
-    const { TrelloMCPClient } = await import(resolve(ROOT, 'src', 'trello-client.js'));
-    const client = new TrelloMCPClient();
-    await client.connect();
-    const boards = await client.listBoards();
-    const result = [];
-    for (const b of boards) {
-      const entry = { id: b.id, name: b.name, url: b.url };
-      if (args.detail) {
-        const lists = await client.getLists(b.id);
-        entry.lists = lists.map(l => ({ id: l.id, name: l.name }));
-      }
-      result.push(entry);
+    if (args.openkbPath) {
+      openkbOk = existsSync(args.openkbPath);
     }
-    client.close();
-    return { boards: result };
+    return { server: SERVER, playbookPathAccessible: playbookOk, openkbPathAccessible: openkbOk };
   }
 
   if (name === 'parse_playbook') {
-    const { parsePlaybook } = await import(resolve(ROOT, 'src', 'orchestrator.js'));
+    const { parsePlaybook } = await import(pathToFileURL(resolve(ROOT, 'src', 'orchestrator.js')).href);
     const playbook = parsePlaybook(args.content);
     return playbook;
   }
 
   if (name === 'bundle_context') {
-    const { bundleContext } = await import(resolve(ROOT, 'src', 'orchestrator.js'));
+    const { bundleContext } = await import(pathToFileURL(resolve(ROOT, 'src', 'orchestrator.js')).href);
     const ctx = bundleContext({
       playbook: args.playbookPath,
       openkb: args.openkbPath,
@@ -132,40 +103,21 @@ async function handleToolsCall(name, args) {
     };
   }
 
-  if (name === 'execute_intent') {
-    const { parsePlaybook, executeIntent } = await import(resolve(ROOT, 'src', 'orchestrator.js'));
-    const { TrelloMCPClient } = await import(resolve(ROOT, 'src', 'trello-client.js'));
+  if (name === 'generate_plan') {
+    const { parsePlaybook, generatePlan } = await import(pathToFileURL(resolve(ROOT, 'src', 'orchestrator.js')).href);
 
     let context = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
     if (args.playbook) {
       context = parsePlaybook(args.playbook);
     }
 
-    const client = new TrelloMCPClient();
-    await client.connect();
-
-    let boardId = args.boardId;
-    if (!boardId) {
-      const boards = await client.listBoards();
-      if (boards.length > 0) {
-        boardId = boards[0].id;
-      } else {
-        client.close();
-        throw new Error('No boards found. Provide a boardId or create a board first.');
-      }
-    }
-
     const extraArgs = {};
-    for (const key of ['task', 'name', 'desc', 'list', 'member', 'memberId', 'color', 'cardId', 'text', 'from', 'to']) {
+    for (const key of ['task', 'name', 'desc', 'list', 'member', 'memberId', 'color', 'cardId', 'text', 'from', 'to', 'items']) {
       if (args[key] !== undefined) extraArgs[key] = args[key];
     }
-    if (args.items !== undefined) {
-      extraArgs.items = (Array.isArray(args.items) ? args.items : [args.items]).map(i => ({ name: i }));
-    }
 
-    const results = await executeIntent(client, args.intent, context, boardId, extraArgs);
-    client.close();
-    return { results };
+    const plan = generatePlan(args.goal, context, extraArgs);
+    return { plan };
   }
 
   throw new Error(`Unknown tool: ${name}`);

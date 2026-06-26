@@ -484,3 +484,151 @@ export function bundleContext(paths) {
 
   return context;
 }
+
+// ── Plan Handlers ──
+
+const planHandlers = [];
+
+function onPlan(patterns, fn) {
+  planHandlers.push({ patterns: patterns.map(p => p.toLowerCase()), fn });
+}
+
+onPlan(['mulai sprint', 'setup sprint'], (pb, args) => {
+  return pb.workflow.lists.map(listName => ({
+    action: 'create_list',
+    params: { name: listName },
+    description: `Buat list "${listName}"`,
+  }));
+});
+
+onPlan(['buat card', 'buat kartu', 'create card', 'tambah task', 'new task'], (pb, args) => {
+  const name = args.task || args.name || 'New Task';
+  const listName = args.list || pb.workflow.lists[0] || '';
+  return [{
+    action: 'create_card',
+    params: { name, desc: args.desc || args.description || '', listName },
+    description: `Buat card "${name}" di list "${listName}"`,
+  }];
+});
+
+onPlan(['assign', 'tugaskan', 'tambahkan anggota'], (pb, args) => {
+  return [{
+    action: 'assign_member',
+    params: { memberId: args.memberId || args.member || '', cardId: args.cardId || args.card || '' },
+    description: `Assign anggota ${args.member || args.memberId || ''} ke card ${args.card || args.cardId || ''}`,
+  }];
+});
+
+onPlan(['tutup sprint', 'close sprint', 'archive sprint'], (pb, args) => {
+  return [{
+    action: 'close_sprint',
+    params: {},
+    description: 'Arsipkan semua card di list Done/Selesai/QA/Code Review',
+  }];
+});
+
+onPlan(['pindah semua', 'move all', 'pindahkan semua'], (pb, args) => {
+  return [{
+    action: 'move_all_cards',
+    params: { fromListName: args.dari || args.from || '', toListName: args.ke || args.to || '' },
+    description: `Pindahkan semua card dari "${args.dari || args.from || ''}" ke "${args.ke || args.to || ''}"`,
+  }];
+});
+
+onPlan(['pindah', 'move card', 'pindahkan'], (pb, args) => {
+  return [{
+    action: 'move_card',
+    params: { cardName: args.cardId || args.card || '', listName: args.listName || '', listId: args.listId || args.list || '' },
+    description: `Pindahkan card ke list ${args.listName || args.listId || ''}`,
+  }];
+});
+
+onPlan(['komentar', 'comment', 'tambah komentar'], (pb, args) => {
+  return [{
+    action: 'add_comment',
+    params: { cardName: args.cardId || args.card || '', text: args.text || args.comment || '' },
+    description: `Tambah komentar ke card ${args.cardId || args.card || ''}`,
+  }];
+});
+
+onPlan(['buat label', 'create label', 'tambah label baru'], (pb, args) => {
+  return [{
+    action: 'create_label',
+    params: { name: args.name || args.nama || '', color: args.color || args.warna || '' },
+    description: `Buat label "${args.name || args.nama || ''}" warna ${args.color || args.warna || ''}`,
+  }];
+});
+
+onPlan(['arsip list', 'archive list', 'hapus list'], (pb, args) => {
+  return [{
+    action: 'archive_list',
+    params: { listName: args.nama || args.name || '', listId: args.listId || '' },
+    description: `Arsipkan list "${args.nama || args.name || ''}"`,
+  }];
+});
+
+onPlan(['arsipkan', 'archive card', 'hapus card', 'delete card'], (pb, args) => {
+  return [{
+    action: 'archive_card',
+    params: { cardId: args.cardId || args.card || '' },
+    description: `Arsipkan card ${args.cardId || args.card || ''}`,
+  }];
+});
+
+onPlan(['update card', 'ubah kartu', 'edit card', 'update kartu'], (pb, args) => {
+  return [{
+    action: 'update_card',
+    params: { cardId: args.cardId || args.card || '', name: args.name, desc: args.description || args.desc },
+    description: `Update card ${args.cardId || args.card || ''}`,
+  }];
+});
+
+onPlan(['buat checklist', 'add checklist', 'tambah checklist'], (pb, args) => {
+  return [{
+    action: 'create_checklist',
+    params: { cardId: args.cardId || args.card || '', name: args.name || args.nama || 'Checklist', items: args.items || [] },
+    description: `Buat checklist "${args.name || args.nama || 'Checklist'}" di card ${args.cardId || args.card || ''}`,
+  }];
+});
+
+onPlan(['buat board', 'create board', 'new board'], (pb, args) => {
+  return [{
+    action: 'create_board',
+    params: { name: args.name || args.nama || 'New Board' },
+    description: `Buat board "${args.name || args.nama || 'New Board'}"`,
+  }];
+});
+
+onPlan(['hapus anggota', 'remove member', 'keluarkan anggota'], (pb, args) => {
+  return [{
+    action: 'remove_member',
+    params: { cardId: args.cardId || args.card || '', memberId: args.memberId || args.member || '' },
+    description: `Hapus anggota ${args.memberId || args.member || ''} dari card ${args.cardId || args.card || ''}`,
+  }];
+});
+
+onPlan(['tambah label ke card', 'add label to card', 'pasang label'], (pb, args) => {
+  return [{
+    action: 'add_label_to_card',
+    params: { cardId: args.cardId || args.card || '', labelId: args.labelId || args.label || '' },
+    description: `Pasang label ${args.labelId || args.label || ''} ke card ${args.cardId || args.card || ''}`,
+  }];
+});
+
+onPlan(['report', 'progress', 'my cards', 'kartu saya'], (pb, args) => {
+  return [{
+    action: 'report',
+    params: {},
+    description: 'Tampilkan laporan kartu yang ditugaskan',
+  }];
+});
+
+export function generatePlan(goal, playbook, extraArgs = {}) {
+  const lower = goal.toLowerCase();
+  for (const h of planHandlers) {
+    if (h.patterns.some(p => lower.includes(p))) {
+      return h.fn(playbook, extraArgs);
+    }
+  }
+  return [{ success: false, action: 'unknown_intent', params: { goal }, description: `Intent tidak dikenal: "${goal}". Coba: mulai sprint, buat card, assign, buat label, arsipkan, arsip list, pindah semua, buat board, update card, buat checklist, komentar, report, tutup sprint` }];
+}
