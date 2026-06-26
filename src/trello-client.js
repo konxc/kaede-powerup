@@ -6,15 +6,31 @@
 
 import { spawn } from 'child_process';
 import { resolve } from 'path';
+import { readFileSync, existsSync } from 'fs';
+import { homedir } from 'os';
 import { createInterface } from 'readline';
 
 const REQUEST_TIMEOUT = 15000;
 const MAX_RETRIES = 3;
 const BASE_DELAY = 1000;
 
+function getGlobalMcpServerPath() {
+  const globalConfig = resolve(homedir(), '.config', 'opencode', 'opencode.json');
+  if (existsSync(globalConfig)) {
+    try {
+      const config = JSON.parse(readFileSync(globalConfig, 'utf-8'));
+      const cmd = config.mcp?.trello?.command;
+      if (Array.isArray(cmd) && cmd.length >= 2) return cmd[cmd.length - 1];
+    } catch {}
+  }
+  const globalDir = resolve(homedir(), '.kaede', 'dist', 'mcp-server.js');
+  if (existsSync(globalDir)) return globalDir;
+  return resolve(process.cwd(), 'dist', 'mcp-server.js');
+}
+
 export class TrelloMCPClient {
   constructor(serverPath, timeout = REQUEST_TIMEOUT) {
-    this.serverPath = serverPath || resolve(process.cwd(), 'dist', 'mcp-server.js');
+    this.serverPath = serverPath || getGlobalMcpServerPath();
     this.rpcId = 0;
     this.pending = new Map();
     this.process = null;

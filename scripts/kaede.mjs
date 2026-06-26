@@ -9,6 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const KAEDE_DIR = process.env.KAEDE_DIR
   ? resolve(process.env.KAEDE_DIR)
   : resolve(__dirname, '..');
+const KAEDE_GLOBAL_DIR = resolve(homedir(), '.kaede');
 
 function loadEnv(filePath) {
   if (!existsSync(filePath)) return {};
@@ -220,8 +221,6 @@ async function cmdInit() {
   const opencodeDir = resolve(targetDir, '.opencode');
   const sharedDir = resolve(opencodeDir, 'SHARED');
   const opencodeJsonPath = resolve(opencodeDir, 'opencode.json');
-  const kaedeScripts = resolve(KAEDE_DIR, 'scripts').replace(/\\/g, '/');
-  const kaedeDist = resolve(KAEDE_DIR, 'dist').replace(/\\/g, '/');
 
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
@@ -336,23 +335,9 @@ async function cmdInit() {
     }
   }
 
-  // MCP Trello via bundled server (--target bun)
-  const mcpConfig = {
-    trello: {
-      type: 'local',
-      command: ['bun', `${kaedeDist}/mcp-server.js`],
-      enabled: true,
-      timeout: 30000,
-    },
-  };
-
-  // Merge — don't overwrite existing MCP unless it references kaede
-  const existingTrello = config.mcp?.trello;
-  if (existingTrello && !JSON.stringify(existingTrello).includes('mcp-server')) {
-    console.log('  \x1b[33m  ⚠  Existing trello MCP config found, keeping as-is\x1b[0m');
-  } else {
-    config.mcp = { ...(config.mcp || {}), ...mcpConfig };
-  }
+  // Note: MCP trello is configured globally at ~/.config/opencode/opencode.json
+  // No need to duplicate MCP config at project level.
+  // If custom MCP needed, add it here.
 
   // Instructions
   if (!config.instructions) {
@@ -366,7 +351,7 @@ async function cmdInit() {
   if (!config.references) {
     config.references = {
       kaede: {
-        path: KAEDE_DIR.replace(/\\/g, '/'),
+        path: KAEDE_GLOBAL_DIR.replace(/\\/g, '/'),
         description: 'KAEDE — Trello MCP, CLI tools & AI Agent ecosystem',
       },
       docs: {
@@ -401,24 +386,28 @@ async function cmdInit() {
     };
   }
 
-  // Commands
+  // Commands (uses global `kaede` CLI — install via `kaede install`)
   if (!config.command) {
     config.command = {
       'kaede-today': {
         description: 'Tampilkan task Trello hari ini',
-        template: `node ${kaedeScripts}/kaede.mjs today`,
+        template: 'kaede today',
       },
       'kaede-status': {
         description: 'Cek status konfigurasi KAEDE',
-        template: `node ${kaedeScripts}/kaede.mjs status`,
+        template: 'kaede status',
       },
       'kaede-setup': {
         description: 'Setup Trello API Key & Token',
-        template: `node ${kaedeScripts}/kaede.mjs setup`,
+        template: 'kaede setup',
+      },
+      'kaede-run': {
+        description: 'Eksekusi intent ke Trello dari playbook',
+        template: 'kaede run --playbook $ARGUMENTS',
       },
       'kaede-push': {
         description: 'Buat Trello cards dari file markdown (.md)',
-        template: `node ${kaedeScripts}/kaede.mjs push \$ARGUMENTS`,
+        template: 'kaede push $ARGUMENTS',
       },
     };
   }
@@ -471,16 +460,13 @@ async function cmdInit() {
   console.log('  \x1b[32m  ✅  KAEDE initialized!\x1b[0m');
   console.log(`  \x1b[90m     Project: ${projectName}\x1b[0m`);
   console.log(`  \x1b[90m     Target:  ${targetDir}\x1b[0m`);
-  console.log(`  \x1b[90m     MCP:     trello (via dist/mcp-server.js)\x1b[0m`);
+  console.log(`  \x1b[90m     MCP:     trello (global config ~/.config/opencode/)\x1b[0m`);
   console.log('');
   console.log('  \x1b[90m  Next steps:\x1b[0m');
   console.log('  \x1b[90m  1. Edit .opencode/SHARED/project-context.md dengan info project\x1b[0m');
-  console.log('  \x1b[90m  2. Copy & edit playbook: \x1b[0m\x1b[90mcp kaede/docs/playbook-template.md ./playbook.md\x1b[0m');
-  if (!optPlaybook) {
-    console.log('  \x1b[90m     Lalu jalankan ulang: \x1b[0m\x1b[36mkaede init . --playbook playbook.md\x1b[0m');
-  }
-  console.log('  \x1b[90m  3. Jalankan \x1b[0m\x1b[36mopencode\x1b[0m\x1b[90m untuk mulai menggunakan AI Agent\x1b[0m');
-  console.log(`  \x1b[90m  4. Cek task Trello: \x1b[0m\x1b[36mnode ${kaedeScripts}/kaede.mjs today\x1b[0m`);
+  console.log('  \x1b[90m  2. Copy & edit playbook: \x1b[0m\x1b[36mkaede init . --playbook playbook.md\x1b[0m');
+  console.log('  \x1b[90m  3. Jalankan \x1b[0m\x1b[36mopencode\x1b[0m\x1b[90m — MCP trello otomatis tersedia\x1b[0m');
+  console.log('  \x1b[90m  4. Cek task Trello: \x1b[0m\x1b[36mkaede today\x1b[0m');
   console.log('');
 }
 
@@ -722,11 +708,17 @@ async function cmdStatus() {
   const localPath = resolve(KAEDE_DIR, 'secrets.env');
   console.log(`  Local config    ${existsSync(localPath) ? '\x1b[32m✓\x1b[0m' : '\x1b[33mnot set\x1b[0m'}  \x1b[90m${localPath}\x1b[0m`);
 
-  const opencodeJson = resolve(process.cwd(), '.opencode', 'opencode.json');
-  const hasMcp = existsSync(opencodeJson)
-    ? readFileSync(opencodeJson, 'utf-8').includes('"mcp"')
-    : false;
-  console.log(`  MCP configured  ${hasMcp ? '\x1b[32m✓\x1b[0m' : '\x1b[33mnot in this project\x1b[0m'}  \x1b[90m${opencodeJson}\x1b[0m`);
+  const globalOc = resolve(homedir(), '.config', 'opencode', 'opencode.json');
+  const projectOc = resolve(process.cwd(), '.opencode', 'opencode.json');
+  const hasGlobalMcp = existsSync(globalOc) && readFileSync(globalOc, 'utf-8').includes('"mcp"');
+  const hasProjectMcp = existsSync(projectOc) && readFileSync(projectOc, 'utf-8').includes('"mcp"');
+  if (hasGlobalMcp) {
+    console.log(`  MCP configured  \x1b[32m✓\x1b[0m  \x1b[90m${globalOc} (global)\x1b[0m`);
+  } else if (hasProjectMcp) {
+    console.log(`  MCP configured  \x1b[32m✓\x1b[0m  \x1b[90m${projectOc}\x1b[0m`);
+  } else {
+    console.log(`  MCP configured  \x1b[33mnot configured\x1b[0m`);
+  }
 
   if (checkMcp && apiKeyOk && tokenOk) {
     console.log('');
@@ -965,14 +957,19 @@ async function cmdRun() {
 
 async function cmdInstall() {
   console.log('');
-  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
-  console.log('  \x1b[35m║      KAEDE — Global Install          ║\x1b[0m');
-  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('  \x1b[35m╔══════════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║        KAEDE — Global Install            ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════════╝\x1b[0m');
   console.log('');
+
+  const { execSync } = await import('child_process');
+  const globalDir = KAEDE_GLOBAL_DIR;
+  const kaedeConfigDir = resolve(homedir(), '.config', 'kaede');
+  const opencodeConfigDir = resolve(homedir(), '.config', 'opencode');
+  const opencodeConfigPath = resolve(opencodeConfigDir, 'opencode.json');
 
   // 1. Build MCP server
   console.log('  \x1b[36m  Building MCP server...\x1b[0m');
-  const { execSync } = await import('child_process');
   try {
     execSync('bun build --target bun src/mcp-server.js --outfile dist/mcp-server.js', {
       cwd: KAEDE_DIR,
@@ -983,33 +980,81 @@ async function cmdInstall() {
     console.log('  \x1b[33m  ⚠  MCP build skipped (bun not found?)\x1b[0m');
   }
 
-  // 2. npm link
+  // 2. Copy files to ~/.kaede/
+  console.log(`  \x1b[36m  Installing to ${globalDir}...\x1b[0m`);
+  mkdirSync(resolve(globalDir, 'dist'), { recursive: true });
+  mkdirSync(resolve(globalDir, 'scripts'), { recursive: true });
+  mkdirSync(resolve(globalDir, 'docs'), { recursive: true });
+
+  try {
+    const cp = (src, dest) => {
+      const content = readFileSync(resolve(KAEDE_DIR, src), 'utf-8');
+      writeFileSync(resolve(globalDir, dest), content, 'utf-8');
+    };
+    cp('dist/mcp-server.js', 'dist/mcp-server.js');
+    cp('scripts/kaede.mjs', 'scripts/kaede.mjs');
+    cp('docs/playbook-template.md', 'docs/playbook-template.md');
+    console.log('  \x1b[32m  ✓ Files copied to ~/.kaede/\x1b[0m');
+  } catch (err) {
+    console.log(`  \x1b[33m  ⚠  File copy failed: ${err.message}\x1b[0m`);
+  }
+
+  // 3. npm link (global `kaede` command)
   console.log('  \x1b[36m  Linking globally via npm link...\x1b[0m');
   try {
     execSync('npm link', { cwd: KAEDE_DIR, stdio: 'inherit' });
-    console.log('  \x1b[32m  ✓ KAEDE linked globally\x1b[0m');
+    console.log('  \x1b[32m  ✓ \x1b[0m\x1b[36mkaede\x1b[0m\x1b[32m command available globally\x1b[0m');
   } catch {
-    console.log('  \x1b[33m  ⚠  npm link failed (try: cd kaede-powerup && npm link)\x1b[0m');
+    console.log('  \x1b[33m  ⚠  npm link failed, creating fallback script...\x1b[0m');
+    // Fallback: create a wrapper script
+    try {
+      const wrapper = `@echo off\r\nnode "${resolve(globalDir, 'scripts', 'kaede.mjs').replace(/\\/g, '\\\\')}" %*\r\n`;
+      writeFileSync(resolve(globalDir, 'kaede.cmd'), wrapper, 'utf-8');
+      console.log(`  \x1b[33m  ⚠  Created fallback at ${resolve(globalDir, 'kaede.cmd')}\x1b[0m`);
+      console.log('  \x1b[33m      Add it to your PATH or run: \x1b[0m\x1b[36msetx PATH "%PATH%;%USERPROFILE%\\.kaede"\x1b[0m');
+    } catch {}
   }
 
-  // 3. Setup global secrets directory
-  const configDir = resolve(homedir(), '.config', 'kaede');
-  if (!existsSync(configDir)) {
-    mkdirSync(configDir, { recursive: true });
-    console.log('  \x1b[32m  ✓ Created ~/.config/kaede/\x1b[0m');
+  // 4. Setup global OpenCode config
+  console.log('  \x1b[36m  Setting up global OpenCode MCP config...\x1b[0m');
+  mkdirSync(opencodeConfigDir, { recursive: true });
+
+  let opencodeConfig = {};
+  if (existsSync(opencodeConfigPath)) {
+    try {
+      opencodeConfig = JSON.parse(readFileSync(opencodeConfigPath, 'utf-8'));
+    } catch {}
   }
+
+  const mcpServerPath = resolve(globalDir, 'dist', 'mcp-server.js').replace(/\\/g, '/');
+  opencodeConfig.mcp = opencodeConfig.mcp || {};
+  if (!opencodeConfig.mcp.trello) {
+    opencodeConfig.mcp.trello = {
+      type: 'local',
+      command: ['bun', mcpServerPath],
+      enabled: true,
+      timeout: 30000,
+    };
+  }
+
+  writeFileSync(opencodeConfigPath, JSON.stringify(opencodeConfig, null, 2) + '\n', 'utf-8');
+  console.log(`  \x1b[32m  ✓ MCP trello added to global OpenCode config\x1b[0m`);
+
+  // 5. Setup credentials directory
+  mkdirSync(kaedeConfigDir, { recursive: true });
 
   console.log('');
   console.log('  \x1b[32m  ✅  KAEDE installed globally!\x1b[0m');
   console.log('');
   console.log('  \x1b[90m     Usage:\x1b[0m');
-  console.log('  \x1b[90m       kaede setup          — setup Trello API key\x1b[0m');
-  console.log('  \x1b[90m       kaede init ../project — init project\x1b[0m');
-  console.log('  \x1b[90m       kaede today          — today\'s tasks\x1b[0m');
-  console.log('  \x1b[90m       kaede status --mcp   — check MCP health\x1b[0m');
+  console.log('  \x1b[90m       \x1b[36mkaede setup\x1b[0m          — setup Trello API key & token');
+  console.log('  \x1b[90m       \x1b[36mkaede init\x1b[0m <dir>     — init project with KAEDE');
+  console.log('  \x1b[90m       \x1b[36mkaede today\x1b[0m          — show today\'s Trello tasks');
+  console.log('  \x1b[90m       \x1b[36mkaede status --mcp\x1b[0m   — check MCP connection');
+  console.log('  \x1b[90m       \x1b[36mkaede run\x1b[0m "intent"   — execute intent from playbook');
   console.log('');
-  console.log('  \x1b[90m     Or set KAEDE_DIR env var if not in PATH:\x1b[0m');
-  console.log(`  \x1b[90m       export KAEDE_DIR=${KAEDE_DIR.replace(/\\/g, '/')}\x1b[0m`);
+  console.log('  \x1b[90m     MCP trello is now available in ALL OpenCode projects via\x1b[0m');
+  console.log(`  \x1b[90m     ~/.config/opencode/opencode.json (global config)\x1b[0m`);
   console.log('');
 }
 
