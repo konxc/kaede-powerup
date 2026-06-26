@@ -857,12 +857,26 @@ async function cmdRun() {
   const playbookPath = getOpt('--playbook');
   const isDryRun = args.includes('--dry-run') || args.includes('-n');
 
-  // Find intent: skip all --flags and their values
+  // Known flags that take a value (skip both flag and value)
+  const knownFlagArgs = ['--playbook', '--board', '--openkb', '--opencode'];
+  // Extra args passed to intent handler (--name, --task, --list, --desc, --member, --color)
+  const extraArgs = {};
+
+  // Find intent and collect extra args
   let intent = '';
   for (let i = 0; i < args.length; i++) {
     if (args[i].startsWith('--') || args[i].startsWith('-')) {
-      if (args[i] === '--playbook' || args[i] === '--board' || args[i] === '--openkb' || args[i] === '--opencode') {
+      if (knownFlagArgs.includes(args[i])) {
         i++; // skip next arg (value)
+        continue;
+      }
+      // Collect extra intent args: --name value --task value etc.
+      const key = args[i].replace(/^--?/, '');
+      if (i + 1 < args.length && !args[i + 1].startsWith('-')) {
+        extraArgs[key] = args[i + 1];
+        i++;
+      } else {
+        extraArgs[key] = true;
       }
       continue;
     }
@@ -871,8 +885,8 @@ async function cmdRun() {
 
   if (!intent) {
     console.error('  \x1b[31m  ✗ Intent required.\x1b[0m');
-    console.log('  \x1b[37m  Usage:\x1b[0m node scripts/kaede.mjs run \x1b[36m--playbook <path>\x1b[0m \x1b[90m"intent"\x1b[0m');
-    console.log('  \x1b[37m  Example:\x1b[0m node scripts/kaede.mjs run --playbook playbook/sprint.md "Mulai Sprint Alpha"');
+    console.log('  \x1b[37m  Usage:\x1b[0m node scripts/kaede.mjs run \x1b[36m--playbook <path>\x1b[0m \x1b[90m"intent" [--name ...] [--task ...]\x1b[0m');
+    console.log('  \x1b[37m  Example:\x1b[0m kaede run --playbook docs/playbook-template.md "buat board" --name "Sprint 1"');
     return;
   }
 
@@ -932,7 +946,7 @@ async function cmdRun() {
           return;
         }
       }
-      const results = await executeIntent(client, intent, playbook, boardId);
+      const results = await executeIntent(client, intent, playbook, boardId, extraArgs);
       console.log('');
       for (const r of results) {
         if (r.success) {
