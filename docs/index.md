@@ -12,11 +12,13 @@ Ikuti 3 langkah berikut untuk mulai menggunakan Trello MCP:
 
 ## Daftar Halaman
 
+### User Documentation
+
 <div class="grid sm:grid-cols-2 gap-4 not-prose">
 
 <a href="api-key.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
   <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-2 text-sm font-bold">1</div>
-  <h3 class="text-sm font-semibold text-kaede-text">API Key &amp; Token</h3>
+  <h3 class="text-sm font-semibold text-kaede-text">API Key & Token</h3>
   <p class="text-xs text-kaede-muted mt-1">Panduan langkah demi langkah mendapatkan Trello API credentials melalui Power-Up admin.</p>
 </a>
 
@@ -36,6 +38,36 @@ Ikuti 3 langkah berikut untuk mulai menggunakan Trello MCP:
   <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-danger/20 text-kaede-danger mb-2 text-sm font-bold">4</div>
   <h3 class="text-sm font-semibold text-kaede-text">Referensi Tools</h3>
   <p class="text-xs text-kaede-muted mt-1">Daftar lengkap semua MCP tools: cards, lists, checklist, komentar, attachments, custom fields.</p>
+</a>
+
+</div>
+
+### Development Documentation
+
+<div class="grid sm:grid-cols-2 gap-4 not-prose mt-6">
+
+<a href="DEVELOPMENT-ROADMAP.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-2 text-sm font-bold">📋</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Development Roadmap</h3>
+  <p class="text-xs text-kaede-muted mt-1">Master development plan: 3-phase implementation, timeline, upstream contribution strategy.</p>
+</a>
+
+<a href="CONTRIBUTION-GUIDE.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-success/20 text-kaede-success mb-2 text-sm font-bold">🤝</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Contribution Guide</h3>
+  <p class="text-xs text-kaede-muted mt-1">Panduan upstream contribution ke TRELLO MCP: PR workflow, testing, communication templates.</p>
+</a>
+
+<a href="FEATURE-SPECIFICATION.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-warning/20 text-kaede-warning mb-2 text-sm font-bold">⚙️</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Feature Specification</h3>
+  <p class="text-xs text-kaede-muted mt-1">Detailed specs: attachments, copy card, checklist enhancements, advanced features.</p>
+</a>
+
+<a href="kaede-architecture.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-danger/20 text-kaede-danger mb-2 text-sm font-bold">🏗️</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Architecture</h3>
+  <p class="text-xs text-kaede-muted mt-1">Arsitektur KAEDE, concern separation, orchestration layer, ecosystem overview.</p>
 </a>
 
 </div>

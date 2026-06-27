@@ -165,12 +165,18 @@ powerup-konxc/
 5. **✅ generatePlan()**: 16 intent pattern handlers → mengembalikan ActionStep[] dengan nama (tanpa ID Trello).
 6. **✅ Pure Context Refactor**: `mcp.kaede` dipisah dari Trello — 4 tools, zero dependency Trello.
 
-### 🟡 Fase 2 — Playbook Parser & Pure Context Refactor (BERTAHAP)
-1. **✅ Upgrade KAEDE CLI**: `kaede playbook parse`, `kaede orchestrate`, `kaede run` (+dry-run), `kaede build`, `kaede start`, `kaede install`, `kaede test-tools`, `kaede status --mcp`.
-2. **✅ Pure Context Refactor**: `mcp.kaede` dipisah dari Trello — menjadi pure context provider dengan 4 tools (`parse_playbook`, `bundle_context`, `generate_plan`, `status`). Tidak ada dependency `trello-client.js`. AI agent chain: `mcp.kaede.generate_plan` → `mcp.trello.*`.
-3. **✅ generatePlan()**: 16 intent pattern handlers di `orchestrator.js` — mengembalikan `ActionStep[]` dengan nama (bukan ID Trello).
-4. **⬜ Orkestrasi Multi-Langkah**: Auto-chaining plan → execute di sisi server (tanpa perlu AI agent manual chain).
-5. **⬜ Real E2E Test with Trello**: Butuh Trello credentials untuk live test.
+### 🟡 Fase 2 — MCP Enhancements & Concern Separation (IN PROGRESS)
+1. **⬜ Attachments Implementation** (5 tools): `attach_file_to_card`, `attach_image_to_card`, `attach_data_to_card`, `attach_image_data_to_card`, `get_card_attachments` (new contribution)
+2. **⬜ Copy Card** (1 tool): `copy_card` dengan keepFromSource options
+3. **⬜ Checklist Enhancements** (4 tools): Delete checklist/item, update checklist item, get card checklists (new contribution)
+4. **⬜ Advanced Features** (5 tools): Watch card/list, get card activity, search labels, remove label from card
+5. **⬜ Upstream Contribution** (3 PRs): Prepare dan submit PRs ke delorenj/mcp-server-trello
+6. **⬜ Code Architecture Refactor**: Modular structure (tools/, trello/ directories)
+
+**Documentation:**
+- [`DEVELOPMENT-ROADMAP.md`](DEVELOPMENT-ROADMAP.html) — Master development plan
+- [`CONTRIBUTION-GUIDE.md`](CONTRIBUTION-GUIDE.html) — Upstream contribution guide
+- [`FEATURE-SPECIFICATION.md`](FEATURE-SPECIFICATION.html) — Detailed feature specs
 
 ### 🟡 Fase 3 — Integrasi Frontend Power-Up (BERTAHAP)
 1. **✅ API Server**: `src/api-server.mjs` — HTTP bridge port 3456, endpoints `/api/health` & `/api/mcp`.

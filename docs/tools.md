@@ -325,3 +325,53 @@ Mendapatkan semua komentar dari kartu.
 - **Member IDs:** Dapatkan via `get_board_members`
 - **Sumber kode:** Tools ini dari `src/mcp-server.js` — custom KAEDE, bukan `@delorenj/mcp-server-trello`
 - **Client wrapper:** Gunakan `TrelloMCPClient` di `src/trello-client.js` untuk akses terstruktur
+
+---
+
+## 🚧 Upcoming Tools (In Development)
+
+Tools berikut sedang dalam pengembangan (Phase 1-4):
+
+### Phase 1: Attachments & Copy Card (Week 1-2)
+- `attach_file_to_card` — Attach from URL or local file
+- `attach_image_to_card` — Attach image from URL
+- `attach_data_to_card` — Attach from base64/data URL
+- `attach_image_data_to_card` — Attach image from base64 (screenshot)
+- `get_card_attachments` — **NEW CONTRIBUTION** (missing di upstream!)
+- `copy_card` — Copy card dengan keepFromSource options
+
+### Phase 2: Checklist Enhancements (Week 3)
+- `delete_checklist` — Remove checklist from card
+- `delete_checklist_item` — Remove item from checklist
+- `update_checklist_item` — Update state, name, position, due date, reminder, member
+- `get_card_checklists` — **NEW CONTRIBUTION** (missing di upstream!)
+
+### Phase 3: Advanced Features (Week 4-5)
+- `watch_card` — Subscribe to card activity
+- `watch_list` — Subscribe to list activity
+- `get_card_activity` — Get card history with filters
+- `search_labels` — Filter labels by name (case-insensitive)
+- `remove_label_from_card` — Remove single label from card
+
+### Phase 4: Additional Enhancements (Week 6-7, Optional)
+- `copy_checklist` — Copy checklist with items to another card
+- `copy_list` — Copy entire list with cards to another board
+- `move_list` — Move entire list to different board
+- `sort_list` — Sort cards in list by dueDate, name, createdAt
+- `share_card` — Generate shareable link (evaluate feasibility)
+- `make_template` — Convert card to template (evaluate feasibility)
+
+### Features to Skip (Power-Up / Complex)
+- `create_jira_work_item` — Jira Power-Up required
+- `mirror_card` — Mirror Power-Up required
+- `butler_automation` — Separate Butler API
+- `custom_fields` — Standard plan required
+- `recurring_cards` — Power-Up feature
+
+**Timeline:** Week 1-10 (Juni-Juli 2026)  
+**Total Tools:** 24 → 43-45 tools
+
+**Documentation:**
+- [`DEVELOPMENT-ROADMAP.md`](DEVELOPMENT-ROADMAP.html) — Master development plan
+- [`FEATURE-SPECIFICATION.md`](FEATURE-SPECIFICATION.html) — Detailed specs
+- [`CONTRIBUTION-GUIDE.md`](CONTRIBUTION-GUIDE.html) — Upstream contribution guide
