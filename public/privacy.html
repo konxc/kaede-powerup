@@ -18,7 +18,7 @@
     <div class="glass rounded-2xl p-6 sm:p-10">
       <div class="prose">
         <h1>Privacy Policy</h1>
-        <p class="text-sm text-kaede-muted mb-6">Last updated: June 24, 2026</p>
+        <p class="text-sm text-kaede-muted mb-6">Last updated: June 27, 2026</p>
 
         <h2>Overview</h2>
         <p>
@@ -38,6 +38,24 @@
           <a href="https://www.atlassian.com/legal/privacy-policy" target="_blank" rel="noopener">Atlassian's Privacy Policy</a>.
         </p>
 
+        <h2>MCP Server</h2>
+        <p>
+          KAEDE includes a local MCP (Model Context Protocol) server that runs
+          entirely on your machine via stdio. It uses Trello API credentials
+          stored in a local configuration file
+          (<code>~/.config/kaede/secrets.env</code>). These credentials are:
+        </p>
+        <ul>
+          <li>Stored only on your local machine, never transmitted to us</li>
+          <li>Used solely to authenticate with Trello's API</li>
+          <li>Never shared with any third party</li>
+        </ul>
+        <p>
+          The MCP server processes board, list, card, and label data on your
+          behalf — all communication is directly between your machine and
+          Trello's servers via HTTPS.
+        </p>
+
         <h2>Information We Collect</h2>
         <p>We do <strong>not</strong> collect, transmit, or store:</p>
         <ul>
@@ -46,11 +64,12 @@
           <li>Card content, board content, or workspace data</li>
           <li>IP addresses or device identifiers</li>
           <li>Cookies or tracking data</li>
+          <li>Your Trello API credentials</li>
         </ul>
         <p>
-          The only data processed is the <strong>environment setting</strong>
-          (production / staging / development) you optionally assign to a card,
-          which is stored entirely within Trello's systems.
+          The only data processed through the Power-Up is the
+          <strong>environment setting</strong> (production / staging / development)
+          you optionally assign to a card, stored entirely within Trello's systems.
         </p>
 
         <h2>Third-Party Services</h2>

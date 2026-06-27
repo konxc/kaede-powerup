@@ -1,5 +1,8 @@
 # Netlify _redirects — specific rules before catch-all
 /install       /install.sh      200
 /install.ps1   /install.ps1     200
+# Expose static pages directly
+/privacy.html  /privacy.html    200
+/auth.html     /auth.html       200
 # All other routes → index.html (SPA fallback)
 /*             /index.html      200
