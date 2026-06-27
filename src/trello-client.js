@@ -1,5 +1,5 @@
-/**
- * Trello MCP Client — Wrapper untuk komunikasi dengan Trello MCP Server
+﻿/**
+ * Trello MCP Client â€” Wrapper untuk komunikasi dengan Trello MCP Server
  *
  * Menggunakan stdio JSON-RPC 2.0 untuk berkomunikasi dengan dist/mcp-server.js
  */
@@ -77,7 +77,7 @@ export class TrelloMCPClient {
             }
           }
         } catch {
-          // non-JSON line — skip silently
+          // non-JSON line â€” skip silently
         }
       });
 
@@ -136,7 +136,7 @@ export class TrelloMCPClient {
     return result;
   }
 
-  // ── Boards ──
+  // â”€â”€ Boards â”€â”€
 
   async listBoards() {
     const r = await this.callTool('list_boards', {});
@@ -152,7 +152,7 @@ export class TrelloMCPClient {
     return this.callTool('create_board', { name, ...opts });
   }
 
-  // ── Lists ──
+  // â”€â”€ Lists â”€â”€
 
   async getLists(boardId) {
     const r = await this.callTool('get_lists', { boardId });
@@ -167,7 +167,7 @@ export class TrelloMCPClient {
     return this.callTool('archive_list', { listId });
   }
 
-  // ── Cards ──
+  // â”€â”€ Cards â”€â”€
 
   async getMyCards() {
     const r = await this.callTool('get_my_cards', {});
@@ -199,7 +199,7 @@ export class TrelloMCPClient {
     return this.callTool('archive_card', { cardId });
   }
 
-  // ── Members ──
+  // â”€â”€ Members â”€â”€
 
   async getBoardMembers(boardId) {
     const r = await this.callTool('get_board_members', { boardId });
@@ -214,7 +214,7 @@ export class TrelloMCPClient {
     return this.callTool('remove_member_from_card', { cardId, memberId });
   }
 
-  // ── Labels ──
+  // â”€â”€ Labels â”€â”€
 
   async getBoardLabels(boardId) {
     const r = await this.callTool('get_board_labels', { boardId });
@@ -233,7 +233,7 @@ export class TrelloMCPClient {
     return this.callTool('delete_label', { labelId });
   }
 
-  // ── Labels (composite operations) ──
+  // â”€â”€ Labels (composite operations) â”€â”€
 
   async addLabelToCard(cardId, labelId) {
     const card = await this.getCard(cardId);
@@ -252,7 +252,7 @@ export class TrelloMCPClient {
     await this.updateCard(cardId, { labels: labelIds });
   }
 
-  // ── Checklists ──
+  // â”€â”€ Checklists â”€â”€
 
   async createChecklist(cardId, name) {
     return this.callTool('create_checklist', { cardId, name });
@@ -264,7 +264,7 @@ export class TrelloMCPClient {
     return this.callTool('add_checklist_item', args);
   }
 
-  // ── Comments ──
+  // â”€â”€ Comments â”€â”€
 
   async addComment(cardId, text) {
     return this.callTool('add_comment', { cardId, text });
@@ -274,6 +274,99 @@ export class TrelloMCPClient {
     const r = await this.callTool('get_card_comments', { cardId, limit });
     return r.comments || [];
   }
+  // ─── Attachments ──
+
+  async attachFileToCard(cardId, fileUrl, name, mimeType) {
+    return this.callTool('attach_file_to_card', { cardId, fileUrl, name, mimeType });
+  }
+
+  async attachImageToCard(cardId, imageUrl, name) {
+    return this.callTool('attach_image_to_card', { cardId, imageUrl, name });
+  }
+
+  async getCardAttachments(cardId) {
+    const r = await this.callTool('get_card_attachments', { cardId });
+    return r.attachments || [];
+  }
+  async attachDataToCard(cardId, data, name, mimeType) {
+    return this.callTool('attach_data_to_card', { cardId, data, name, mimeType });
+  }
+
+  async attachImageDataToCard(cardId, imageData, name) {
+    return this.callTool('attach_image_data_to_card', { cardId, imageData, name });
+  }
+  async copyCard(options) {
+    const { sourceCardId, listId, name, description, keepFromSource, pos } = options;
+    return this.callTool('copy_card', { sourceCardId, listId, name, description, keepFromSource, pos });
+  }
+
+  // ─── Checklist Management (NEW) ──
+  async deleteChecklist(checklistId) {
+    return this.callTool('delete_checklist', { checklistId });
+  }
+
+  async deleteChecklistItem(checklistId, checkItemId) {
+    return this.callTool('delete_checklist_item', { checklistId, checkItemId });
+  }
+
+  async updateChecklistItem(options) {
+    const { checklistId, checkItemId, name, checked } = options;
+    return this.callTool('update_checklist_item', { checklistId, checkItemId, name, checked });
+  }
+
+  async getCardChecklists(cardId) {
+    return this.callTool('get_card_checklists', { cardId });
+  }
+
+  // ─── Watch & Activity (Phase 3) ──
+  async watchCard(cardId, add = true) {
+    return this.callTool('watch_card', { cardId, add, remove: !add });
+  }
+
+  async unwatchCard(cardId) {
+    return this.callTool('watch_card', { cardId, add: false, remove: true });
+  }
+
+  async watchList(listId, add = true) {
+    return this.callTool('watch_list', { listId, add, remove: !add });
+  }
+
+  async unwatchList(listId) {
+    return this.callTool('watch_list', { listId, add: false, remove: true });
+  }
+
+  async getCardActivity(cardId, options = {}) {
+    const { filter, limit } = options;
+    return this.callTool('get_card_activity', { cardId, filter, limit });
+  }
+
+  async searchLabels(boardId, query = '') {
+    return this.callTool('search_labels', { boardId, query });
+  }
+
+  async removeLabelFromCard(cardId, labelId) {
+    return this.callTool('remove_label_from_card', { cardId, labelId });
+  }
+
+  // ─── Sort & Advanced List Management (Phase 4) ──
+  async copyChecklist(sourceChecklistId, cardId) {
+    return this.callTool('copy_checklist', { sourceChecklistId, cardId });
+  }
+
+  async sortListCards(listId, sort) {
+    return this.callTool('sort_list_cards', { listId, sort });
+  }
+
+  async updateList(options) {
+    const { listId, name, closed, pos, subscribed } = options;
+    return this.callTool('update_list', { listId, name, closed, pos, subscribed });
+  }
+
+
+
+
+
+
 
   close() {
     if (this.process) {
@@ -284,3 +377,10 @@ export class TrelloMCPClient {
     }
   }
 }
+
+
+
+
+
+
+

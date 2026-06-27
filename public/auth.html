@@ -11,9 +11,28 @@
     <div class="flex items-center justify-center size-10 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3">
       <span class="text-sm font-bold">K</span>
     </div>
-    <h2 class="text-base font-semibold text-kaede-text mb-2">Authorize KAEDE</h2>
-    <p class="text-sm text-kaede-muted leading-relaxed mb-4">Connect your deployment provider to enable automated environment management.</p>
-    <button type="button" id="kaede-auth-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none bg-kaede-primary text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-kaede-primary-hover">Connect</button>
+    <div id="auth-unauthorized">
+      <h2 class="text-base font-semibold text-kaede-text mb-2">Authorize KAEDE</h2>
+      <p class="text-sm text-kaede-muted leading-relaxed mb-4">Authorize this board to mark it as ready for KAEDE MCP orchestration. The MCP server reads Trello API credentials from your local environment — no credentials are stored in Trello.</p>
+      <div class="text-left bg-kaede-bg rounded-md p-3 mb-4 border border-kaede-border/50 text-[11px] text-kaede-muted leading-relaxed">
+        <p class="mb-1.5"><strong class="text-kaede-text">Prasyarat:</strong></p>
+        <ol class="list-decimal list-inside space-y-0.5">
+          <li>Dapatkan <a href="https://trello.com/power-ups/admin" target="_blank" rel="noopener" class="text-kaede-primary no-underline hover:underline">API Key & Token</a></li>
+          <li>Simpan di file <code class="text-kaede-primary text-[10px]">secrets.env</code> atau <code class="text-kaede-primary text-[10px]">~/.kaede/secrets.env</code></li>
+          <li>Jalankan <code class="text-kaede-primary text-[10px]">node scripts/kaede.mjs start</code></li>
+        </ol>
+        <p class="mt-1.5">Lihat <a href="https://konxc.github.io/kaede-powerup/api-key.html" target="_blank" rel="noopener" class="text-kaede-primary no-underline hover:underline">panduan lengkap</a> untuk detail.</p>
+      </div>
+      <button type="button" id="kaede-auth-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none bg-kaede-primary text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-kaede-primary-hover">Authorize Board</button>
+    </div>
+    <div id="auth-authorized" class="hidden">
+      <div class="flex items-center justify-center size-10 rounded-full bg-kaede-success/20 text-kaede-success mb-3">
+        <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h2 class="text-base font-semibold text-kaede-text mb-2">Board Authorized</h2>
+      <p class="text-sm text-kaede-muted mb-4">This board is ready for KAEDE MCP orchestration.</p>
+      <button type="button" id="kaede-deauth-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-kaede-danger/50 text-kaede-danger text-sm font-medium bg-transparent cursor-pointer transition-colors duration-200 hover:bg-kaede-danger/10">Remove Authorization</button>
+    </div>
   </div>
 
   <div class="pt-3 border-t border-kaede-border/50 text-center">
@@ -22,17 +41,43 @@
 
   <script src="https://p.trellocdn.net/power-up.min.js"></script>
   <script>
-    TrelloPowerUp.initialize({
-      'authorization-status': function(t) { return { authorized: false }; }
-    });
+    (function () {
+      var t = TrelloPowerUp.iframe();
 
-    document.getElementById('kaede-auth-btn').addEventListener('click', function() {
-      TrelloPowerUp.iframe()
-        .set('board', 'shared', 'auth', { connected: true, provider: 'netlify' })
-        .then(function() {
-          TrelloPowerUp.iframe().closePopup();
-        });
-    });
+      var unauthSection = document.getElementById('auth-unauthorized');
+      var authSection = document.getElementById('auth-authorized');
+
+      t.get('board', 'shared', 'auth', null)
+        .then(function (auth) {
+          if (auth && auth.connected) {
+            unauthSection.classList.add('hidden');
+            authSection.classList.remove('hidden');
+          }
+        })
+        .catch(function () {});
+
+      document.getElementById('kaede-auth-btn').addEventListener('click', function () {
+        t.set('board', 'shared', 'auth', { connected: true, provider: 'kaede-mcp', version: '1.0.0' })
+          .then(function () {
+            unauthSection.classList.add('hidden');
+            authSection.classList.remove('hidden');
+          })
+          .catch(function (err) {
+            console.error('[KAEDE] Auth failed:', err);
+          });
+      });
+
+      document.getElementById('kaede-deauth-btn').addEventListener('click', function () {
+        t.set('board', 'shared', 'auth', null)
+          .then(function () {
+            authSection.classList.add('hidden');
+            unauthSection.classList.remove('hidden');
+          })
+          .catch(function (err) {
+            console.error('[KAEDE] Deauth failed:', err);
+          });
+      });
+    })();
   </script>
 </body>
 </html>

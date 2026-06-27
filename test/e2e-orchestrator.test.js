@@ -277,13 +277,16 @@ describe('E2E: parsePlaybook → executeIntent (Mocked MCP)', () => {
 
   it('10. executeIntent "buat card" with listId skips getLists', async () => {
     const client = new MockClient();
-    const origGetLists = mock.method(client, 'getLists');
+    let getListsCalled = false;
+    const origGetLists = client.getLists;
+    client.getLists = async () => { getListsCalled = true; return origGetLists.call(client); };
     const results = await executeIntent(client, 'buat card', pb, 'b1', {
       task: 'Direct',
       listId: 'l123',
     });
     assert.equal(results[0].success, true);
-    assert.equal(origGetLists.mock.callCount(), 0);
+    assert.equal(getListsCalled, false);
+    client.getLists = origGetLists;
   });
 
   it('11. executeIntent "pindah" with listName finds list', async () => {

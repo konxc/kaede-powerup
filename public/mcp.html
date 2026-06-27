@@ -19,6 +19,16 @@
     </div>
   </div>
 
+  <div id="card-context" class="hidden mb-3">
+    <div class="flex items-center gap-2 px-3 py-2 bg-kaede-bg rounded-md border border-kaede-border/50">
+      <span class="size-2 rounded-full bg-kaede-primary shrink-0"></span>
+      <div class="min-w-0">
+        <div class="text-sm font-medium text-kaede-text truncate" id="context-name"></div>
+        <div class="text-[10px] text-kaede-muted font-mono truncate" id="context-id"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="flex-1">
     <div class="mb-3">
       <label class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide">Intent</label>
@@ -32,6 +42,10 @@
       <button type="button" id="execute-btn" class="flex-1 px-4 py-2 rounded-lg bg-kaede-primary text-white text-sm font-medium cursor-pointer border-none transition-colors duration-200 hover:bg-kaede-primary-hover disabled:opacity-40 disabled:cursor-not-allowed">Execute</button>
       <button type="button" id="quick-card" class="px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary">Quick Card</button>
       <button type="button" id="quick-move" class="px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary">Quick Move</button>
+    </div>
+    <div class="flex gap-2 mt-2">
+      <button type="button" id="quick-comment" class="flex-1 px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary">Quick Comment</button>
+      <button type="button" id="quick-archive" class="flex-1 px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary">Quick Archive</button>
     </div>
     <div id="result-area" class="mt-3 hidden">
       <div class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide mb-1">Result</div>
@@ -53,10 +67,15 @@
     (function () {
       var API_BASE = 'http://localhost:3456';
       var t = TrelloPowerUp.iframe();
+      var cardId = '';
+      var cardName = '';
 
       var statusDot = document.getElementById('status-dot');
       var statusText = document.getElementById('status-text');
       var statusSection = document.getElementById('mcp-status');
+      var contextSection = document.getElementById('card-context');
+      var contextName = document.getElementById('context-name');
+      var contextId = document.getElementById('context-id');
       var intentInput = document.getElementById('intent-input');
       var argsInput = document.getElementById('args-input');
       var executeBtn = document.getElementById('execute-btn');
@@ -66,11 +85,25 @@
       var errorText = document.getElementById('error-text');
       var quickCard = document.getElementById('quick-card');
       var quickMove = document.getElementById('quick-move');
+      var quickComment = document.getElementById('quick-comment');
+      var quickArchive = document.getElementById('quick-archive');
+
+      t.card('id', 'name')
+        .then(function (card) {
+          if (card && card.id) {
+            cardId = card.id;
+            cardName = card.name || 'Untitled';
+            contextSection.classList.remove('hidden');
+            contextName.textContent = cardName;
+            contextId.textContent = cardId;
+          }
+        })
+        .catch(function () {});
 
       function showResult(data) {
         errorArea.classList.add('hidden');
         resultArea.classList.remove('hidden');
-        resultText.textContent = JSON.stringify(data, null, 2);
+        resultText.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
       }
 
       function showError(msg) {
@@ -140,7 +173,19 @@
 
       quickMove.addEventListener('click', function () {
         intentInput.value = 'pindah';
-        argsInput.value = JSON.stringify({ cardId: 'enter-card-id', listName: 'Done' }, null, 2);
+        argsInput.value = JSON.stringify({ cardId: cardId || 'enter-card-id', listName: 'Done' }, null, 2);
+      });
+
+      quickComment.addEventListener('click', function () {
+        if (!cardId) { showError('No card context available. Open this from a card.'); return; }
+        intentInput.value = 'komentar';
+        argsInput.value = JSON.stringify({ cardId: cardId, text: 'Update from KAEDE Power-Up' }, null, 2);
+      });
+
+      quickArchive.addEventListener('click', function () {
+        if (!cardId) { showError('No card context available. Open this from a card.'); return; }
+        intentInput.value = 'arsipkan';
+        argsInput.value = JSON.stringify({ cardId: cardId }, null, 2);
       });
 
       checkConnection();

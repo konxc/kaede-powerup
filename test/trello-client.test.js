@@ -1,17 +1,26 @@
-import { describe, it, after, mock } from 'node:test';
+import { describe, it, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'events';
 import { TrelloMCPClient } from '../src/trello-client.js';
 
+function createMockFn() {
+  const fn = function (...args) {
+    fn.mock.calls.push(args);
+    return fn.mock.returnValue;
+  };
+  fn.mock = { calls: [] };
+  fn.mockReturnValue = function (v) { fn.mock.returnValue = v; return fn; };
+  return fn;
+}
+
 function createMockProcess() {
   const proc = new EventEmitter();
   proc.stdout = new EventEmitter();
-  proc.stdin = { write: mock.fn() };
-  proc.kill = mock.fn();
+  proc.stdin = { write: createMockFn() };
+  proc.kill = createMockFn();
   return proc;
 }
 
-// Custom client with 1ms timeout — timers expire instantly in tests
 class FastClient extends TrelloMCPClient {
   constructor() {
     super(undefined, 1);
@@ -62,7 +71,6 @@ describe('TrelloMCPClient', () => {
     assert.equal(client.rpcId, origId + 1);
     assert.equal(client.pending.size, 1);
 
-    // Clean up — reject the promise so it doesn't fire as unhandled rejection
     const [, entry] = client.pending.entries().next().value;
     clearTimeout(entry.timer);
     entry.reject(new Error('cleanup'));
@@ -76,7 +84,6 @@ describe('TrelloMCPClient', () => {
     client.pending = new Map();
 
     const promise = client.sendRequest('timeout_test', {});
-    // Timer fires in 1ms, should reject quickly
     await assert.rejects(promise, /RPC timeout/);
     assert.equal(client.pending.size, 0);
   });
@@ -85,12 +92,13 @@ describe('TrelloMCPClient', () => {
     const client = new FastClient();
     const proc = createMockProcess();
     client.process = proc;
-    client.rl = { close: mock.fn() };
+    const rlClose = createMockFn();
+    client.rl = { close: rlClose };
 
     client.close();
 
-    assert.equal(proc.kill.mock.callCount(), 1);
-    assert.equal(client.rl.close.mock.callCount(), 1);
+    assert.equal(proc.kill.mock.calls.length, 1);
+    assert.equal(rlClose.mock.calls.length, 1);
   });
 
   it('close handles null process and null rl', () => {
@@ -98,7 +106,7 @@ describe('TrelloMCPClient', () => {
     client.close();
   });
 
-  it('rejects pending requests on process exit', () => {
+  it('rejects pending requests on process exit', async () => {
     const client = new FastClient();
     const proc = createMockProcess();
     client.process = proc;
@@ -122,28 +130,27 @@ describe('TrelloMCPClient', () => {
 
     proc.emit('exit', 1);
 
-    return promise.then(
-      () => { throw new Error('Should have rejected'); },
-      (err) => {
-        assert.equal(err.message, 'MCP server exited with code 1');
-        assert.equal(client.pending.size, 0);
-      }
-    );
+    try {
+      await promise;
+      throw new Error('Should have rejected');
+    } catch (err) {
+      assert.equal(err.message, 'MCP server exited with code 1');
+      assert.equal(client.pending.size, 0);
+    }
   });
 
-  it('handles JSON response via line handler', () => {
+  it('handles JSON response via line handler', async () => {
     const client = new FastClient();
     clients.push(client);
     const proc = createMockProcess();
     client.process = proc;
-    client.rl = { close: mock.fn() };
+    client.rl = { close: createMockFn() };
 
     const resultPromise = new Promise((resolve, reject) => {
       const timer = setTimeout(() => {}, 99999);
       client.pending.set(42, { resolve, reject, timer });
     });
 
-    // Simulate readline handler
     const line = JSON.stringify({ id: 42, result: { boards: [{ id: 'b1' }] } });
     try {
       const msg = JSON.parse(line);
@@ -155,17 +162,16 @@ describe('TrelloMCPClient', () => {
       }
     } catch { /* skip */ }
 
-    return resultPromise.then((result) => {
-      assert.deepEqual(result, { boards: [{ id: 'b1' }] });
-    });
+    const result = await resultPromise;
+    assert.deepEqual(result, { boards: [{ id: 'b1' }] });
   });
 
-  it('handles JSON error via line handler', () => {
+  it('handles JSON error via line handler', async () => {
     const client = new FastClient();
     clients.push(client);
     const proc = createMockProcess();
     client.process = proc;
-    client.rl = { close: mock.fn() };
+    client.rl = { close: createMockFn() };
 
     const errPromise = new Promise((resolve) => {
       const timer = setTimeout(() => {}, 99999);
@@ -183,32 +189,31 @@ describe('TrelloMCPClient', () => {
       }
     } catch { /* skip */ }
 
-    return errPromise.then((err) => {
-      assert.equal(err.message, 'Not found');
-    });
+    const err = await errPromise;
+    assert.equal(err.message, 'Not found');
   });
 
   it('callTool parses text content to JSON', async () => {
     const client = new FastClient();
-    mock.method(client, 'sendRequest', () => Promise.resolve({
+    client.sendRequest = async () => ({
       content: [{ type: 'text', text: JSON.stringify({ boards: [{ id: 'b1' }] }) }],
-    }));
+    });
     const result = await client.callTool('list_boards', {});
     assert.deepEqual(result, { boards: [{ id: 'b1' }] });
   });
 
   it('callTool returns raw result for non-text content', async () => {
     const client = new FastClient();
-    mock.method(client, 'sendRequest', () => Promise.resolve({
+    client.sendRequest = async () => ({
       content: [{ type: 'image', data: 'base64...' }],
-    }));
+    });
     const result = await client.callTool('get_card', { cardId: 'c1' });
     assert.deepEqual(result, { content: [{ type: 'image', data: 'base64...' }] });
   });
 
   it('listBoards delegates to callTool', async () => {
     const client = new FastClient();
-    mock.method(client, 'callTool', () => Promise.resolve({ boards: [{ id: 'b1', name: 'Board 1' }] }));
+    client.callTool = async () => ({ boards: [{ id: 'b1', name: 'Board 1' }] });
     const boards = await client.listBoards();
     assert.equal(boards.length, 1);
     assert.equal(boards[0].name, 'Board 1');
@@ -216,7 +221,7 @@ describe('TrelloMCPClient', () => {
 
   it('getLists delegates to callTool', async () => {
     const client = new FastClient();
-    mock.method(client, 'callTool', () => Promise.resolve({ lists: [{ id: 'l1', name: 'To Do' }] }));
+    client.callTool = async () => ({ lists: [{ id: 'l1', name: 'To Do' }] });
     const lists = await client.getLists('b1');
     assert.equal(lists.length, 1);
     assert.equal(lists[0].name, 'To Do');
@@ -224,21 +229,21 @@ describe('TrelloMCPClient', () => {
 
   it('listWorkspaces delegates to callTool', async () => {
     const client = new FastClient();
-    mock.method(client, 'callTool', () => Promise.resolve({ workspaces: [{ id: 'w1' }] }));
+    client.callTool = async () => ({ workspaces: [{ id: 'w1' }] });
     const ws = await client.listWorkspaces();
     assert.equal(ws.length, 1);
   });
 
   it('getBoardMembers delegates to callTool', async () => {
     const client = new FastClient();
-    mock.method(client, 'callTool', () => Promise.resolve({ members: [{ id: 'm1' }] }));
+    client.callTool = async () => ({ members: [{ id: 'm1' }] });
     const m = await client.getBoardMembers('b1');
     assert.equal(m.length, 1);
   });
 
   it('getMyCards delegates to callTool', async () => {
     const client = new FastClient();
-    mock.method(client, 'callTool', () => Promise.resolve({ cards: [{ id: 'c1' }] }));
+    client.callTool = async () => ({ cards: [{ id: 'c1' }] });
     const c = await client.getMyCards();
     assert.equal(c.length, 1);
   });
