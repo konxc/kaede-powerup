@@ -1,0 +1,20 @@
+# type(scope): subject (max 50 chars)
+#
+# type: feat | fix | refactor | chore | docs | test | style
+# scope: mcp | trello | cli | api | auth | board | card | docs | deploy | config | test
+#
+# Examples:
+#   feat(mcp): add attachment stubs with multipart upload
+#   fix(cli): handle missing secrets.env gracefully
+#   refactor(api): extract trelloAuth helper
+#   docs(roadmap): update status to all phases complete
+#   chore(config): add gitmessage template
+#
+# Body (optional, wrap at 72 chars):
+# - Why this change is needed
+# - What it does differently
+# - Breaking changes, if any
+#
+# Footer (optional):
+# Closes #123
+# Co-authored-by: ...

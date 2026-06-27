@@ -2,7 +2,7 @@
 
 ## Dokumentasi Online
 - [KAEDE App](https://kaede-powerup.netlify.app) — Trello Power-Up
-- [KAEDE Docs](https://konxc.github.io/kaede) — Dokumentasi (GitHub Pages)
+- [KAEDE Docs](https://konxc.github.io/kaede-powerup) — Dokumentasi (GitHub Pages)
 
 ## Source Code
 - [kaede-powerup.git](https://github.com/konxc/kaede-powerup) — Repositori

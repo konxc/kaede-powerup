@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Power-Up** | [`kaede-powerup.netlify.app`](https://kaede-powerup.netlify.app) |
-| **Dokumentasi** | [`konxc.github.io/kaede`](https://konxc.github.io/kaede) |
+| **Dokumentasi** | [`konxc.github.io/kaede-powerup`](https://konxc.github.io/kaede-powerup) |
 | **Repo** | `github.com/konxc/kaede-powerup` |
 | **Stack** | Tailwind CSS v4 + Bun |
 | **License** | Proprietary — PT Koneksi Jaringan Indonesia |
@@ -72,14 +72,12 @@
 │   ├── opencode.json    # Konfigurasi AI Agent
 │   └── SHARED/          # Project context & agent rules
 │
-├── secrets.env          # Trello credentials (gitignored)
 ├── netlify.toml         # Konfigurasi deploy Netlify
-└── package.json         # Build scripts + CLI entry
-=======
+├── package.json         # Build scripts + CLI entry
 ├── scripts/
 │   ├── kaede.mjs        # CLI tool (setup, today, init, push, env, status)
 │   └── build-docs.mjs   # Build docs: Markdown → HTML
->>>>>>> f9fed721 (feat: replace MCP wrapper with compiled server, add KAEDE CLI)
+├── secrets.env          # Trello credentials (gitignored)
 ```
 
 ---
