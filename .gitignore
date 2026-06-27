@@ -9,3 +9,8 @@ secrets.env
 .openkb/PERSONAL/
 # Build artifacts
 dist/
+# AI agent session cache
+.sisyphus/
+
+# Upstream PR submission drafts
+pr-submissions/

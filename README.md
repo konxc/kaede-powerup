@@ -188,6 +188,31 @@ Dokumentasi di `docs/*.md` auto-build ke `gh-pages` branch via GitHub Actions.
 
 ---
 
+## Siapa yang Membutuhkan KAEDE?
+
+| Peran | Manfaat Utama |
+|---|---|
+| **Project Manager** | Sprint automation via intent — "Mulai Sprint Alpha" satu perintah |
+| **Developer** | 44 tools MCP, clipboard-to-card attachment, `kaede today` |
+| **QA / Tester** | Template checklist, histori card, sort by due date |
+| **Tech Lead** | Playbook-enforced governance, dual MCP architecture |
+| **Stakeholder** | Badge environment langsung di card, zero config |
+| **AI Engineer** | Extensible MCP server, kontribusi upstream via PR |
+
+Dokumentasi lengkap: [`docs/sdlc-roles.md`](docs/sdlc-roles.md) (EN) | [`docs/id/sdlc-roles.md`](docs/id/sdlc-roles.md) (ID)
+
+---
+
+## Dukung Pengembangan
+
+KAEDE dikembangkan oleh **Sandiko** sebagai proyek open-source internal PT Koneksi Jaringan Indonesia. Jika tools ini bermanfaat, dukung pengembangan selanjutnya:
+
+[![Trakteer](https://img.shields.io/badge/Trakteer-Sandiko-red?logo=buymeacoffee&style=for-the-badge)](https://trakteer.id/sandikodev)
+
+Setiap dukungan berarti — mulai dari semacam kopi hingga kontribusi kode.
+
+---
+
 ## Ekosistem
 
 KAEDE adalah bagian dari ekosistem pengembangan PT Koneksi Jaringan Indonesia:

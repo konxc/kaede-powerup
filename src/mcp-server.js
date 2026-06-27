@@ -50,6 +50,29 @@ function getAuth() {
 
 // â”€â”€â”€ Trello API â”€â”€â”€
 
+let _defaultBoardId = null;
+function getDefaultBoardId() {
+  if (!_defaultBoardId) {
+    _defaultBoardId = process.env.TRELLO_DEFAULT_BOARD_ID || '';
+  }
+  return _defaultBoardId;
+}
+
+function resolveBoardId(args) {
+  return args.boardId || getDefaultBoardId() || null;
+}
+
+function validateRequired(args, required, toolName) {
+  const missing = required.filter(k => args[k] == null);
+  if (missing.length) {
+    throw new Error(`${toolName}: missing required parameter(s): ${missing.join(', ')}`);
+  }
+}
+
+function wrap(res) {
+  return { content: [{ type: 'text', text: JSON.stringify(res, null, 2) }] };
+}
+
 async function trello(path, opts = {}) {
   const auth = getAuth();
   if (!auth) throw new Error('TRELLO_API_KEY or TRELLO_TOKEN not configured');
@@ -142,12 +165,14 @@ async function handleToolsCall(name, args) {
 
     // â”€â”€â”€ Lists â”€â”€â”€
     case 'get_lists': {
-      const bid = args.boardId || getAuth().key;
+      const bid = resolveBoardId(args);
+      if (!bid) throw new Error('get_lists: boardId is required (set TRELLO_DEFAULT_BOARD_ID or pass boardId)');
       const lists = await trello(`/boards/${bid}/lists?fields=name,id,closed`);
       return { lists: lists.map(l => ({ id: l.id, name: l.name, closed: l.closed })) };
     }
     case 'add_list_to_board': {
-      const bid = args.boardId || getAuth().key;
+      const bid = resolveBoardId(args);
+      if (!bid) throw new Error('add_list_to_board: boardId is required (set TRELLO_DEFAULT_BOARD_ID or pass boardId)');
       const list = await trelloPost(`/boards/${bid}/lists`, { name: args.name });
       return { id: list.id, name: list.name };
     }
@@ -223,7 +248,8 @@ async function handleToolsCall(name, args) {
 
     // â”€â”€â”€ Members â”€â”€â”€
     case 'get_board_members': {
-      const bid = args.boardId || getAuth().key;
+      const bid = resolveBoardId(args);
+      if (!bid) throw new Error('get_board_members: boardId is required (set TRELLO_DEFAULT_BOARD_ID or pass boardId)');
       const members = await trello(`/boards/${bid}/members?fields=id,fullName,username,initials,avatarUrl`);
       return { members };
     }
@@ -238,12 +264,14 @@ async function handleToolsCall(name, args) {
 
     // â”€â”€â”€ Labels â”€â”€â”€
     case 'get_board_labels': {
-      const bid = args.boardId || getAuth().key;
+      const bid = resolveBoardId(args);
+      if (!bid) throw new Error('get_board_labels: boardId is required (set TRELLO_DEFAULT_BOARD_ID or pass boardId)');
       const labels = await trello(`/boards/${bid}/labels?fields=id,name,color`);
       return { labels };
     }
     case 'create_label': {
-      const bid = args.boardId || getAuth().key;
+      const bid = resolveBoardId(args);
+      if (!bid) throw new Error('create_label: boardId is required (set TRELLO_DEFAULT_BOARD_ID or pass boardId)');
       const body = { name: args.name };
       if (args.color) body.color = args.color;
       const label = await trelloPost(`/boards/${bid}/labels`, body);
@@ -561,7 +589,9 @@ case 'attach_image_to_card': {
 
     // ─── Label Tools ──
     case 'search_labels': {
-      const labels = await trello(`/boards/${args.boardId}/labels?fields=id,name,color`);
+      const bid = resolveBoardId(args);
+      if (!bid) throw new Error('search_labels: boardId is required (set TRELLO_DEFAULT_BOARD_ID or pass boardId)');
+      const labels = await trello(`/boards/${bid}/labels?fields=id,name,color`);
       if (args.query) {
         const q = args.query.toLowerCase();
         return {
@@ -644,10 +674,10 @@ const TOOLS = [
   }, ['name']),
 
   toolSchema('get_lists', 'Get all lists in a board', {
-    boardId: { type: 'string', description: 'Board ID (uses default if not provided)' },
+    boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
   }),
   toolSchema('add_list_to_board', 'Add a new list to a board', {
-    boardId: { type: 'string', description: 'Board ID' },
+    boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
     name: { type: 'string', description: 'Name of the new list' },
   }, ['name']),
   toolSchema('archive_list', 'Archive a list', {
@@ -692,7 +722,7 @@ const TOOLS = [
   }, ['cardId']),
 
   toolSchema('get_board_members', 'Get members of a board', {
-    boardId: { type: 'string', description: 'Board ID' },
+    boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
   }),
   toolSchema('assign_member_to_card', 'Assign a member to a card', {
     cardId: { type: 'string', description: 'ID of the card' },
@@ -704,10 +734,10 @@ const TOOLS = [
   }, ['cardId', 'memberId']),
 
   toolSchema('get_board_labels', 'Get all labels on a board', {
-    boardId: { type: 'string', description: 'Board ID' },
+    boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
   }),
   toolSchema('create_label', 'Create a new label', {
-    boardId: { type: 'string', description: 'Board ID' },
+    boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
     name: { type: 'string', description: 'Label name' },
     color: { type: 'string', description: 'Label color' },
   }, ['name']),
@@ -872,12 +902,7 @@ stdin.on('data', (chunk) => {
       result(id, { tools: TOOLS });
     } else if (method === 'tools/call') {
       handleToolsCall(params.name, params.arguments || {})
-        .then((res) => {
-          const content = typeof res === 'string'
-            ? [{ type: 'text', text: res }]
-            : [{ type: 'text', text: JSON.stringify(res, null, 2) }];
-          result(id, { content });
-        })
+        .then(res => result(id, wrap(res)))
         .catch((err) => {
           error(id, -32603, err.message);
         });

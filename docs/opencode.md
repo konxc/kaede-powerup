@@ -1,20 +1,20 @@
-# Integrasi Trello MCP dengan OpenCode
+# Trello MCP Integration with OpenCode
 
-Setelah Trello MCP server berjalan, langkah selanjutnya adalah menghubungkannya ke **OpenCode** — AI coding agent yang digunakan tim Koneksi. Dengan integrasi ini, AI Agent bisa membaca dan menulis Trello langsung dari percakapan.
+Once the Trello MCP server is running, the next step is connecting it to **OpenCode** — the AI coding agent used by Koneksi team. With this integration, the AI Agent can read and write Trello directly from conversation.
 
 <div class="not-prose p-4 rounded-xl bg-kaede-primary/10 border border-kaede-primary/20 mb-6">
 
-**Prasyarat**
+**Prerequisites**
 
-- Trello MCP Server sudah terinstall — [lihat panduan](mcp-server.html)
-- Trello API Key & Token — [lihat panduan](api-key.html)
-- OpenCode sudah terinstall di environment kerja
+- Trello MCP Server installed — [see guide](mcp-server.html)
+- Trello API Key & Token — [see guide](api-key.html)
+- OpenCode installed in your working environment
 
 </div>
 
-## 1. Tambahkan MCP Server ke OpenCode
+## 1. Add MCP Server to OpenCode
 
-Edit file `.opencode/opencode.json` di repositori kamu:
+Edit your `.opencode/opencode.json` in your repository:
 
 ```json
 {
@@ -35,75 +35,77 @@ Edit file `.opencode/opencode.json` di repositori kamu:
 
 <div class="not-prose p-3 rounded-lg bg-kaede-surface border border-kaede-border mt-2">
 
-**Jangan hardcode credentials!** Di environment production, gunakan environment variable dari `~/.config/dev/*.env` sebagai pengganti nilai langsung.
+**Do not hardcode credentials!** In production, use environment variables from `~/.config/dev/*.env` instead of inline values.
 
 </div>
 
-## 2. Verifikasi Koneksi
+## 2. Verify Connection
 
 1. Restart OpenCode session
-2. Coba perintah:
+2. Try:
 
     ```
-    Coba list semua board Trello yang saya punya.
+    List all my Trello boards.
     ```
 
-3. Jika OpenCode meresponse dengan daftar board, koneksi berhasil!
+3. If OpenCode responds with a board list, the connection works!
 
-## 3. Contoh Penggunaan
-
-Berikut contoh percakapan dengan AI Agent setelah integrasi:
+## 3. Usage Examples
 
 <div class="not-prose glass rounded-xl p-4 space-y-3">
 
 <div class="flex items-start gap-2">
   <span class="text-[10px] font-bold text-kaede-success px-1.5 py-0.5 rounded bg-kaede-success/20 shrink-0 mt-0.5">You</span>
-  <p class="text-xs text-kaede-muted">"Apa task yang sedang dalam status 'In Progress' di board project saya?"</p>
+  <p class="text-xs text-kaede-muted">"What tasks are in 'In Progress' on my project board?"</p>
 </div>
 
 <div class="flex items-start gap-2">
   <span class="text-[10px] font-bold text-kaede-primary px-1.5 py-0.5 rounded bg-kaede-primary/20 shrink-0 mt-0.5">AI</span>
-  <p class="text-xs text-kaede-muted">"Ada 3 kartu di list 'In Progress': 'Fix login bug' (dimulai 24 Juni), 'Update dashboard' (due 28 Juni), 'Integrasi API payment' (due 30 Juni)."</p>
+  <p class="text-xs text-kaede-muted">"There are 3 cards in 'In Progress': 'Fix login bug' (started Jun 24), 'Update dashboard' (due Jun 28), 'Integrate payment API' (due Jun 30)."</p>
 </div>
 
 <div class="border-t border-kaede-border/50 pt-2 flex items-start gap-2">
   <span class="text-[10px] font-bold text-kaede-success px-1.5 py-0.5 rounded bg-kaede-success/20 shrink-0 mt-0.5">You</span>
-  <p class="text-xs text-kaede-muted">"Buat kartu baru 'Setup CI/CD pipeline' di list 'To Do' dengan label development."</p>
+  <p class="text-xs text-kaede-muted">"Create a new card 'Setup CI/CD pipeline' in 'To Do' list with development label."</p>
 </div>
 
 <div class="flex items-start gap-2">
   <span class="text-[10px] font-bold text-kaede-primary px-1.5 py-0.5 rounded bg-kaede-primary/20 shrink-0 mt-0.5">AI</span>
-  <p class="text-xs text-kaede-muted">"Kartu 'Setup CI/CD pipeline' sudah dibuat di list 'To Do' dengan label development."</p>
+  <p class="text-xs text-kaede-muted">"Card 'Setup CI/CD pipeline' has been created in 'To Do' list with development label."</p>
 </div>
 
 </div>
 
-## 4. Mengatur Board Aktif
+## 4. Set Active Board
 
-Sebelum memulai, set board yang akan dikerjakan:
+Before starting, set which board to work on:
 
-    Set active board saya ke board "Sprint 24".
+```
+Set my active board to "Sprint 24".
+```
 
-Atau jika tahu Board ID:
+Or if you know the Board ID:
 
-    Gunakan tool set_active_board dengan boardId "abc123xyz".
+```
+Use set_active_board with boardId "abc123xyz".
+```
 
 ## 5. Best Practices
 
-- **Gunakan board aktif:** Set active board di awal sesi agar konteks jelas
-- **Periksa dulu:** Minta AI untuk "List boards" sebelum memulai
-- **Labels:** Gunakan label ID dari Trello (bisa dicek via tool `get_board_custom_fields`)
-- **Workspace restriction:** Aktifkan `TRELLO_ALLOWED_WORKSPACES` untuk keamanan
+- **Use active board:** Set active board at the start of each session for clear context
+- **Check first:** Ask AI to "List boards" before starting
+- **Labels:** Use Trello label IDs (check via `get_board_custom_fields`)
+- **Workspace restriction:** Enable `TRELLO_ALLOWED_WORKSPACES` for security
 
-## 6. Keamanan Credentials
+## 6. Credential Security
 
-Ikuti aturan berikut untuk menjaga keamanan:
+Follow these rules to keep credentials safe:
 
-- Jangan commit `.env` atau credentials ke git
-- Gunakan `~/.config/dev/*.env` untuk menyimpan secrets
-- Di OpenCode, gunakan referensi environment variable, bukan nilai hardcode
-- Rotate token secara berkala
+- Do not commit `.env` or credentials to git
+- Use `~/.config/dev/*.env` to store secrets
+- In OpenCode, reference environment variables, not hardcoded values
+- Rotate tokens regularly
 
-## Langkah Selanjutnya
+## Next Steps
 
-Setelah integrasi berhasil, lihat [Referensi Tools](tools.html) untuk daftar lengkap semua tools yang tersedia.
+Once integration is complete, see the [Tools Reference](tools.html) for a full list of available tools.

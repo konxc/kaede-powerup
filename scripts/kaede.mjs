@@ -645,12 +645,31 @@ async function cmdEnv() {
     return;
   }
 
-  if (process.platform === 'win32') {
-    console.log(`$env:TRELLO_API_KEY="${secrets.TRELLO_API_KEY}"`);
-    console.log(`$env:TRELLO_TOKEN="${secrets.TRELLO_TOKEN}"`);
+  const args = process.argv.slice(3);
+  const shell = args.includes('--bash') ? 'bash'
+    : args.includes('--ps') ? 'ps'
+    : args.includes('--cmd') ? 'cmd'
+    : process.env.SHELL?.includes('bash') || process.env.SHELL?.includes('zsh') ? 'bash'
+    : process.platform === 'win32' ? 'ps'
+    : 'bash';
+
+  let defaultBoardId = '';
+  if (secrets.TRELLO_DEFAULT_BOARD_ID) {
+    defaultBoardId = secrets.TRELLO_DEFAULT_BOARD_ID;
+  }
+
+  const pairs = [
+    [`TRELLO_API_KEY`, secrets.TRELLO_API_KEY],
+    [`TRELLO_TOKEN`, secrets.TRELLO_TOKEN],
+  ];
+  if (defaultBoardId) pairs.push([`TRELLO_DEFAULT_BOARD_ID`, defaultBoardId]);
+
+  if (shell === 'bash') {
+    for (const [k, v] of pairs) console.log(`export ${k}="${v}"`);
+  } else if (shell === 'cmd') {
+    for (const [k, v] of pairs) console.log(`set ${k}=${v}`);
   } else {
-    console.log(`export TRELLO_API_KEY="${secrets.TRELLO_API_KEY}"`);
-    console.log(`export TRELLO_TOKEN="${secrets.TRELLO_TOKEN}"`);
+    for (const [k, v] of pairs) console.log(`$env:${k}="${v}"`);
   }
 }
 
@@ -863,12 +882,12 @@ async function cmdRun() {
   const isDryRun = args.includes('--dry-run') || args.includes('-n');
 
   // Known flags that take a value (skip both flag and value)
-  const knownFlagArgs = ['--playbook', '--board', '--openkb', '--opencode'];
+  const knownFlagArgs = ['--playbook', '--board', '--openkb', '--opencode', '--intent'];
   // Extra args passed to intent handler (--name, --task, --list, --desc, --member, --color)
   const extraArgs = {};
 
   // Find intent and collect extra args
-  let intent = '';
+  let intent = getOpt('--intent') || '';
   for (let i = 0; i < args.length; i++) {
     if (args[i].startsWith('--') || args[i].startsWith('-')) {
       if (knownFlagArgs.includes(args[i])) {
@@ -1132,6 +1151,7 @@ async function cmdTestTools() {
     ['list_boards', {}],
     ['get_my_cards', {}],
   ];
+  const total = tools.length;
 
   const client = new TrelloMCPClient();
   try {
@@ -1144,22 +1164,26 @@ async function cmdTestTools() {
     let passed = 0;
     let failed = 0;
 
-    for (const [tool, params] of tools) {
+    for (let i = 0; i < tools.length; i++) {
+      const [tool, params] = tools[i];
+      process.stdout.write(`  [${i+1}/${total}] ${tool}... `);
       try {
         const result = await client.callTool(tool, params);
         const summary = Object.keys(result).slice(0, 3).map(k => `${k}: ${Array.isArray(result[k]) ? result[k].length : typeof result[k]}`).join(', ');
-        console.log(`  \x1b[32m  ✓ ${tool}\x1b[0m \x1b[90m(${summary})\x1b[0m`);
+        process.stdout.write(`\x1b[32m✓\x1b[0m \x1b[90m(${summary})\x1b[0m\n`);
         passed++;
       } catch (err) {
-        console.log(`  \x1b[31m  ✗ ${tool}\x1b[0m \x1b[90m— ${err.message.slice(0, 80)}\x1b[0m`);
+        process.stdout.write(`\x1b[31m✗\x1b[0m \x1b[90m${err.message.slice(0, 80)}\x1b[0m\n`);
         failed++;
       }
     }
 
     console.log('');
-    console.log(`  \x1b[36m  Result: ${passed} passed, ${failed} failed\x1b[0m`);
-    if (passed === tools.length) {
+    console.log(`  \x1b[36m  Result: ${passed}/${total} passed, ${failed} failed\x1b[0m`);
+    if (passed === total) {
       console.log('  \x1b[32m  ✅  All MCP tools responding.\x1b[0m');
+    } else {
+      console.log('  \x1b[33m  ⚠  Some tools failed. Check credentials or board config.\x1b[0m');
     }
   } catch (err) {
     console.error(`  \x1b[31m  ✗ ${err.message}\x1b[0m`);
@@ -1182,11 +1206,11 @@ function cmdHelp() {
   console.log('    \x1b[36mtoday\x1b[0m     \x1b[90mTampilkan task Trello hari ini\x1b[0m');
   console.log('    \x1b[36minit\x1b[0m      \x1b[90mInit KAEDE di project. Flags: --playbook <path>, --tech <stack>, --db <type>\x1b[0m');
   console.log('    \x1b[36mpush\x1b[0m      \x1b[90mBuat Trello cards dari file markdown\x1b[0m');
-  console.log('    \x1b[36menv\x1b[0m       \x1b[90mExport credentials ke shell environment\x1b[0m');
+    console.log('    \x1b[36menv\x1b[0m       \x1b[90mExport credentials (--bash, --ps, --cmd)\x1b[0m');
   console.log('    \x1b[36mstatus\x1b[0m    \x1b[90mCek status konfigurasi KAEDE (--mcp untuk test koneksi)\x1b[0m');
   console.log('    \x1b[36mplaybook\x1b[0m  \x1b[90mParse/show playbook (parse <path> | show <path>)\x1b[0m');
   console.log('    \x1b[36morchestrate\x1b[0m \x1b[90mLoad context (--playbook <path> [--detail])\x1b[0m');
-  console.log('    \x1b[36mrun\x1b[0m       \x1b[90mExecute intent (--playbook <path> [--board <id>] [--dry-run] "intent")\x1b[0m');
+    console.log('    \x1b[36mrun\x1b[0m       \x1b[90mExecute intent (--playbook <path> [--board <id>] [--dry-run] [--intent <intent>])\x1b[0m');
   console.log('    \x1b[36mbuild\x1b[0m     \x1b[90mBuild MCP server (dist/mcp-server.js)\x1b[0m');
     console.log('    \x1b[36mstart\x1b[0m     \x1b[90mStart API server (HTTP bridge for frontend) [port]\x1b[0m');
     console.log('    \x1b[36mtest-tools\x1b[0m \x1b[90mUji koneksi 22 MCP tools (butuh Trello credentials)\x1b[0m');
@@ -1201,11 +1225,14 @@ function cmdHelp() {
   console.log('    node scripts/kaede.mjs push tasks.md --board "My Board" --list "To Do"');
   console.log('    node scripts/kaede.mjs setup');
   console.log('    node scripts/kaede.mjs today');
-  console.log('    node scripts/kaede.mjs env | iex                 # Windows PowerShell');
+    console.log('    node scripts/kaede.mjs env | iex                 # Windows PowerShell');
+    console.log('    node scripts/kaede.mjs env --bash | source /dev/stdin  # Linux/Mac');
+    console.log('    node scripts/kaede.mjs env --cmd | cmd            # Windows CMD');
   console.log('    node scripts/kaede.mjs playbook parse ../playbook/sprint.md');
   console.log('    node scripts/kaede.mjs orchestrate --playbook ../playbook/sprint.md --detail');
-  console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md -n "Mulai Sprint Alpha"');
-  console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --board abc123 "Mulai Sprint Alpha"');
+    console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --intent "Mulai Sprint Alpha"');
+    console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --board abc123 "Mulai Sprint Alpha"');
+    console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --dry-run "Mulai Sprint Alpha"');
   console.log('    node scripts/kaede.mjs status --mcp');
     console.log('    node scripts/kaede.mjs build');
     console.log('    node scripts/kaede.mjs start');

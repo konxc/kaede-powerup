@@ -1,25 +1,25 @@
 # Setup Trello MCP Server
 
-**MCP Server Trello** ([delorenj/mcp-server-trello](https://github.com/delorenj/mcp-server-trello)) adalah server open source yang menyediakan jembatan antara Trello API dan AI Agent melalui protokol MCP. Server ini menangani rate limiting, validasi input, dan error handling secara otomatis.
+**Trello MCP Server** ([delorenj/mcp-server-trello](https://github.com/delorenj/mcp-server-trello)) is an open-source server that bridges the Trello API with AI Agents via the MCP protocol. It handles rate limiting, input validation, and error handling automatically.
 
 <div class="not-prose p-4 rounded-xl bg-kaede-success/10 border border-kaede-success/20 mb-6">
 
-**Prasyarat**
+**Prerequisites**
 
-- Node.js 18+ atau **Bun** v1.0+ (direkomendasikan — 2.8-4.4x lebih cepat)
-- Trello API Key & Token — [lihat panduan](api-key.html)
+- Node.js 18+ or **Bun** v1.0+ (recommended — 2.8-4.4x faster)
+- Trello API Key & Token — [see guide](api-key.html)
 
 </div>
 
-## Installasi
+## Installation
 
-### Opsi A: Menggunakan Bunx (Termudah)
+### Option A: Using Bunx (Easiest)
 
 ```bash
 bunx @delorenj/mcp-server-trello
 ```
 
-### Opsi B: Clone Repositori
+### Option B: Clone Repository
 
 ```bash
 git clone https://github.com/delorenj/mcp-server-trello.git
@@ -30,31 +30,31 @@ bun run build
 
 ## Environment Variables
 
-Buat file `.env` di direktori server:
+Create a `.env` file in the server directory:
 
 ```env
 # Required: Trello API credentials
 TRELLO_API_KEY=your-api-key
 TRELLO_TOKEN=your-token
 
-# Optional: Default board ID (bisa diubah via set_active_board)
+# Optional: Default board ID (can be changed via set_active_board)
 TRELLO_BOARD_ID=your-board-id
 
 # Optional: Initial workspace ID
 TRELLO_WORKSPACE_ID=your-workspace-id
 
-# Optional: Proxy untuk corporate network
+# Optional: Proxy for corporate network
 https_proxy=http://your-proxy:8080
 
-# Optional: Batasi akses ke workspace tertentu
+# Optional: Restrict access to specific workspaces
 TRELLO_ALLOWED_WORKSPACES=workspace-id-1,workspace-id-2
 ```
 
-## Konfigurasi untuk OpenCode / Claude Desktop
+## Configuration for OpenCode / Claude Desktop
 
-Tambahkan MCP server ke file konfigurasi MCP client-mu:
+Add the MCP server to your MCP client configuration:
 
-### Contoh untuk Claude Desktop
+### Claude Desktop
 
 ```json
 {
@@ -71,7 +71,7 @@ Tambahkan MCP server ke file konfigurasi MCP client-mu:
 }
 ```
 
-### Contoh untuk OpenCode
+### OpenCode
 
 ```json
 {
@@ -90,109 +90,40 @@ Tambahkan MCP server ke file konfigurasi MCP client-mu:
 }
 ```
 
-## Verifikasi Setup
+## Verify Setup
 
-Untuk memastikan server berjalan dengan benar:
+To confirm the server is running correctly:
 
-1. Jalankan server: `bunx @delorenj/mcp-server-trello`
-2. Buka MCP client (OpenCode / Claude Desktop)
-3. Coba perintah: *"List all my Trello boards"*
-4. Jika response muncul, setup berhasil!
+1. Start the server: `bunx @delorenj/mcp-server-trello`
+2. Open your MCP client (OpenCode / Claude Desktop)
+3. Try: *"List all my Trello boards"*
+4. If you get a response, setup is complete!
 
-## Manajemen Board & Workspace
+## Board & Workspace Management
 
-Server mendukung multiple board dan workspace. Kamu bisa:
+The server supports multiple boards and workspaces:
 
-- **Dynamic board selection:** Gunakan `set_active_board` untuk berganti board tanpa restart
-- **Multi-board support:** Semua method menerima parameter `boardId` opsional
-- **Workspace restriction:** Batasi akses AI ke workspace tertentu via `TRELLO_ALLOWED_WORKSPACES`
+- **Dynamic board selection:** Use `set_active_board` to switch boards without restart
+- **Multi-board support:** All methods accept an optional `boardId` parameter
+- **Workspace restriction:** Limit AI access to specific workspaces via `TRELLO_ALLOWED_WORKSPACES`
 
-Konfigurasi yang sudah dipilih akan persist di `~/.trello-mcp/config.json`.
+Configuration persists at `~/.trello-mcp/config.json`.
 
 ## Rate Limiting
 
-Server menerapkan **token bucket algorithm** untuk mematuhi batas API Trello:
+The server uses a **token bucket algorithm** to comply with Trello API limits:
 
-- 300 requests per 10 detik per API key
-- 100 requests per 10 detik per token
-- Request akan di-queue jika limit tercapai
+- 300 requests per 10 seconds per API key
+- 100 requests per 10 seconds per token
+- Requests are queued if limits are reached
 
-## KAEDE Custom Extensions
+## Language Selection
 
-KAEDE MCP memiliki beberapa extensions di atas TRELLO MCP upstream:
+This documentation is available in:
 
-### Concern Separation
+- [English (Default)](/)
+- [Bahasa Indonesia](id/)
 
-KAEDE mengimplementasikan **concern separation** yang jelas:
+## Next Steps
 
-- **KAEDE MCP** (`mcp.kaede`) — Pure context provider, playbook-aware, high-level intents
-- **TRELLO MCP** (`mcp.trello`) — Raw Trello API tools, low-level execution
-
-### Enhanced Features
-
-**Attachments (Phase 1):**
-- `attach_file_to_card` — Attach from URL or local file
-- `attach_image_to_card` — Attach image from URL
-- `attach_data_to_card` — Attach from base64/data URL
-- `attach_image_data_to_card` — Attach image from base64 (screenshot)
-- `get_card_attachments` — **NEW** (missing di upstream!)
-
-**Copy Card (Phase 1):**
-- `copy_card` — Dengan `keepFromSource` options
-
-**Checklist Enhancements (Phase 2):**
-- `delete_checklist`
-- `delete_checklist_item`
-- `update_checklist_item`
-- `get_card_checklists` — **NEW** (missing di upstream!)
-
-**Advanced Features (Phase 3):**
-- `watch_card` — Subscribe to card activity
-- `watch_list` — Subscribe to list activity
-- `get_card_activity` — Get card history
-- `search_labels` — Filter labels by name
-- `remove_label_from_card` — Remove single label
-
-### Comparison: KAEDE MCP vs TRELLO MCP
-
-| Feature | KAEDE MCP | TRELLO MCP | Notes |
-|---------|-----------|------------|-------|
-| **Core Tools** | 24 tools | 45+ tools | KAEDE focused on essentials |
-| **Attachments** | ⬜ In Progress | ✅ Complete | Phase 1 |
-| **Copy Card** | ⬜ In Progress | ✅ Complete | Phase 1 |
-| **Checklist** | ⚠️ Partial | ✅ Complete | Phase 2 |
-| **Orchestrator** | ✅ Complete | ❌ Missing | KAEDE unique feature |
-| **Playbook Integration** | ✅ Complete | ❌ Missing | KAEDE unique feature |
-| **Custom Fields** | ❌ Not planned | ✅ Complete | Power-Up feature |
-
-**Documentation:**
-- [`DEVELOPMENT-ROADMAP.md`](DEVELOPMENT-ROADMAP.html) — Master development plan
-- [`CONTRIBUTION-GUIDE.md`](CONTRIBUTION-GUIDE.html) — Upstream contribution guide
-- [`FEATURE-SPECIFICATION.md`](FEATURE-SPECIFICATION.html) — Detailed feature specs
-
----
-
-## Troubleshooting
-
-<div class="not-prose space-y-2 mt-3">
-
-<div class="p-3 rounded-lg bg-kaede-surface border border-kaede-border">
-  <p class="text-xs font-medium text-kaede-text">Error: <code>Suspicious link removed</code> pada board URL</p>
-  <p class="text-xs text-kaede-muted mt-1">Abaikan — ini adalah false positive dari Trello. Board ID tetap bisa digunakan.</p>
-</div>
-
-<div class="p-3 rounded-lg bg-kaede-surface border border-kaede-border">
-  <p class="text-xs font-medium text-kaede-text">Error: <code>Authentication failed</code></p>
-  <p class="text-xs text-kaede-muted mt-1">Pastikan API Key dan Token benar. Generate ulang token jika perlu.</p>
-</div>
-
-<div class="p-3 rounded-lg bg-kaede-surface border border-kaede-border">
-  <p class="text-xs font-medium text-kaede-text">Error: <code>Rate limit exceeded</code></p>
-  <p class="text-xs text-kaede-muted mt-1">Tunggu beberapa detik — server akan meng-queue request secara otomatis.</p>
-</div>
-
-</div>
-
-## Langkah Selanjutnya
-
-Jika server sudah berjalan, lanjut ke panduan [Integrasi OpenCode](opencode.html) untuk mengonfigurasi AI Agent-mu.
+Once the server is running, proceed to the [OpenCode Integration](opencode.html) guide to configure your AI Agent.

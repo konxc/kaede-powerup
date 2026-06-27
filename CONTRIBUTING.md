@@ -13,17 +13,18 @@ Terima kasih atas minat Anda untuk berkontribusi! Dokumen ini adalah panduan len
 5. [Adding New Tools](#adding-new-tools)
 6. [Testing](#testing)
 7. [Documentation](#documentation)
-8. [Submitting Changes](#submitting-changes)
-9. [Upstream Contribution](#upstream-contribution)
+8. [Translations](#translations)
+9. [Submitting Changes](#submitting-changes)
+10. [Upstream Contribution](#upstream-contribution)
 
 ---
 
 ## Code of Conduct
 
-- Gunakan bahasa Indonesia dalam komunikasi
-- Bersikap profesional dan respectful
-- Follow arsitektur dan konvensi yang sudah ada
-- Jangan commit credentials atau secrets
+- Be professional and respectful
+- Communication in English (default) or Indonesian is welcome
+- Follow existing architecture and conventions
+- Do not commit credentials or secrets
 
 ---
 
@@ -250,19 +251,54 @@ Create test guide in `test/`:
 
 ### Documentation Standards
 
-- **Bahasa Indonesia** untuk semua docs
-- **Clear headings** dengan hierarchy
-- **Code examples** dengan syntax highlighting
-- **Screenshots** untuk UI changes
+- **English** is the default language for `docs/`. Indonesian translations live in `docs/id/`.
+- **Clear headings** with hierarchy
+- **Code examples** with syntax highlighting
+- **Screenshots** for UI changes
 
 ### Files to Update
 
 When adding features, update:
 
-1. `IMPLEMENTATION-SUMMARY.md` — Add to summary
-2. `CHANGELOG.md` — Document changes
-3. `README.md` — Update if user-facing changes
-4. `docs/DEVELOPMENT-ROADMAP.md` — Mark phase complete
+1. `CHANGELOG.md` — Document changes
+2. `README.md` — Update if user-facing changes
+3. `docs/[lang]/DEVELOPMENT-ROADMAP.md` — Mark phase complete
+
+---
+
+## Translations
+
+Documentation is available in multiple languages. You can contribute by translating or improving existing translations.
+
+### Language Structure
+
+```
+docs/           ← English (default)
+docs/id/        ← Bahasa Indonesia
+docs/[lang]/    ← Other languages (created by contributors)
+```
+
+### How to Contribute a Translation
+
+1. **Check existing issues** — someone may already be working on it
+2. **Open a translation issue** — use the [translation template](https://github.com/konxc/kaede-powerup/issues/new?template=translation.yml)
+3. **Fork and translate** — create `docs/[lang]/filename.md` mirroring the English version
+4. **Submit a PR** — reference the issue number
+
+### Documents Needing Translation
+
+| English (`docs/`) | Indonesian (`docs/id/`) | Status |
+|---|---|---|
+| `index.md` | ✅ | Both ready |
+| `api-key.md` | ✅ | Both ready |
+| `mcp-server.md` | ✅ | Both ready |
+| `opencode.md` | ✅ | Both ready |
+| `tools.md` | ✅ | Both ready |
+| `sdlc-roles.md` | ✅ | Both ready |
+| `sponsorship.md` | ✅ | Both ready |
+| `role-management.md` | ⬜ | Help wanted — [translate](https://github.com/konxc/kaede-powerup/issues/new?template=translation.yml) |
+| `kaede-architecture.md` | ⬜ | Help wanted — [translate](https://github.com/konxc/kaede-powerup/issues/new?template=translation.yml) |
+| `playbook-template.md` | ⬜ | Help wanted — [translate](https://github.com/konxc/kaede-powerup/issues/new?template=translation.yml) |
 
 ---
 

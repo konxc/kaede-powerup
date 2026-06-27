@@ -5,7 +5,7 @@
   "description": "KAEDE — Trello Power-Up, MCP Server & CLI Orchestrator for AI Agent ecosystem",
   "type": "module",
   "scripts": {
-    "dev": "bun run dev:css & bun run serve",
+    "dev": "bun run build:mcp && bun run dev:css & bun run serve",
     "dev:css": "tailwindcss -i src/style.css -o public/css/style.css --watch",
     "build": "tailwindcss -i src/style.css -o public/css/style.css --minify",
     "build:mcp": "node scripts/build-mcp.mjs",

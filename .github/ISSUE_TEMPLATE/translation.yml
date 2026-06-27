@@ -1,0 +1,49 @@
+name: "🌐 Translation Request / Contribution"
+description: "Request or contribute a translation for documentation"
+title: "docs(lang): [language] — [document name]"
+labels: ["translations", "help-wanted"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - "🇮🇩 Indonesian → English"
+        - "🇬🇧 English → Indonesian"
+        - "🌍 New language translation"
+    validations:
+      required: true
+  - type: dropdown
+    id: document
+    attributes:
+      label: Document
+      description: Which document would you like to translate?
+      options:
+        - docs/index.md (Overview)
+        - docs/api-key.md (API Key & Token)
+        - docs/mcp-server.md (MCP Server Setup)
+        - docs/opencode.md (OpenCode Integration)
+        - docs/tools.md (Tools Reference)
+        - docs/sponsorship.md (Sponsorship)
+        - docs/sdlc-roles.md (SDLC Roles)
+        - docs/role-management.md (Roles & Access)
+        - docs/kaede-architecture.md (Architecture & Roadmap)
+        - docs/playbook-template.md (Playbook Template)
+        - Other (specify below)
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Target Language
+      description: e.g., Japanese, Korean, Spanish, French
+      placeholder: "Japanese"
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any context or special instructions
+    validations:
+      required: false

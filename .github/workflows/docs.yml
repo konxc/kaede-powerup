@@ -1,11 +1,6 @@
 name: Build & Deploy Docs
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docs/**'
-      - 'scripts/build-docs.mjs'
   workflow_dispatch:
 
 permissions:
