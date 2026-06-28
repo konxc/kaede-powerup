@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy — KAEDE</title>
   <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="js/components.js"></script>
 </head>
 <body class="bg-kaede-bg font-sans antialiased min-h-screen">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
     <div class="mb-8">
       <a href="/" class="inline-flex items-center gap-2 text-sm text-kaede-muted hover:text-kaede-primary no-underline transition-colors">
         <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        Kembali ke KAEDE
+        Back to KAEDE
       </a>
     </div>
 
@@ -112,9 +114,7 @@
       </div>
     </div>
 
-    <div class="mt-8 text-center text-xs text-kaede-muted">
-      &copy; 2026 PT Koneksi Jaringan Indonesia
-    </div>
+    <kaede-footer></kaede-footer>
   </div>
 </body>
 </html>

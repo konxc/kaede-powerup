@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,13 +15,13 @@
       <h2 class="text-base font-semibold text-kaede-text mb-2">Authorize KAEDE</h2>
       <p class="text-sm text-kaede-muted leading-relaxed mb-4">Authorize this board to mark it as ready for KAEDE MCP orchestration. The MCP server reads Trello API credentials from your local environment — no credentials are stored in Trello.</p>
       <div class="text-left bg-kaede-bg rounded-md p-3 mb-4 border border-kaede-border/50 text-[11px] text-kaede-muted leading-relaxed">
-        <p class="mb-1.5"><strong class="text-kaede-text">Prasyarat:</strong></p>
+        <p class="mb-1.5"><strong class="text-kaede-text">Prerequisites:</strong></p>
         <ol class="list-decimal list-inside space-y-0.5">
-          <li>Dapatkan <a href="https://trello.com/power-ups/admin" target="_blank" rel="noopener" class="text-kaede-primary no-underline hover:underline">API Key & Token</a></li>
-          <li>Simpan di file <code class="text-kaede-primary text-[10px]">secrets.env</code> atau <code class="text-kaede-primary text-[10px]">~/.kaede/secrets.env</code></li>
-          <li>Jalankan <code class="text-kaede-primary text-[10px]">node scripts/kaede.mjs start</code></li>
+          <li>Get <a href="https://trello.com/power-ups/admin" target="_blank" rel="noopener" class="text-kaede-primary no-underline hover:underline">API Key & Token</a></li>
+          <li>Save in <code class="text-kaede-primary text-[10px]">secrets.env</code> or <code class="text-kaede-primary text-[10px]">~/.kaede/secrets.env</code></li>
+          <li>Run <code class="text-kaede-primary text-[10px]">node scripts/kaede.mjs start</code></li>
         </ol>
-        <p class="mt-1.5">Lihat <a href="https://konxc.github.io/kaede-powerup/api-key.html" target="_blank" rel="noopener" class="text-kaede-primary no-underline hover:underline">panduan lengkap</a> untuk detail.</p>
+        <p class="mt-1.5">See the <a href="https://konxc.github.io/kaede-powerup/api-key.html" target="_blank" rel="noopener" class="text-kaede-primary no-underline hover:underline">full guide</a> for details.</p>
       </div>
       <button type="button" id="kaede-auth-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none bg-kaede-primary text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-kaede-primary-hover">Authorize Board</button>
     </div>
@@ -36,7 +36,7 @@
   </div>
 
   <div class="pt-3 border-t border-kaede-border/50 text-center">
-    <a href="/" target="_blank" rel="noopener" class="text-[10px] text-kaede-muted hover:text-kaede-primary no-underline transition-colors">Tentang Ekosistem KAEDE</a>
+    <a href="/" target="_blank" rel="noopener" class="text-[10px] text-kaede-muted hover:text-kaede-primary no-underline transition-colors">About KAEDE Ecosystem</a>
   </div>
 
   <script src="https://p.trellocdn.net/power-up.min.js"></script>
