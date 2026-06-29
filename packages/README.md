@@ -95,6 +95,6 @@ Lihat `packages/kaede-trello/README.md` untuk detail lebih lanjut.
 
 1. **Global opencode.json** — command dari `~/.config/opencode/opencode.json`
 2. **packages/kaede-trello** — `packages/kaede-trello/src/mcp-server.js` (lib)
-3. **packages/mcp-server-trello** — `packages/mcp-server-trello/src/index.js`
+3. **packages/mcp-server-trello** — `packages/mcp-server-trello/build/index.js` (compiled output)
 4. **dist/** — `dist/mcp-server.js` (built fallback)
 5. **~/.kaede/** — `~/.kaede/dist/mcp-server.js` (global install fallback)

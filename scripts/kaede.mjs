@@ -1072,13 +1072,13 @@ async function cmdInstall() {
     console.log(`  \x1b[33m  ⚠  File copy failed: ${err.message}\x1b[0m`);
   }
 
-  // 3. npm link (global `kaede` command)
-  console.log('  \x1b[36m  Linking globally via npm link...\x1b[0m');
+  // 3. bun link (global `kaede` command)
+  console.log('  \x1b[36m  Linking globally via bun link...\x1b[0m');
   try {
-    execSync('npm link', { cwd: KAEDE_DIR, stdio: 'inherit' });
+    execSync('bun link', { cwd: KAEDE_DIR, stdio: 'inherit' });
     console.log('  \x1b[32m  ✓ \x1b[0m\x1b[36mkaede\x1b[0m\x1b[32m command available globally\x1b[0m');
   } catch {
-    console.log('  \x1b[33m  ⚠  npm link failed, creating fallback script...\x1b[0m');
+    console.log('  \x1b[33m  ⚠  bun link failed, creating fallback script...\x1b[0m');
     // Fallback: create a wrapper script
     try {
       const wrapper = `@echo off\r\nbun "${resolve(globalDir, 'scripts', 'kaede.mjs').replace(/\\/g, '\\\\')}" %*\r\n`;
@@ -1141,7 +1141,9 @@ async function cmdInstall() {
   console.log('');
   console.log('  \x1b[90m     Two MCP servers registered globally in\x1b[0m');
   console.log('  \x1b[90m     ~/.config/opencode/opencode.json:\x1b[0m');
-  console.log('  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    — 42 raw Trello tools\x1b[0m');
+  console.log(
+    '  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    — kaede-trello (42 tools, fallback jika upstream tidak tersedia)\x1b[0m',
+  );
   console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     — 4 orchestration tools\x1b[0m');
   console.log('');
 }
@@ -1254,7 +1256,7 @@ function cmdHelp() {
   console.log('    \x1b[36mbuild\x1b[0m     \x1b[90mBuild MCP server (dist/mcp-server.js)\x1b[0m');
   console.log('    \x1b[36mstart\x1b[0m     \x1b[90mStart API server (HTTP bridge for frontend) [port]\x1b[0m');
   console.log('    \x1b[36mtest-tools\x1b[0m \x1b[90mUji koneksi 42 MCP tools (butuh Trello credentials)\x1b[0m');
-  console.log('    \x1b[36minstall\x1b[0m   \x1b[90mInstall KAEDE globally via npm link\x1b[0m');
+  console.log('    \x1b[36minstall\x1b[0m   \x1b[90mInstall KAEDE globally via bun link\x1b[0m');
   console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
   console.log('');
   console.log('  \x1b[37mExamples:\x1b[0m');

@@ -37,7 +37,7 @@ export async function startApiServer(port = 3456) {
     }
 
     let body = '';
-    req.on('data', chunk => body += chunk);
+    req.on('data', (chunk) => (body += chunk));
     req.on('end', async () => {
       try {
         const { intent, args = {}, boardId, playbook } = JSON.parse(body);
@@ -48,11 +48,15 @@ export async function startApiServer(port = 3456) {
           return;
         }
 
-        const serverPath = resolve(process.cwd(), 'dist', 'mcp-server.js');
-        const client = new TrelloMCPClient(serverPath);
+        const client = new TrelloMCPClient();
         await client.connect();
 
-        let context = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+        let context = {
+          title: '',
+          roles: [],
+          workflow: { lists: [] },
+          conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+        };
         if (playbook) {
           context = parsePlaybook(playbook);
         }

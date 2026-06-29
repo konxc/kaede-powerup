@@ -176,13 +176,13 @@ C.1. Trello MCP Server (`packages/kaede-trello/src/mcp-server.js`) — Executor
 5. **✅ generatePlan()**: 16 intent pattern handlers → returns ActionStep[] with names (without Trello IDs).
 6. **✅ Pure Context Refactor**: `mcp.kaede` separated from Trello — 4 tools, zero Trello dependencies.
 
-### 🟡 Phase 2 — MCP Enhancements & Concern Separation (IN PROGRESS)
-1. **⬜ Attachments Implementation** (5 tools): `attach_file_to_card`, `attach_image_to_card`, `attach_data_to_card`, `attach_image_data_to_card`, `get_card_attachments` (new contribution)
-2. **⬜ Copy Card** (1 tool): `copy_card` with keepFromSource options
-3. **⬜ Checklist Enhancements** (4 tools): Delete checklist/item, update checklist item, get card checklists (new contribution)
-4. **⬜ Advanced Features** (5 tools): Watch card/list, get card activity, search labels, remove label from card
-5. **⬜ Upstream Contribution** (3 PRs): Prepare and submit PRs to delorenj/mcp-server-trello
-6. **⬜ Code Architecture Refactor**: Modular structure (tools/, trello/ directories)
+### ✅ Phase 2 — MCP Enhancements & Concern Separation (COMPLETE)
+1. **✅ Attachments Implementation** (5 tools): `attach_file_to_card`, `attach_image_to_card`, `attach_data_to_card`, `attach_image_data_to_card`, `get_card_attachments` (PR submitted)
+2. **✅ Copy Card** (1 tool): `copy_card` with keepFromSource options
+3. **✅ Checklist Enhancements** (4 tools): Delete checklist/item, update checklist item, get card checklists (PR submitted)
+4. **✅ Advanced Features** (5 tools): Watch card/list, get card activity, search labels, remove label from card (PR submitted)
+5. **✅ Upstream Contribution** (3 PRs): PR #98, #99, #100 submitted to delorenj/mcp-server-trello
+6. **✅ Code Architecture Refactor**: Modular structure (packages/kaede-trello/ + submodule) completed
 
 **Documentation:**
 - [`DEVELOPMENT-ROADMAP.md`](DEVELOPMENT-ROADMAP.html) — Master development plan

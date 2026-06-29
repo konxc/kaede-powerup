@@ -307,7 +307,7 @@ function rpc(proc, method, params = {}) {
 
 // ── Tests ──
 
-describe('KAEDE MCP Server (44 Trello tools)', () => {
+describe('KAEDE MCP Server (42 Trello tools — kaede-trello lib)', () => {
   let proc;
 
   before(() => {

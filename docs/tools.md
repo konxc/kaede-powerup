@@ -543,50 +543,20 @@ Attach image data to a card (screenshot convenience — accepts base64 or data U
 
 ---
 
-## 🚧 Upcoming Tools (In Development)
+## ✅ Status Implementasi
 
-The following tools are in development (Phase 1-4):
+Semua tools di bawah sudah **complete** dan tersedia di `packages/kaede-trello/src/mcp-server.js` (lib) serta sebagian sudah di-PR ke upstream `@delorenj/mcp-server-trello`.
 
-### Phase 1: Attachments & Copy Card (Week 1-2)
-- `attach_file_to_card` — Attach from URL or local file
-- `attach_image_to_card` — Attach image from URL
-- `attach_data_to_card` — Attach from base64/data URL
-- `attach_image_data_to_card` — Attach image from base64 (screenshot)
-- `get_card_attachments` — **NEW CONTRIBUTION** (missing in upstream!)
-- `copy_card` — Copy card with keepFromSource options
+**Tool count:**
+- `packages/kaede-trello` (lib): **42 tools** — fitur custom/penyangga
+- `@delorenj/mcp-server-trello` (upstream): **55+ tools** — tools resmi
 
-### Phase 2: Checklist Enhancements (Week 3)
-- `delete_checklist` — Remove checklist from card
-- `delete_checklist_item` — Remove item from checklist
-- `update_checklist_item` — Update state, name, position, due date, reminder, member
-- `get_card_checklists` — **NEW CONTRIBUTION** (missing in upstream!)
+**PR ke upstream (oleh sandikodev):**
+- `get_card_attachments` + `get_card_checklists` — [#98](https://github.com/delorenj/mcp-server-trello/pull/98)
+- `watch_card` + `watch_list` — [#99](https://github.com/delorenj/mcp-server-trello/pull/99)
+- `search_labels` + `remove_label_from_card` — [#100](https://github.com/delorenj/mcp-server-trello/pull/100)
 
-### Phase 3: Advanced Features (Week 4-5)
-- `watch_card` — Subscribe to card activity
-- `watch_list` — Subscribe to list activity
-- `get_card_activity` — Get card history with filters
-- `search_labels` — Filter labels by name (case-insensitive)
-- `remove_label_from_card` — Remove single label from card
-
-### Phase 4: Additional Enhancements (Week 6-7, Optional)
-- `copy_checklist` — Copy checklist with items to another card
-- `copy_list` — Copy entire list with cards to another board
-- `move_list` — Move entire list to different board
-- `sort_list` — Sort cards in list by dueDate, name, createdAt
-- `share_card` — Generate shareable link (evaluate feasibility)
-- `make_template` — Convert card to template (evaluate feasibility)
-
-### Features to Skip (Power-Up / Complex)
-- `create_jira_work_item` — Jira Power-Up required
-- `mirror_card` — Mirror Power-Up required
-- `butler_automation` — Separate Butler API
-- `custom_fields` — Standard plan required
-- `recurring_cards` — Power-Up feature
-
-**Timeline:** Week 1-10 (June-July 2026)  
-**Total Tools:** 42 tools
-
-**Related documentation:**
-- [`DEVELOPMENT-ROADMAP.md`](DEVELOPMENT-ROADMAP.html) — Master development plan
-- [`FEATURE-SPECIFICATION.md`](FEATURE-SPECIFICATION.html) — Detailed specs
-- [`CONTRIBUTION-GUIDE.md`](CONTRIBUTION-GUIDE.html) — Upstream contribution guide
+**Fitur yang tidak akan di-upstream** (akan tetap di lib kaede-trello):
+- `copy_list`, `move_list` — membutuhkan Power-Up
+- `share_card`, `make_template` — dievaluasi
+- `create_jira_work_item`, `mirror_card`, `butler_automation`, `custom_fields`, `recurring_cards` — fitur Power-Up/plugin eksternal

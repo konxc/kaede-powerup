@@ -3,7 +3,7 @@
  *
  * Menggunakan stdio JSON-RPC 2.0 untuk berkomunikasi dengan MCP Trello server
  * Prioritas: 1) global opencode.json → 2) packages/kaede-trello/src/mcp-server.js
- *           → 3) packages/mcp-server-trello/src/index.js → 4) dist/mcp-server.js
+ *           → 3) packages/mcp-server-trello/build/index.js → 4) dist/mcp-server.js
  */
 
 import { spawn } from 'child_process';
@@ -27,7 +27,7 @@ function getGlobalMcpServerPath() {
   }
   const kaedeTrello = resolve(process.cwd(), 'packages', 'kaede-trello', 'src', 'mcp-server.js');
   if (existsSync(kaedeTrello)) return kaedeTrello;
-  const upstreamSub = resolve(process.cwd(), 'packages', 'mcp-server-trello', 'src', 'index.js');
+  const upstreamSub = resolve(process.cwd(), 'packages', 'mcp-server-trello', 'build', 'index.js');
   if (existsSync(upstreamSub)) return upstreamSub;
   const globalDir = resolve(homedir(), '.kaede', 'dist', 'mcp-server.js');
   if (existsSync(globalDir)) return globalDir;

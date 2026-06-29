@@ -115,7 +115,7 @@ Playbook → OpenKB → OpenCode → mcp.kaede (orchestration) → mcp.trello (e
 | Role | Key Benefit | Entry Point |
 |---|---|---|
 | PM/PM | Intent-driven sprint automation | `kaede run --intent` |
-| Developer | 44 MCP tools from AI Agent | `kaede init` |
+| Developer | 42 tools (lib) + 55+ tools (upstream) via AI Agent | `kaede init` |
 | QA/Tester | Checklist templates + card history | `get_card_activity` |
 | Tech Lead | Playbook-enforced governance | Playbook parser |
 | Stakeholder | Zero-config visibility | Trello badges |

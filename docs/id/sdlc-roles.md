@@ -115,7 +115,7 @@ Playbook → OpenKB → OpenCode → mcp.kaede (orchestrasi) → mcp.trello (eks
 | Peran | Manfaat Utama | Entry Point |
 |---|---|---|
 | PM/PO | Otomatisasi sprint berbasis intent | `kaede run --intent` |
-| Developer | 42+45 tools dari kaede-trello + upstream | `kaede init` |
+| Developer | 42 tools (lib kaede-trello) + 55+ tools (upstream delorenj) | `kaede init` |
 | QA/Tester | Template checklist + histori card | `get_card_activity` |
 | Tech Lead | Governance via playbook | Playbook parser |
 | Stakeholder | Visibilitas tanpa konfigurasi | Badge Trello |

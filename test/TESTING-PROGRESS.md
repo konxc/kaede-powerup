@@ -2,13 +2,13 @@
 
 **Last Updated:** June 29, 2026  
 **Test Board:** https://trello.com/b/rAKmlRj3/lab-testing-kaede  
-**Status:** ✅ ALL 44 TOOLS PASSING — 46/46 automated tests
+**Status:** ✅ ALL 42 TOOLS PASSING — 46/46 automated tests
 
 ---
 
 ## Automated Test Suite (`test/mcp-server.test.js`)
 
-The new automated test suite covers **all 44 Trello MCP tools** via stdio JSON-RPC with `global.fetch` mocked (loaded via `-r ./test/mock-fetch.js` preload).
+The new automated test suite covers **all 42 Trello MCP tools** (kaede-trello lib) via stdio JSON-RPC with `global.fetch` mocked (loaded via `-r ./test/mock-fetch.js` preload).
 
 | Category | Tests | Passed | Failed |
 |----------|-------|--------|--------|
@@ -27,7 +27,7 @@ The new automated test suite covers **all 44 Trello MCP tools** via stdio JSON-R
 | Error Handling | 2 | 2 | 0 |
 | **TOTAL** | **46** | **46** | **0** |
 
-### 44 Tools Covered
+### 42 Tools Covered
 
 **Boards (3):** `list_boards`, `create_board`, `list_workspaces`
 **Lists (4):** `get_lists`, `add_list_to_board`, `archive_list`, `update_list`
@@ -46,16 +46,16 @@ The new automated test suite covers **all 44 Trello MCP tools** via stdio JSON-R
 
 ```bash
 # Run all tests
-npm test
+bun test
 
 # Run only MCP server tests
-npm run test:mcp
+bun run test:mcp
 
 # Run orchestrator tests only
-npm run test:orchestrator
+bun run test:orchestrator
 
 # Run Trello client tests only
-npm run test:trello
+bun run test:trello
 ```
 
 ---

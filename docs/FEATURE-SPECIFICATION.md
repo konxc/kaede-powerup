@@ -1333,20 +1333,22 @@ Impact ↑
 
 ---
 
-## 📅 Updated Timeline
+## 📅 Timeline (Historical)
 
-| Phase | Weeks | Tools Count | Cumulative |
-|-------|-------|-------------|------------|
-| **Phase 1** | 1-2 | 6 tools | 30 tools |
-| **Phase 2** | 3 | 4 tools | 34 tools |
-| **Phase 3** | 4-5 | 5 tools | 39 tools |
-| **Phase 4** | 9-10 | 4-6 tools | 43-45 tools |
-| **Upstream** | 6-7 | 3 PRs | — |
-| **Sync** | 8 | — | — |
+Semua fase sudah complete. **Total final: 42 tools** di `packages/kaede-trello` + **55+ tools** di upstream `@delorenj/mcp-server-trello`.
 
-**Total:** 43-45 tools (from 24 current tools)
+| Phase | Weeks | Tools Added |
+|-------|-------|-------------|
+| **Phase 1** (Attachments & Copy Card) | 1-2 | 6 tools |
+| **Phase 2** (Checklist Enhancements) | 3 | 4 tools |
+| **Phase 3** (Watch & Activity) | 4-5 | 5 tools |
+| **Phase 4** (Sort & List Mgmt) | 6-7 | 3 tools |
+| **Upstream PRs** | 8-10 | 3 PRs submitted |
 
-**Timeline Extension:** 8 weeks → 10 weeks (with Phase 4 optional)
+**PR ke delorenj:**
+- [#98](https://github.com/delorenj/mcp-server-trello/pull/98) — `get_card_attachments`, `get_card_checklists`
+- [#99](https://github.com/delorenj/mcp-server-trello/pull/99) — `watch_card`, `watch_list`
+- [#100](https://github.com/delorenj/mcp-server-trello/pull/100) — `search_labels`, `remove_label_from_card`
 
 ---
 
