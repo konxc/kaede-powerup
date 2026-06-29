@@ -37,47 +37,32 @@
 ## Struktur Repo
 
 ```
-├── public/              # Static site (deploy ke Netlify)
-│   ├── index.html       # Landing page + iframe connector (Trello)
-│   ├── board.html       # Dashboard popup
-│   ├── card.html        # Environment manager per kartu
-│   ├── auth.html        # Halaman otorisasi
-│   ├── privacy.html     # Kebijakan privasi
-│   ├── js/kaede.js      # Power-Up capabilities
-│   ├── css/style.css    # Compiled CSS (auto-generated)
-│   └── _redirects       # Netlify redirect rules
+├── public/                  # Static site (deploy ke Netlify)
 ├── src/
-│   ├── mcp-server.js    # MCP Trello server (source)
-│   └── style.css        # Source CSS (Tailwind v4 + custom components)
-├── dist/
-│   └── mcp-server.js    # MCP Trello server (compiled, --target bun)
+│   ├── kaede-mcp-server.js  # KAEDE Orchestrator MCP (4 tools)
+│   ├── trello-client.js     # Trello MCP Client wrapper
+│   ├── orchestrator.js      # Intent engine & playbook parser
+│   └── style.css            # Source CSS (Tailwind v4)
+├── packages/
+│   ├── README.md            # Dokumentasi arsitektur packages
+│   ├── mcp-server-trello/   # Git submodule → delorenj/mcp-server-trello
+│   └── kaede-trello/
+│       └── src/
+│           ├── mcp-server.js    # MCP Trello server (42 tools, staging)
+│           └── trello/
+│               └── attachments.js  # Attachment utilities
+├── dist/                    # Build output (gitignored)
 ├── scripts/
-│   ├── kaede.mjs        # CLI tool (setup, today, init, push, env, status)
-│   ├── build-docs.mjs   # Build docs: Markdown → HTML
-│   └── build-mcp.mjs    # Compile MCP server via bun build
-├── netlify.toml         # Konfigurasi deploy Netlify
-├── package.json         # Build scripts & entry points
-│
-├── docs/                # Dokumentasi (sumber: Markdown)
-│   ├── index.md         # Ikhtisar
-│   ├── api-key.md       # Panduan API Key & Token Trello
-│   ├── mcp-server.md    # Setup Trello MCP Server
-│   ├── opencode.md      # Integrasi OpenCode
-│   ├── tools.md         # Referensi tools MCP
-│   ├── role-management.md # Role definitions & AI Agent integration
-│   ├── kaede-architecture.md # Arsitektur & roadmap lengkap
-│   └── playbook-template.md # Template playbook universal
-│
+│   ├── kaede.mjs            # CLI tool (setup, today, init, push, env, status)
+│   ├── build-docs.mjs       # Build docs: Markdown → HTML
+│   └── build-mcp.mjs        # Compile MCP server via bun build
 ├── .opencode/
-│   ├── opencode.json    # Konfigurasi AI Agent
-│   └── SHARED/          # Project context & agent rules
-│
-├── netlify.toml         # Konfigurasi deploy Netlify
-├── package.json         # Build scripts + CLI entry
-├── scripts/
-│   ├── kaede.mjs        # CLI tool (setup, today, init, push, env, status)
-│   └── build-docs.mjs   # Build docs: Markdown → HTML
-├── secrets.env          # Trello credentials (gitignored)
+│   ├── opencode.json        # Konfigurasi AI Agent
+│   └── SHARED/              # Project context & agent rules
+├── docs/                    # Dokumentasi (sumber: Markdown)
+├── netlify.toml             # Konfigurasi deploy Netlify
+├── package.json             # Build scripts + CLI entry
+└── secrets.env              # Trello credentials (gitignored)
 ```
 
 ---
@@ -88,7 +73,7 @@
 
 ```bash
 # Interaktif — masukkan API Key & Token Trello
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 ```
 
 Atau buat `secrets.env` manual:
@@ -101,14 +86,14 @@ TRELLO_TOKEN=your-token
 ### 2. Lihat Task Hari Ini
 
 ```bash
-node scripts/kaede.mjs today
+bun scripts/kaede.mjs today
 ```
 
 ### 3. Inisialisasi di Project Lain
 
 ```bash
 # Dari dalam project target
-node path/to/kaede/scripts/kaede.mjs init .
+bun path/to/kaede/scripts/kaede.mjs init .
 ```
 
 Ini akan menambahkan konfigurasi MCP Trello ke `.opencode/opencode.json` project kamu.
@@ -119,13 +104,13 @@ KAEDE sudah siap digunakan dengan Opencode. MCP Trello dikonfigurasi via wrapper
 
 ```bash
 # Cek status konfigurasi
-node scripts/kaede.mjs status
+bun scripts/kaede.mjs status
 
 # Export credentials ke session (PowerShell)
-node scripts/kaede.mjs env | iex
+bun scripts/kaede.mjs env | iex
 
 # Export credentials ke session (Bash)
-eval $(node scripts/kaede.mjs env)
+eval $(bun scripts/kaede.mjs env)
 ```
 
 ---
@@ -182,7 +167,7 @@ Dokumentasi di `docs/*.md` auto-build ke `gh-pages` branch via GitHub Actions.
 |---|---|
 | [Tailwind CSS](https://tailwindcss.com) | v4 |
 | [Bun](https://bun.sh) | v1 |
-| [delorenj/mcp-server-trello](https://github.com/delorenj/mcp-server-trello) | v1.6.1+ |
+| [delorenj/mcp-server-trello](https://github.com/delorenj/mcp-server-trello) | v1.7.1+ |
 | [Marked](https://marked.js.org) | build-time |
 | [peaceiris/actions-gh-pages](https://github.com/peaceiris/actions-gh-pages) | v4 |
 
@@ -193,7 +178,7 @@ Dokumentasi di `docs/*.md` auto-build ke `gh-pages` branch via GitHub Actions.
 | Peran | Manfaat Utama |
 |---|---|
 | **Project Manager** | Sprint automation via intent — "Mulai Sprint Alpha" satu perintah |
-| **Developer** | 44 tools MCP, clipboard-to-card attachment, `kaede today` |
+| **Developer** | 42 tools MCP, clipboard-to-card attachment, `kaede today` |
 | **QA / Tester** | Template checklist, histori card, sort by due date |
 | **Tech Lead** | Playbook-enforced governance, dual MCP architecture |
 | **Stakeholder** | Badge environment langsung di card, zero config |

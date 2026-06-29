@@ -1,7 +1,9 @@
 ﻿/**
  * Trello MCP Client â€” Wrapper untuk komunikasi dengan Trello MCP Server
  *
- * Menggunakan stdio JSON-RPC 2.0 untuk berkomunikasi dengan dist/mcp-server.js
+ * Menggunakan stdio JSON-RPC 2.0 untuk berkomunikasi dengan MCP Trello server
+ * Prioritas: 1) global opencode.json → 2) packages/kaede-trello/src/mcp-server.js
+ *           → 3) packages/mcp-server-trello/src/index.js → 4) dist/mcp-server.js
  */
 
 import { spawn } from 'child_process';
@@ -23,6 +25,10 @@ function getGlobalMcpServerPath() {
       if (Array.isArray(cmd) && cmd.length >= 2) return cmd[cmd.length - 1];
     } catch {}
   }
+  const kaedeTrello = resolve(process.cwd(), 'packages', 'kaede-trello', 'src', 'mcp-server.js');
+  if (existsSync(kaedeTrello)) return kaedeTrello;
+  const upstreamSub = resolve(process.cwd(), 'packages', 'mcp-server-trello', 'src', 'index.js');
+  if (existsSync(upstreamSub)) return upstreamSub;
   const globalDir = resolve(homedir(), '.kaede', 'dist', 'mcp-server.js');
   if (existsSync(globalDir)) return globalDir;
   return resolve(process.cwd(), 'dist', 'mcp-server.js');
@@ -46,7 +52,7 @@ export class TrelloMCPClient {
       } catch (err) {
         if (attempt === retries) throw err;
         const delay = BASE_DELAY * Math.pow(2, attempt - 1);
-        await new Promise(r => setTimeout(r, delay));
+        await new Promise((r) => setTimeout(r, delay));
       }
     }
   }
@@ -99,10 +105,12 @@ export class TrelloMCPClient {
         protocolVersion: '2024-11-05',
         capabilities: {},
         clientInfo: { name: 'KAEDE-Orchestrator', version: '1.0.0' },
-      }).then(() => {
-        this.sendNotification('notifications/initialized');
-        resolve();
-      }).catch(reject);
+      })
+        .then(() => {
+          this.sendNotification('notifications/initialized');
+          resolve();
+        })
+        .catch(reject);
     });
   }
 
@@ -238,7 +246,7 @@ export class TrelloMCPClient {
   async addLabelToCard(cardId, labelId) {
     const card = await this.getCard(cardId);
     const existingLabels = card.labels || [];
-    const labelIds = existingLabels.map(l => l.id);
+    const labelIds = existingLabels.map((l) => l.id);
     if (!labelIds.includes(labelId)) {
       labelIds.push(labelId);
       await this.updateCard(cardId, { labels: labelIds });
@@ -248,7 +256,7 @@ export class TrelloMCPClient {
   async removeLabelFromCard(cardId, labelId) {
     const card = await this.getCard(cardId);
     const existingLabels = card.labels || [];
-    const labelIds = existingLabels.filter(l => l.id !== labelId).map(l => l.id);
+    const labelIds = existingLabels.filter((l) => l.id !== labelId).map((l) => l.id);
     await this.updateCard(cardId, { labels: labelIds });
   }
 
@@ -362,12 +370,6 @@ export class TrelloMCPClient {
     return this.callTool('update_list', { listId, name, closed, pos, subscribed });
   }
 
-
-
-
-
-
-
   close() {
     if (this.process) {
       this.process.kill();
@@ -377,10 +379,3 @@ export class TrelloMCPClient {
     }
   }
 }
-
-
-
-
-
-
-

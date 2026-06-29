@@ -40,19 +40,19 @@
   "command": {
     "kaede-setup": {
       "description": "Setup Trello API Key & Token interaktif",
-      "template": "node scripts/kaede.mjs setup"
+      "template": "bun scripts/kaede.mjs setup"
     },
     "kaede-today": {
       "description": "Tampilkan task Trello untuk hari ini",
-      "template": "node scripts/kaede.mjs today"
+      "template": "bun scripts/kaede.mjs today"
     },
     "kaede-status": {
       "description": "Cek status konfigurasi KAEDE",
-      "template": "node scripts/kaede.mjs status"
+      "template": "bun scripts/kaede.mjs status"
     },
     "kaede-init": {
       "description": "Inisialisasi KAEDE di project lain",
-      "template": "node scripts/kaede.mjs init $ARGUMENTS"
+      "template": "bun scripts/kaede.mjs init $ARGUMENTS"
     },
     "dev": {
       "description": "Development server + CSS watch",
@@ -68,17 +68,17 @@
     },
     "kaede-push": {
       "description": "Buat Trello cards dari file markdown (.md)",
-      "template": "node scripts/kaede.mjs push $ARGUMENTS"
+      "template": "bun scripts/kaede.mjs push $ARGUMENTS"
     },
     "build-docs": {
       "description": "Build dokumentasi Markdown → HTML",
-      "template": "node scripts/build-docs.mjs"
+      "template": "bun scripts/build-docs.mjs"
     }
   },
   "mcp": {
     "trello": {
       "type": "local",
-      "command": ["bun", "dist/mcp-server.js"],
+      "command": ["bun", "packages/kaede-trello/src/mcp-server.js"],
       "enabled": true,
       "timeout": 30000
     }

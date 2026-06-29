@@ -21,7 +21,7 @@ Setiap kali Anda diminta untuk melakukan tugas manajemen project (seperti membua
 - Cari referensi playbook di `opencode.json` → `references.playbook.path`.
 - Baca file playbook (seperti SOP, alur sprint, konvensi penamaan) sebelum menyentuh Trello.
 - *Aturan*: Tindakan Anda di Trello harus 100% patuh pada aturan playbook tersebut.
-- Gunakan CLI: `node scripts/kaede.mjs playbook parse <path>` untuk melihat struktur playbook.
+- Gunakan CLI: `bun scripts/kaede.mjs playbook parse <path>` untuk melihat struktur playbook.
 
 ### Langkah 2: Pahami Konteks Project (OpenKB)
 - Baca `.openkb/SHARED/glossary.md` untuk istilah-istilah spesifik.
@@ -36,10 +36,11 @@ Sebelum menyentuh Trello, gunakan `mcp.kaede` untuk menghasilkan rencana eksekus
 
 ### Langkah 4: Eksekusi via mcp.trello
 Setelah dapat plan dari `mcp.kaede`, eksekusi setiap step ke Trello:
-- Gunakan tools `mcp.trello` (24 tools) yang tersedia di `dist/mcp-server.js`.
+- Gunakan tools `mcp.trello` (42 tools) yang tersedia di `packages/kaede-trello/src/mcp-server.js`
+  atau upstream `packages/mcp-server-trello/src/index.js` (jika submodule terdaftar).
 - Resolve nama member/list/board via `mcp.trello` tools (`search_members`, `get_board_lists`, dll).
 - Jika plan gagal di satu step, lanjutkan ke step berikutnya.
-- Untuk eksekusi cepat bisa juga via CLI: `node scripts/kaede.mjs run --playbook <path> --board <id> "Mulai Sprint Alpha"`
+- Untuk eksekusi cepat bisa juga via CLI: `bun scripts/kaede.mjs run --playbook <path> --board <id> "Mulai Sprint Alpha"`
 - Intent yang didukung CLI: mulai sprint, buat card, assign, pindah, komentar, report, tutup sprint
 
 Pastikan:

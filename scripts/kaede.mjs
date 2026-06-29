@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { resolve, dirname, basename } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -6,9 +6,7 @@ import { homedir, hostname } from 'os';
 import { createInterface } from 'readline';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const KAEDE_DIR = process.env.KAEDE_DIR
-  ? resolve(process.env.KAEDE_DIR)
-  : resolve(__dirname, '..');
+const KAEDE_DIR = process.env.KAEDE_DIR ? resolve(process.env.KAEDE_DIR) : resolve(__dirname, '..');
 const KAEDE_GLOBAL_DIR = resolve(homedir(), '.kaede');
 
 function loadEnv(filePath) {
@@ -131,35 +129,31 @@ async function cmdToday() {
     const meRes = await fetch(`${apiBase}/members/me?${auth}`);
     const me = await meRes.json();
 
-    const boardsRes = await fetch(
-      `${apiBase}/members/${me.id}/boards?${auth}&fields=name,id,url,closed&filter=open`
-    );
+    const boardsRes = await fetch(`${apiBase}/members/${me.id}/boards?${auth}&fields=name,id,url,closed&filter=open`);
     const boards = await boardsRes.json();
 
     console.log('');
     console.log(`  \x1b[35m╔══════════════════════════════════════╗\x1b[0m`);
     console.log(`  \x1b[35m║      KAEDE — Today's Tasks           ║\x1b[0m`);
     console.log(`  \x1b[35m╚══════════════════════════════════════╝\x1b[0m`);
-    console.log(`  \x1b[90m  ${me.fullName || me.username} · ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\x1b[0m`);
+    console.log(
+      `  \x1b[90m  ${me.fullName || me.username} · ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\x1b[0m`,
+    );
     console.log('');
 
     let hasTasks = false;
 
     for (const board of boards) {
-      const listsRes = await fetch(
-        `${apiBase}/boards/${board.id}/lists?${auth}&fields=name,id`
-      );
+      const listsRes = await fetch(`${apiBase}/boards/${board.id}/lists?${auth}&fields=name,id`);
       const lists = await listsRes.json();
 
       for (const list of lists) {
         const cardsRes = await fetch(
-          `${apiBase}/lists/${list.id}/cards?${auth}&fields=name,id,due,dueComplete,idMembers,url,desc,dateLastActivity&members=true`
+          `${apiBase}/lists/${list.id}/cards?${auth}&fields=name,id,due,dueComplete,idMembers,url,desc,dateLastActivity&members=true`,
         );
         const cards = await cardsRes.json();
 
-        const myCards = cards.filter((c) =>
-          c.idMembers && c.idMembers.includes(me.id)
-        );
+        const myCards = cards.filter((c) => c.idMembers && c.idMembers.includes(me.id));
 
         if (myCards.length === 0) continue;
         hasTasks = true;
@@ -174,8 +168,7 @@ async function cmdToday() {
                 month: 'short',
               })
             : '';
-          const isOverdue =
-            card.due && new Date(card.due) < new Date() && !card.dueComplete;
+          const isOverdue = card.due && new Date(card.due) < new Date() && !card.dueComplete;
           const dueStr = due
             ? ` \x1b[90m[\x1b[0m${isOverdue ? '\x1b[31m⚠ ' : '\x1b[32m'}` +
               `${due}\x1b[0m${card.dueComplete ? ' ✓' : ''}\x1b[90m]\x1b[0m`
@@ -204,7 +197,10 @@ async function cmdInit() {
   // Parse args: [dir] [--name X] [--tech X] [--db X]
   const args = process.argv.slice(3);
   const targetDir = resolve(args.find((_, i, a) => !a[i].startsWith('-')) || process.cwd());
-  const getOpt = (flag) => { const i = args.indexOf(flag); return i !== -1 ? args[i + 1] : undefined; };
+  const getOpt = (flag) => {
+    const i = args.indexOf(flag);
+    return i !== -1 ? args[i + 1] : undefined;
+  };
   const optName = getOpt('--name');
   const optTech = getOpt('--tech');
   const optDb = getOpt('--db');
@@ -249,8 +245,8 @@ async function cmdInit() {
   let techStack = optTech;
   let dbType = optDb;
   if (interactive) {
-    techStack = await ask('  \x1b[36m  Tech stack (e.g. Laravel, Node.js, Next.js): \x1b[0m') || projectName;
-    dbType = await ask('  \x1b[36m  Database (e.g. MySQL, PostgreSQL, SQLite): \x1b[0m') || '—';
+    techStack = (await ask('  \x1b[36m  Tech stack (e.g. Laravel, Node.js, Next.js): \x1b[0m')) || projectName;
+    dbType = (await ask('  \x1b[36m  Database (e.g. MySQL, PostgreSQL, SQLite): \x1b[0m')) || '—';
   }
 
   // 3. Create directory structure
@@ -335,10 +331,7 @@ async function cmdInit() {
 
   // Instructions
   if (!config.instructions) {
-    config.instructions = [
-      '.opencode/SHARED/project-context.md',
-      '.opencode/SHARED/agent-rules.md',
-    ];
+    config.instructions = ['.opencode/SHARED/project-context.md', '.opencode/SHARED/agent-rules.md'];
   }
 
   // References
@@ -500,13 +493,19 @@ function parseCards(content) {
   }
 
   if (current && current.title) cards.push(current);
-  for (const c of cards) { c.desc = c.desc.trim(); if (!c.desc) delete c.desc; }
+  for (const c of cards) {
+    c.desc = c.desc.trim();
+    if (!c.desc) delete c.desc;
+  }
   return cards;
 }
 
 async function cmdPush() {
   const args = process.argv.slice(3);
-  const getOpt = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : undefined; };
+  const getOpt = (f) => {
+    const i = args.indexOf(f);
+    return i !== -1 ? args[i + 1] : undefined;
+  };
   const boardName = getOpt('--board');
   const listName = getOpt('--list');
   const filePath = args.find((_, i, a) => !a[i].startsWith('-'));
@@ -523,7 +522,9 @@ async function cmdPush() {
     process.stdin.setEncoding('utf-8');
     content = await new Promise((r) => {
       let d = '';
-      process.stdin.on('data', (c) => { d += c; });
+      process.stdin.on('data', (c) => {
+        d += c;
+      });
       process.stdin.on('end', () => r(d));
       if (process.stdin.isTTY) process.stdin.resume();
     });
@@ -646,12 +647,17 @@ async function cmdEnv() {
   }
 
   const args = process.argv.slice(3);
-  const shell = args.includes('--bash') ? 'bash'
-    : args.includes('--ps') ? 'ps'
-    : args.includes('--cmd') ? 'cmd'
-    : process.env.SHELL?.includes('bash') || process.env.SHELL?.includes('zsh') ? 'bash'
-    : process.platform === 'win32' ? 'ps'
-    : 'bash';
+  const shell = args.includes('--bash')
+    ? 'bash'
+    : args.includes('--ps')
+      ? 'ps'
+      : args.includes('--cmd')
+        ? 'cmd'
+        : process.env.SHELL?.includes('bash') || process.env.SHELL?.includes('zsh')
+          ? 'bash'
+          : process.platform === 'win32'
+            ? 'ps'
+            : 'bash';
 
   let defaultBoardId = '';
   if (secrets.TRELLO_DEFAULT_BOARD_ID) {
@@ -716,7 +722,9 @@ async function cmdStatus() {
   console.log(`  Trello Token    ${tokenOk ? '\x1b[32m✓ configured\x1b[0m' : '\x1b[31m✗ missing\x1b[0m'}`);
 
   const globalPath = resolve(homedir(), '.config', 'kaede', 'secrets.env');
-  console.log(`  Global secrets  ${existsSync(globalPath) ? '\x1b[32m✓\x1b[0m' : '\x1b[33mnot set\x1b[0m'}  \x1b[90m${globalPath}\x1b[0m`);
+  console.log(
+    `  Global secrets  ${existsSync(globalPath) ? '\x1b[32m✓\x1b[0m' : '\x1b[33mnot set\x1b[0m'}  \x1b[90m${globalPath}\x1b[0m`,
+  );
 
   const devPath = resolve(KAEDE_DIR, 'secrets.env');
   if (existsSync(devPath)) {
@@ -771,7 +779,9 @@ async function cmdPlaybook() {
   const subcmd = args[0];
   if (!subcmd) {
     console.error('  \x1b[31m  ✗ Subcommand required.\x1b[0m');
-    console.log('  \x1b[37m  Usage:\x1b[0m node scripts/kaede.mjs playbook \x1b[36m<parse|show>\x1b[0m \x1b[90m<path>\x1b[0m');
+    console.log(
+      '  \x1b[37m  Usage:\x1b[0m bun scripts/kaede.mjs playbook \x1b[36m<parse|show>\x1b[0m \x1b[90m<path>\x1b[0m',
+    );
     return;
   }
 
@@ -833,7 +843,10 @@ async function cmdPlaybook() {
 
 async function cmdOrchestrate() {
   const args = process.argv.slice(3);
-  const getOpt = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : undefined; };
+  const getOpt = (f) => {
+    const i = args.indexOf(f);
+    return i !== -1 ? args[i + 1] : undefined;
+  };
   const playbookPath = getOpt('--playbook');
   const openkbDir = getOpt('--openkb') || resolve(process.cwd(), '.openkb');
   const opencodeDir = getOpt('--opencode') || resolve(process.cwd(), '.opencode');
@@ -855,7 +868,9 @@ async function cmdOrchestrate() {
 
   if (ctx.playbook) {
     console.log(`  \x1b[36m  Playbook:\x1b[0m \x1b[90m${ctx.playbook.title}\x1b[0m`);
-    console.log(`  \x1b[90m    ${ctx.playbook.roles.length} roles · ${ctx.playbook.workflow.lists.length} lists · ${ctx.playbook.conventions.labels.length} labels\x1b[0m`);
+    console.log(
+      `  \x1b[90m    ${ctx.playbook.roles.length} roles · ${ctx.playbook.workflow.lists.length} lists · ${ctx.playbook.conventions.labels.length} labels\x1b[0m`,
+    );
     if (detail) {
       for (const r of ctx.playbook.roles) {
         console.log(`    \x1b[90m  Role: ${r.name}\x1b[0m`);
@@ -868,7 +883,9 @@ async function cmdOrchestrate() {
   }
 
   console.log(`  \x1b[36m  OpenKB Glossary:\x1b[0m \x1b[90m${ctx.openkb.glossary.length} terms\x1b[0m`);
-  console.log(`  \x1b[36m  OpenCode Config:\x1b[0m \x1b[90m${ctx.opencode?.mcp?.trello ? '✓ Trello MCP' : '✗ No MCP'}\x1b[0m`);
+  console.log(
+    `  \x1b[36m  OpenCode Config:\x1b[0m \x1b[90m${ctx.opencode?.mcp?.trello ? '✓ Trello MCP' : '✗ No MCP'}\x1b[0m`,
+  );
 
   console.log('');
   console.log('  \x1b[32m  ✅  Context loaded. Ready for orchestration.\x1b[0m');
@@ -877,7 +894,10 @@ async function cmdOrchestrate() {
 
 async function cmdRun() {
   const args = process.argv.slice(3);
-  const getOpt = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : undefined; };
+  const getOpt = (f) => {
+    const i = args.indexOf(f);
+    return i !== -1 ? args[i + 1] : undefined;
+  };
   const playbookPath = getOpt('--playbook');
   const isDryRun = args.includes('--dry-run') || args.includes('-n');
 
@@ -909,8 +929,12 @@ async function cmdRun() {
 
   if (!intent) {
     console.error('  \x1b[31m  ✗ Intent required.\x1b[0m');
-    console.log('  \x1b[37m  Usage:\x1b[0m node scripts/kaede.mjs run \x1b[36m--playbook <path>\x1b[0m \x1b[90m"intent" [--name ...] [--task ...]\x1b[0m');
-    console.log('  \x1b[37m  Example:\x1b[0m kaede run --playbook docs/playbook-template.md "buat board" --name "Sprint 1"');
+    console.log(
+      '  \x1b[37m  Usage:\x1b[0m bun scripts/kaede.mjs run \x1b[36m--playbook <path>\x1b[0m \x1b[90m"intent" [--name ...] [--task ...]\x1b[0m',
+    );
+    console.log(
+      '  \x1b[37m  Example:\x1b[0m kaede run --playbook docs/playbook-template.md "buat board" --name "Sprint 1"',
+    );
     return;
   }
 
@@ -925,18 +949,24 @@ async function cmdRun() {
   }
 
   if (playbookPath && existsSync(playbookPath)) {
-    const { parsePlaybook, executeIntent } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'orchestrator.js')).href);
+    const { parsePlaybook, executeIntent } = await import(
+      pathToFileURL(resolve(KAEDE_DIR, 'src', 'orchestrator.js')).href
+    );
     const { TrelloMCPClient } = await import(pathToFileURL(resolve(KAEDE_DIR, 'src', 'trello-client.js')).href);
 
     const content = readFileSync(playbookPath, 'utf-8');
     const playbook = parsePlaybook(content);
 
-    console.log(`  \x1b[36m  Playbook loaded:\x1b[0m \x1b[90m${playbook.workflow.lists.length} lists, ${playbook.roles.length} roles\x1b[0m`);
+    console.log(
+      `  \x1b[36m  Playbook loaded:\x1b[0m \x1b[90m${playbook.workflow.lists.length} lists, ${playbook.roles.length} roles\x1b[0m`,
+    );
 
     if (isDryRun) {
       console.log('');
       console.log('  \x1b[36m  Would execute:\x1b[0m \x1b[90m"' + intent + '"\x1b[0m');
-      console.log(`  \x1b[36m  Intents available:\x1b[0m \x1b[90mmulai sprint, buat card, assign, buat label, arsipkan, pindah semua, buat board, komentar, report, tutup sprint\x1b[0m`);
+      console.log(
+        `  \x1b[36m  Intents available:\x1b[0m \x1b[90mmulai sprint, buat card, assign, buat label, arsipkan, pindah semua, buat board, komentar, report, tutup sprint\x1b[0m`,
+      );
       console.log(`  \x1b[36m  Workflow lists:\x1b[0m \x1b[90m${playbook.workflow.lists.join(', ')}\x1b[0m`);
       console.log('');
       console.log('  \x1b[32m  ✅  Dry run complete. Pass --board <id> to execute.\x1b[0m');
@@ -1008,7 +1038,7 @@ async function cmdInstall() {
 
   // 1. Build MCP servers
   for (const [label, src, out] of [
-    ['Trello MCP', 'src/mcp-server.js', 'dist/mcp-server.js'],
+    ['Trello MCP', 'packages/kaede-trello/src/mcp-server.js', 'dist/mcp-server.js'],
     ['KAEDE Orchestrator MCP', 'src/kaede-mcp-server.js', 'dist/kaede-mcp-server.js'],
   ]) {
     console.log(`  \x1b[36m  Building ${label}...\x1b[0m`);
@@ -1055,7 +1085,9 @@ async function cmdInstall() {
       const wrapper = `@echo off\r\nnode "${resolve(globalDir, 'scripts', 'kaede.mjs').replace(/\\/g, '\\\\')}" %*\r\n`;
       writeFileSync(resolve(globalDir, 'kaede.cmd'), wrapper, 'utf-8');
       console.log(`  \x1b[33m  ⚠  Created fallback at ${resolve(globalDir, 'kaede.cmd')}\x1b[0m`);
-      console.log('  \x1b[33m      Add it to your PATH or run: \x1b[0m\x1b[36msetx PATH "%PATH%;%USERPROFILE%\\.kaede"\x1b[0m');
+      console.log(
+        '  \x1b[33m      Add it to your PATH or run: \x1b[0m\x1b[36msetx PATH "%PATH%;%USERPROFILE%\\.kaede"\x1b[0m',
+      );
     } catch {}
   }
 
@@ -1104,13 +1136,13 @@ async function cmdInstall() {
   console.log('  \x1b[90m     Usage:\x1b[0m');
   console.log('  \x1b[90m       \x1b[36mkaede setup\x1b[0m          — setup Trello API key & token');
   console.log('  \x1b[90m       \x1b[36mkaede init\x1b[0m <dir>     — init project with KAEDE');
-  console.log('  \x1b[90m       \x1b[36mkaede today\x1b[0m          — show today\'s Trello tasks');
+  console.log("  \x1b[90m       \x1b[36mkaede today\x1b[0m          — show today's Trello tasks");
   console.log('  \x1b[90m       \x1b[36mkaede status --mcp\x1b[0m   — check MCP connection');
   console.log('  \x1b[90m       \x1b[36mkaede run\x1b[0m "intent"   — execute intent from playbook');
   console.log('');
   console.log('  \x1b[90m     Two MCP servers registered globally in\x1b[0m');
   console.log('  \x1b[90m     ~/.config/opencode/opencode.json:\x1b[0m');
-  console.log('  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    — 24 raw Trello tools\x1b[0m');
+  console.log('  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    — 42 raw Trello tools\x1b[0m');
   console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     — 4 orchestration tools\x1b[0m');
   console.log('');
 }
@@ -1155,7 +1187,9 @@ async function cmdTestTools() {
 
   const client = new TrelloMCPClient();
   try {
-    const timeout = setTimeout(() => { throw new Error('Connection timed out (30s)'); }, 30000);
+    const timeout = setTimeout(() => {
+      throw new Error('Connection timed out (30s)');
+    }, 30000);
     await client.connect();
     clearTimeout(timeout);
     console.log(`  \x1b[32m  ✓ Connected to MCP Server\x1b[0m`);
@@ -1166,10 +1200,13 @@ async function cmdTestTools() {
 
     for (let i = 0; i < tools.length; i++) {
       const [tool, params] = tools[i];
-      process.stdout.write(`  [${i+1}/${total}] ${tool}... `);
+      process.stdout.write(`  [${i + 1}/${total}] ${tool}... `);
       try {
         const result = await client.callTool(tool, params);
-        const summary = Object.keys(result).slice(0, 3).map(k => `${k}: ${Array.isArray(result[k]) ? result[k].length : typeof result[k]}`).join(', ');
+        const summary = Object.keys(result)
+          .slice(0, 3)
+          .map((k) => `${k}: ${Array.isArray(result[k]) ? result[k].length : typeof result[k]}`)
+          .join(', ');
         process.stdout.write(`\x1b[32m✓\x1b[0m \x1b[90m(${summary})\x1b[0m\n`);
         passed++;
       } catch (err) {
@@ -1204,45 +1241,49 @@ function cmdHelp() {
   console.log('  \x1b[37mCommands:\x1b[0m');
   console.log('    \x1b[36msetup\x1b[0m     \x1b[90mKonfigurasi Trello API Key & Token\x1b[0m');
   console.log('    \x1b[36mtoday\x1b[0m     \x1b[90mTampilkan task Trello hari ini\x1b[0m');
-  console.log('    \x1b[36minit\x1b[0m      \x1b[90mInit KAEDE di project. Flags: --playbook <path>, --tech <stack>, --db <type>\x1b[0m');
+  console.log(
+    '    \x1b[36minit\x1b[0m      \x1b[90mInit KAEDE di project. Flags: --playbook <path>, --tech <stack>, --db <type>\x1b[0m',
+  );
   console.log('    \x1b[36mpush\x1b[0m      \x1b[90mBuat Trello cards dari file markdown\x1b[0m');
-    console.log('    \x1b[36menv\x1b[0m       \x1b[90mExport credentials (--bash, --ps, --cmd)\x1b[0m');
+  console.log('    \x1b[36menv\x1b[0m       \x1b[90mExport credentials (--bash, --ps, --cmd)\x1b[0m');
   console.log('    \x1b[36mstatus\x1b[0m    \x1b[90mCek status konfigurasi KAEDE (--mcp untuk test koneksi)\x1b[0m');
   console.log('    \x1b[36mplaybook\x1b[0m  \x1b[90mParse/show playbook (parse <path> | show <path>)\x1b[0m');
   console.log('    \x1b[36morchestrate\x1b[0m \x1b[90mLoad context (--playbook <path> [--detail])\x1b[0m');
-    console.log('    \x1b[36mrun\x1b[0m       \x1b[90mExecute intent (--playbook <path> [--board <id>] [--dry-run] [--intent <intent>])\x1b[0m');
+  console.log(
+    '    \x1b[36mrun\x1b[0m       \x1b[90mExecute intent (--playbook <path> [--board <id>] [--dry-run] [--intent <intent>])\x1b[0m',
+  );
   console.log('    \x1b[36mbuild\x1b[0m     \x1b[90mBuild MCP server (dist/mcp-server.js)\x1b[0m');
-    console.log('    \x1b[36mstart\x1b[0m     \x1b[90mStart API server (HTTP bridge for frontend) [port]\x1b[0m');
-    console.log('    \x1b[36mtest-tools\x1b[0m \x1b[90mUji koneksi 22 MCP tools (butuh Trello credentials)\x1b[0m');
-    console.log('    \x1b[36minstall\x1b[0m   \x1b[90mInstall KAEDE globally via npm link\x1b[0m');
-    console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
-    console.log('');
-    console.log('  \x1b[37mExamples:\x1b[0m');
-    console.log('    node scripts/kaede.mjs init                              # interactive');
-    console.log('    node scripts/kaede.mjs init ../project --tech Laravel --db MySQL');
-    console.log('    node scripts/kaede.mjs init . --playbook playbook.md    # init + playbook ref');
-  console.log('    node scripts/kaede.mjs push tasks.md                     # file mode');
-  console.log('    node scripts/kaede.mjs push tasks.md --board "My Board" --list "To Do"');
-  console.log('    node scripts/kaede.mjs setup');
-  console.log('    node scripts/kaede.mjs today');
-    console.log('    node scripts/kaede.mjs env | iex                 # Windows PowerShell');
-    console.log('    node scripts/kaede.mjs env --bash | source /dev/stdin  # Linux/Mac');
-    console.log('    node scripts/kaede.mjs env --cmd | cmd            # Windows CMD');
-  console.log('    node scripts/kaede.mjs playbook parse ../playbook/sprint.md');
-  console.log('    node scripts/kaede.mjs orchestrate --playbook ../playbook/sprint.md --detail');
-    console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --intent "Mulai Sprint Alpha"');
-    console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --board abc123 "Mulai Sprint Alpha"');
-    console.log('    node scripts/kaede.mjs run --playbook playbook/sprint.md --dry-run "Mulai Sprint Alpha"');
-  console.log('    node scripts/kaede.mjs status --mcp');
-    console.log('    node scripts/kaede.mjs build');
-    console.log('    node scripts/kaede.mjs start');
-    console.log('    node scripts/kaede.mjs start 8080');
-    console.log('    node scripts/kaede.mjs test-tools');
-    console.log('    node scripts/kaede.mjs install');
-    console.log('');
-    console.log('  \x1b[37mEnv:\x1b[0m');
-    console.log('    \x1b[36mKAEDE_DIR\x1b[0m   \x1b[90mOverride path ke instalasi KAEDE (default: auto-detect)\x1b[0m');
-    console.log('');
+  console.log('    \x1b[36mstart\x1b[0m     \x1b[90mStart API server (HTTP bridge for frontend) [port]\x1b[0m');
+  console.log('    \x1b[36mtest-tools\x1b[0m \x1b[90mUji koneksi 42 MCP tools (butuh Trello credentials)\x1b[0m');
+  console.log('    \x1b[36minstall\x1b[0m   \x1b[90mInstall KAEDE globally via npm link\x1b[0m');
+  console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
+  console.log('');
+  console.log('  \x1b[37mExamples:\x1b[0m');
+  console.log('    bun scripts/kaede.mjs init                              # interactive');
+  console.log('    bun scripts/kaede.mjs init ../project --tech Laravel --db MySQL');
+  console.log('    bun scripts/kaede.mjs init . --playbook playbook.md    # init + playbook ref');
+  console.log('    bun scripts/kaede.mjs push tasks.md                     # file mode');
+  console.log('    bun scripts/kaede.mjs push tasks.md --board "My Board" --list "To Do"');
+  console.log('    bun scripts/kaede.mjs setup');
+  console.log('    bun scripts/kaede.mjs today');
+  console.log('    bun scripts/kaede.mjs env | iex                 # Windows PowerShell');
+  console.log('    bun scripts/kaede.mjs env --bash | source /dev/stdin  # Linux/Mac');
+  console.log('    bun scripts/kaede.mjs env --cmd | cmd            # Windows CMD');
+  console.log('    bun scripts/kaede.mjs playbook parse ../playbook/sprint.md');
+  console.log('    bun scripts/kaede.mjs orchestrate --playbook ../playbook/sprint.md --detail');
+  console.log('    bun scripts/kaede.mjs run --playbook playbook/sprint.md --intent "Mulai Sprint Alpha"');
+  console.log('    bun scripts/kaede.mjs run --playbook playbook/sprint.md --board abc123 "Mulai Sprint Alpha"');
+  console.log('    bun scripts/kaede.mjs run --playbook playbook/sprint.md --dry-run "Mulai Sprint Alpha"');
+  console.log('    bun scripts/kaede.mjs status --mcp');
+  console.log('    bun scripts/kaede.mjs build');
+  console.log('    bun scripts/kaede.mjs start');
+  console.log('    bun scripts/kaede.mjs start 8080');
+  console.log('    bun scripts/kaede.mjs test-tools');
+  console.log('    bun scripts/kaede.mjs install');
+  console.log('');
+  console.log('  \x1b[37mEnv:\x1b[0m');
+  console.log('    \x1b[36mKAEDE_DIR\x1b[0m   \x1b[90mOverride path ke instalasi KAEDE (default: auto-detect)\x1b[0m');
+  console.log('');
 }
 
 // ─── Main ───

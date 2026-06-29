@@ -1,8 +1,8 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /**
  * Build MCP Servers: Compile src/ → dist/ for both Trello MCP and KAEDE Orchestrator MCP
  *
- * Usage: node scripts/build-mcp.mjs
+ Usage: bun scripts/build-mcp.mjs
  */
 
 import { execSync } from 'child_process';
@@ -41,7 +41,7 @@ async function main() {
 
   const trelloOk = buildOne(
     'Trello MCP',
-    resolve(ROOT, 'src', 'mcp-server.js'),
+    resolve(ROOT, 'packages', 'kaede-trello', 'src', 'mcp-server.js'),
     resolve(ROOT, 'dist', 'mcp-server.js'),
   );
 

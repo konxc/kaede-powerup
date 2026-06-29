@@ -1,0 +1,11 @@
+{
+  "name": "@kaede/trello",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "KAEDE Trello MCP — Custom tools yang belum tersedia di upstream delorenj/mcp-server-trello",
+  "main": "src/mcp-server.js",
+  "scripts": {
+    "build": "bun build src/mcp-server.js --target bun --minify --outfile ../../dist/mcp-server.js"
+  }
+}

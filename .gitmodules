@@ -1,0 +1,3 @@
+[submodule "packages/mcp-server-trello"]
+	path = packages/mcp-server-trello
+	url = git@github.com:sandikodev/mcp-server-trello.git
