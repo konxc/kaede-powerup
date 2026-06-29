@@ -35,7 +35,7 @@ function buildOne(label, src, dist) {
 async function main() {
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════════╗\x1b[0m');
-  console.log('  \x1b[35m║      KAEDE — Build MCP Servers          ║\x1b[0m');
+  console.log('  \x1b[35m║      KAEDE — Build MCP Servers           ║\x1b[0m');
   console.log('  \x1b[35m╚══════════════════════════════════════════╝\x1b[0m');
   console.log('');
 

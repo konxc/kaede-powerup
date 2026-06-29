@@ -1,10 +1,12 @@
-﻿# Checklist Tools — Manual Test Results
+﻿# Checklist Tools — Manual Test Results (Historical)
+
+> **Note:** This is an intermediate test report. For the latest comprehensive status, see [`TESTING-PROGRESS.md`](TESTING-PROGRESS.md).
 
 ## Test Session: 2026-06-27
 
 **Tester:** AI Agent
 **Test Board:** https://trello.com/b/rAKmlRj3/lab-testing-kaede
-**Card ID:** 6a1b170320f6b4aa6ad055a9 (https://www.loom.com/share/0e6813b76cd44ca48d892af56be658f5?sid=80638cfb-e43b-42df-8940-63f4811bb13f)
+**Card ID:** 6a1b170320f6b4aa6ad055a9
 
 ---
 

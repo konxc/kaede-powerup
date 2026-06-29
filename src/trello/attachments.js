@@ -1,6 +1,6 @@
 /**
  * KAEDE Attachments Utility
- * 
+ *
  * Utilities untuk mengelola attachments di Trello cards.
  * Ported dari delorenj/mcp-server-trello dengan adaptasi ke fetch-based API.
  */
@@ -146,7 +146,9 @@ export function filenameFromUrl(url) {
  */
 export function createAttachmentFormData(file, filename, mimeType) {
   const formData = new FormData();
-  formData.append('file', file, {
+  // Wrap Buffer in Blob for Node.js compatibility (Node 18+ FormData requires Blob)
+  const blob = Buffer.isBuffer(file) ? new Blob([file]) : file;
+  formData.append('file', blob, {
     filename: filename,
     contentType: mimeType,
   });

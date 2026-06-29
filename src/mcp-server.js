@@ -63,7 +63,7 @@ function resolveBoardId(args) {
 }
 
 function validateRequired(args, required, toolName) {
-  const missing = required.filter(k => args[k] == null);
+  const missing = required.filter((k) => args[k] == null);
   if (missing.length) {
     throw new Error(`${toolName}: missing required parameter(s): ${missing.join(', ')}`);
   }
@@ -147,11 +147,11 @@ async function handleToolsCall(name, args) {
     // â”€â”€â”€ Boards â”€â”€â”€
     case 'list_boards': {
       const boards = await trello('/members/me/boards?fields=name,id,url,closed&filter=open');
-      return { boards: boards.map(b => ({ id: b.id, name: b.name, url: b.url, closed: b.closed })) };
+      return { boards: boards.map((b) => ({ id: b.id, name: b.name, url: b.url, closed: b.closed })) };
     }
     case 'list_workspaces': {
       const orgs = await trello('/members/me/organizations?fields=name,id,displayName');
-      return { workspaces: orgs.map(o => ({ id: o.id, name: o.name, displayName: o.displayName })) };
+      return { workspaces: orgs.map((o) => ({ id: o.id, name: o.name, displayName: o.displayName })) };
     }
     case 'create_board': {
       const body = { name: args.name };
@@ -168,7 +168,7 @@ async function handleToolsCall(name, args) {
       const bid = resolveBoardId(args);
       if (!bid) throw new Error('get_lists: boardId is required (set TRELLO_DEFAULT_BOARD_ID or pass boardId)');
       const lists = await trello(`/boards/${bid}/lists?fields=name,id,closed`);
-      return { lists: lists.map(l => ({ id: l.id, name: l.name, closed: l.closed })) };
+      return { lists: lists.map((l) => ({ id: l.id, name: l.name, closed: l.closed })) };
     }
     case 'add_list_to_board': {
       const bid = resolveBoardId(args);
@@ -183,30 +183,56 @@ async function handleToolsCall(name, args) {
 
     // â”€â”€â”€ Cards â”€â”€â”€
     case 'get_my_cards': {
-      const cards = await trello(`/members/me/cards?fields=name,id,due,dueComplete,idMembers,url,desc,idList,idBoard&members=true`);
-      return { cards: cards.map(c => ({
-        id: c.id, name: c.name, due: c.due, dueComplete: c.dueComplete,
-        url: c.url, desc: c.desc, listId: c.idList, boardId: c.idBoard,
-      })) };
+      const cards = await trello(
+        `/members/me/cards?fields=name,id,due,dueComplete,idMembers,url,desc,idList,idBoard&members=true`,
+      );
+      return {
+        cards: cards.map((c) => ({
+          id: c.id,
+          name: c.name,
+          due: c.due,
+          dueComplete: c.dueComplete,
+          url: c.url,
+          desc: c.desc,
+          listId: c.idList,
+          boardId: c.idBoard,
+        })),
+      };
     }
     case 'get_cards_by_list_id': {
       const lid = args.listId;
       const fields = 'name,id,due,dueComplete,idMembers,url,desc,dateLastActivity,start';
       const cards = await trello(`/lists/${lid}/cards?fields=${fields}&members=true`);
-      return { cards: cards.map(c => ({
-        id: c.id, name: c.name, due: c.due, dueComplete: c.dueComplete,
-        start: c.start, url: c.url, desc: c.desc, idMembers: c.idMembers,
-        dateLastActivity: c.dateLastActivity,
-      })) };
+      return {
+        cards: cards.map((c) => ({
+          id: c.id,
+          name: c.name,
+          due: c.due,
+          dueComplete: c.dueComplete,
+          start: c.start,
+          url: c.url,
+          desc: c.desc,
+          idMembers: c.idMembers,
+          dateLastActivity: c.dateLastActivity,
+        })),
+      };
     }
     case 'get_card': {
+      if (!args.cardId) throw new Error('get_card: missing required parameter: cardId');
       const fields = 'name,id,due,dueComplete,idMembers,url,desc,idList,idBoard,start,labels,dateLastActivity';
       const card = await trello(`/cards/${args.cardId}?fields=${fields}`);
       const res = {
-        id: card.id, name: card.name, desc: card.desc, url: card.url,
-        due: card.due, dueComplete: card.dueComplete, start: card.start,
-        listId: card.idList, boardId: card.idBoard,
-        idMembers: card.idMembers, labels: card.labels,
+        id: card.id,
+        name: card.name,
+        desc: card.desc,
+        url: card.url,
+        due: card.due,
+        dueComplete: card.dueComplete,
+        start: card.start,
+        listId: card.idList,
+        boardId: card.idBoard,
+        idMembers: card.idMembers,
+        labels: card.labels,
         dateLastActivity: card.dateLastActivity,
       };
       if (args.includeMarkdown && card.desc) {
@@ -309,13 +335,15 @@ async function handleToolsCall(name, args) {
     case 'get_card_comments': {
       const limit = args.limit || 100;
       const actions = await trello(`/cards/${args.cardId}/actions?filter=commentCard&limit=${limit}`);
-      return { comments: actions.map(a => ({ id: a.id, text: a.data?.text, date: a.date, memberCreator: a.memberCreator })) };
+      return {
+        comments: actions.map((a) => ({ id: a.id, text: a.data?.text, date: a.date, memberCreator: a.memberCreator })),
+      };
     }
 
     // â”€â”€â”€ Attachments â”€â”€â”€
-case 'attach_file_to_card': {
+    case 'attach_file_to_card': {
       const { cardId, fileUrl, name, mimeType } = args;
-      
+
       if (!fileUrl) {
         throw new Error('fileUrl is required');
       }
@@ -332,7 +360,7 @@ case 'attach_file_to_card': {
         // URL-based attachment - Trello API expects POST with form data
         const body = { url: fileUrl };
         if (filename) body.name = filename;
-        
+
         response = await trelloPost(`/cards/${cardId}/attachments`, body);
       }
 
@@ -345,9 +373,9 @@ case 'attach_file_to_card': {
       };
     }
 
-case 'attach_image_to_card': {
+    case 'attach_image_to_card': {
       const { cardId, imageUrl, name } = args;
-      
+
       if (!imageUrl) {
         throw new Error('imageUrl is required');
       }
@@ -371,15 +399,15 @@ case 'attach_image_to_card': {
 
     case 'get_card_attachments': {
       const { cardId } = args;
-      
+
       if (!cardId) {
         throw new Error('cardId is required');
       }
 
       const attachments = await trello(`/cards/${cardId}/attachments`);
-      
+
       return {
-        attachments: attachments.map(a => ({
+        attachments: attachments.map((a) => ({
           id: a.id,
           name: a.name,
           url: a.url,
@@ -473,7 +501,7 @@ case 'attach_image_to_card': {
     // â”€â”€â”€ Copy Card â”€â”€
     case 'copy_card': {
       const { sourceCardId, listId, name, description, keepFromSource, pos } = args;
-      
+
       if (!sourceCardId || !listId) {
         throw new Error('sourceCardId and listId are required');
       }
@@ -486,14 +514,21 @@ case 'attach_image_to_card': {
       if (name) body.name = name;
       if (description !== undefined) body.desc = description;
       if (pos) body.pos = pos;
-      
-      // keepFromSource: "all" or comma-separated list
+
+      // keepFromSource: "all", comma-separated string, or array
       if (keepFromSource) {
         if (keepFromSource === 'all') {
           body.keepFromSource = 'all';
+        } else if (Array.isArray(keepFromSource)) {
+          body.keepFromSource = keepFromSource.join(',');
+        } else if (typeof keepFromSource === 'object') {
+          // Convert object keys to comma-separated list
+          body.keepFromSource = Object.keys(keepFromSource).join(',');
         } else {
-          // Parse comma-separated list
-          const options = keepFromSource.split(',').map(s => s.trim());
+          // Parse comma-separated string
+          const options = String(keepFromSource)
+            .split(',')
+            .map((s) => s.trim());
           body.keepFromSource = options.join(',');
         }
       }
@@ -513,13 +548,13 @@ case 'attach_image_to_card': {
     case 'get_card_checklists': {
       const checklists = await trello(`/cards/${args.cardId}/checklists`);
       return {
-        checklists: checklists.map(cl => ({
+        checklists: checklists.map((cl) => ({
           id: cl.id,
           name: cl.name,
           cardId: cl.idCard,
           boardId: cl.idBoard,
           itemCount: cl.checkItems?.length || 0,
-          items: (cl.checkItems || []).map(item => ({
+          items: (cl.checkItems || []).map((item) => ({
             id: item.id,
             name: item.name,
             checked: item.state === 'complete',
@@ -573,15 +608,17 @@ case 'attach_image_to_card': {
       const limit = args.limit || 50;
       const actions = await trello(`/cards/${args.cardId}/actions?filter=${filter}&limit=${limit}`);
       return {
-        actions: actions.map(a => ({
+        actions: actions.map((a) => ({
           id: a.id,
           type: a.type,
           date: a.date,
-          memberCreator: a.memberCreator ? {
-            id: a.memberCreator.id,
-            fullName: a.memberCreator.fullName,
-            username: a.memberCreator.username,
-          } : null,
+          memberCreator: a.memberCreator
+            ? {
+                id: a.memberCreator.id,
+                fullName: a.memberCreator.fullName,
+                username: a.memberCreator.username,
+              }
+            : null,
           data: a.data,
         })),
       };
@@ -595,9 +632,8 @@ case 'attach_image_to_card': {
       if (args.query) {
         const q = args.query.toLowerCase();
         return {
-          labels: labels.filter(l =>
-            (l.name || '').toLowerCase().includes(q) ||
-            (l.color || '').toLowerCase().includes(q)
+          labels: labels.filter(
+            (l) => (l.name || '').toLowerCase().includes(q) || (l.color || '').toLowerCase().includes(q),
           ),
         };
       }
@@ -621,15 +657,24 @@ case 'attach_image_to_card': {
         }
       }
       const result = await trello(`/checklists/${newChecklist.id}?fields=name,idCard`);
-      return { id: result.id, name: result.name, cardId: result.idCard, itemCount: sourceChecklist.checkItems?.length || 0 };
+      return {
+        id: result.id,
+        name: result.name,
+        cardId: result.idCard,
+        itemCount: sourceChecklist.checkItems?.length || 0,
+      };
     }
 
     // ─── Sort List Cards ──
     case 'sort_list_cards': {
-      const sortField = args.sort === 'listPosition' ? 'pos'
-        : args.sort === 'dueDate' ? 'due'
-        : args.sort === 'startDate' ? 'start'
-        : args.sort;
+      const sortField =
+        args.sort === 'listPosition'
+          ? 'pos'
+          : args.sort === 'dueDate'
+            ? 'due'
+            : args.sort === 'startDate'
+              ? 'start'
+              : args.sort;
       const cards = await trello(`/lists/${args.listId}/cards?fields=name,id,due,start,pos,dateLastActivity`);
       cards.sort((a, b) => {
         const va = a[sortField];
@@ -665,198 +710,385 @@ case 'attach_image_to_card': {
 const TOOLS = [
   toolSchema('list_boards', 'List all Trello boards the user has access to'),
   toolSchema('list_workspaces', 'List all Trello workspaces/organizations'),
-  toolSchema('create_board', 'Create a new Trello board', {
-    name: { type: 'string', description: 'Name of the board' },
-    desc: { type: 'string', description: 'Description of the board' },
-    idOrganization: { type: 'string', description: 'Workspace ID' },
-    defaultLabels: { type: 'boolean', description: 'Create default labels' },
-    defaultLists: { type: 'boolean', description: 'Create default lists' },
-  }, ['name']),
+  toolSchema(
+    'create_board',
+    'Create a new Trello board',
+    {
+      name: { type: 'string', description: 'Name of the board' },
+      desc: { type: 'string', description: 'Description of the board' },
+      idOrganization: { type: 'string', description: 'Workspace ID' },
+      defaultLabels: { type: 'boolean', description: 'Create default labels' },
+      defaultLists: { type: 'boolean', description: 'Create default lists' },
+    },
+    ['name'],
+  ),
 
   toolSchema('get_lists', 'Get all lists in a board', {
     boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
   }),
-  toolSchema('add_list_to_board', 'Add a new list to a board', {
-    boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
-    name: { type: 'string', description: 'Name of the new list' },
-  }, ['name']),
-  toolSchema('archive_list', 'Archive a list', {
-    listId: { type: 'string', description: 'ID of the list to archive' },
-  }, ['listId']),
+  toolSchema(
+    'add_list_to_board',
+    'Add a new list to a board',
+    {
+      boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
+      name: { type: 'string', description: 'Name of the new list' },
+    },
+    ['name'],
+  ),
+  toolSchema(
+    'archive_list',
+    'Archive a list',
+    {
+      listId: { type: 'string', description: 'ID of the list to archive' },
+    },
+    ['listId'],
+  ),
 
   toolSchema('get_my_cards', 'Get all cards assigned to the current user'),
-  toolSchema('get_cards_by_list_id', 'Get cards in a specific list', {
-    listId: { type: 'string', description: 'ID of the list' },
-    boardId: { type: 'string', description: 'Board ID (optional)' },
-  }, ['listId']),
-  toolSchema('get_card', 'Get detailed card information', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    includeMarkdown: { type: 'boolean', description: 'Return description as markdown' },
-  }, ['cardId']),
-  toolSchema('add_card_to_list', 'Add a new card to a list', {
-    listId: { type: 'string', description: 'ID of the target list' },
-    name: { type: 'string', description: 'Name of the card' },
-    description: { type: 'string', description: 'Description' },
-    dueDate: { type: 'string', description: 'Due date (ISO 8601)' },
-    dueReminder: { type: 'number', description: 'Due date reminder in minutes before due date (e.g., 1440 for 1 day before)' },
-    start: { type: 'string', description: 'Start date (YYYY-MM-DD)' },
-    labels: { type: 'array', items: { type: 'string' }, description: 'Label IDs' },
-  }, ['listId', 'name']),
-  toolSchema('update_card_details', 'Update card details', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    name: { type: 'string', description: 'New name' },
-    description: { type: 'string', description: 'New description' },
-    dueDate: { type: 'string', description: 'New due date' },
-    dueReminder: { type: 'number', description: 'New due date reminder in minutes before due date' },
-    start: { type: 'string', description: 'New start date' },
-    dueComplete: { type: 'boolean', description: 'Mark due complete' },
-    labels: { type: 'array', items: { type: 'string' }, description: 'New label IDs' },
-  }, ['cardId']),
-  toolSchema('move_card', 'Move card to another list', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    listId: { type: 'string', description: 'ID of the target list' },
-    boardId: { type: 'string', description: 'Target board ID' },
-  }, ['cardId', 'listId']),
-  toolSchema('archive_card', 'Archive a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-  }, ['cardId']),
+  toolSchema(
+    'get_cards_by_list_id',
+    'Get cards in a specific list',
+    {
+      listId: { type: 'string', description: 'ID of the list' },
+      boardId: { type: 'string', description: 'Board ID (optional)' },
+    },
+    ['listId'],
+  ),
+  toolSchema(
+    'get_card',
+    'Get detailed card information',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      includeMarkdown: { type: 'boolean', description: 'Return description as markdown' },
+    },
+    ['cardId'],
+  ),
+  toolSchema(
+    'add_card_to_list',
+    'Add a new card to a list',
+    {
+      listId: { type: 'string', description: 'ID of the target list' },
+      name: { type: 'string', description: 'Name of the card' },
+      description: { type: 'string', description: 'Description' },
+      dueDate: { type: 'string', description: 'Due date (ISO 8601)' },
+      dueReminder: {
+        type: 'number',
+        description: 'Due date reminder in minutes before due date (e.g., 1440 for 1 day before)',
+      },
+      start: { type: 'string', description: 'Start date (YYYY-MM-DD)' },
+      labels: { type: 'array', items: { type: 'string' }, description: 'Label IDs' },
+    },
+    ['listId', 'name'],
+  ),
+  toolSchema(
+    'update_card_details',
+    'Update card details',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      name: { type: 'string', description: 'New name' },
+      description: { type: 'string', description: 'New description' },
+      dueDate: { type: 'string', description: 'New due date' },
+      dueReminder: { type: 'number', description: 'New due date reminder in minutes before due date' },
+      start: { type: 'string', description: 'New start date' },
+      dueComplete: { type: 'boolean', description: 'Mark due complete' },
+      labels: { type: 'array', items: { type: 'string' }, description: 'New label IDs' },
+    },
+    ['cardId'],
+  ),
+  toolSchema(
+    'move_card',
+    'Move card to another list',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      listId: { type: 'string', description: 'ID of the target list' },
+      boardId: { type: 'string', description: 'Target board ID' },
+    },
+    ['cardId', 'listId'],
+  ),
+  toolSchema(
+    'archive_card',
+    'Archive a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+    },
+    ['cardId'],
+  ),
 
   toolSchema('get_board_members', 'Get members of a board', {
     boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
   }),
-  toolSchema('assign_member_to_card', 'Assign a member to a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    memberId: { type: 'string', description: 'ID of the member' },
-  }, ['cardId', 'memberId']),
-  toolSchema('remove_member_from_card', 'Remove a member from a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    memberId: { type: 'string', description: 'ID of the member' },
-  }, ['cardId', 'memberId']),
+  toolSchema(
+    'assign_member_to_card',
+    'Assign a member to a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      memberId: { type: 'string', description: 'ID of the member' },
+    },
+    ['cardId', 'memberId'],
+  ),
+  toolSchema(
+    'remove_member_from_card',
+    'Remove a member from a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      memberId: { type: 'string', description: 'ID of the member' },
+    },
+    ['cardId', 'memberId'],
+  ),
 
   toolSchema('get_board_labels', 'Get all labels on a board', {
     boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
   }),
-  toolSchema('create_label', 'Create a new label', {
-    boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
-    name: { type: 'string', description: 'Label name' },
-    color: { type: 'string', description: 'Label color' },
-  }, ['name']),
-  toolSchema('update_label', 'Update a label', {
-    labelId: { type: 'string', description: 'ID of the label' },
-    name: { type: 'string', description: 'New name' },
-    color: { type: 'string', description: 'New color' },
-  }, ['labelId']),
-  toolSchema('delete_label', 'Delete a label', {
-    labelId: { type: 'string', description: 'ID of the label' },
-  }, ['labelId']),
+  toolSchema(
+    'create_label',
+    'Create a new label',
+    {
+      boardId: { type: 'string', description: 'Board ID (uses TRELLO_DEFAULT_BOARD_ID if not provided)' },
+      name: { type: 'string', description: 'Label name' },
+      color: { type: 'string', description: 'Label color' },
+    },
+    ['name'],
+  ),
+  toolSchema(
+    'update_label',
+    'Update a label',
+    {
+      labelId: { type: 'string', description: 'ID of the label' },
+      name: { type: 'string', description: 'New name' },
+      color: { type: 'string', description: 'New color' },
+    },
+    ['labelId'],
+  ),
+  toolSchema(
+    'delete_label',
+    'Delete a label',
+    {
+      labelId: { type: 'string', description: 'ID of the label' },
+    },
+    ['labelId'],
+  ),
 
-  toolSchema('add_comment', 'Add a comment to a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    text: { type: 'string', description: 'Comment text' },
-  }, ['cardId', 'text']),
-  toolSchema('get_card_comments', 'Get comments on a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    limit: { type: 'number', description: 'Max comments (default 100)' },
-  }, ['cardId']),
+  toolSchema(
+    'add_comment',
+    'Add a comment to a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      text: { type: 'string', description: 'Comment text' },
+    },
+    ['cardId', 'text'],
+  ),
+  toolSchema(
+    'get_card_comments',
+    'Get comments on a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      limit: { type: 'number', description: 'Max comments (default 100)' },
+    },
+    ['cardId'],
+  ),
 
-  toolSchema('attach_file_to_card', 'Attach a file to a card from URL', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    fileUrl: { type: 'string', description: 'URL of the file to attach' },
-    name: { type: 'string', description: 'Attachment name (optional)' },
-    mimeType: { type: 'string', description: 'MIME type (optional, auto-detected)' },
-  }, ['cardId', 'fileUrl']),
-  toolSchema('attach_image_to_card', 'Attach an image to a card from URL', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    imageUrl: { type: 'string', description: 'URL of the image to attach' },
-    name: { type: 'string', description: 'Attachment name (optional)' },
-  }, ['cardId', 'imageUrl']),
-  toolSchema('get_card_attachments', 'Get all attachments from a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-  }, ['cardId']),
-  toolSchema('attach_data_to_card', 'Attach data (base64 or data URL) to a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    data: { type: 'string', description: 'Base64 data or data URL' },
-    name: { type: 'string', description: 'Filename (optional)' },
-    mimeType: { type: 'string', description: 'MIME type (optional)' },
-  }, ['cardId', 'data']),
-  toolSchema('attach_image_data_to_card', 'Attach image data to a card (screenshot convenience)', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    imageData: { type: 'string', description: 'Base64 image data or data URL' },
-    name: { type: 'string', description: 'Image filename (optional)' },
-  }, ['cardId', 'imageData']),
-  toolSchema('copy_card', 'Copy/duplicate a card to another list (even on different board)', {
-    sourceCardId: { type: 'string', description: 'ID of the source card to copy' },
-    listId: { type: 'string', description: 'ID of the destination list' },
-    name: { type: 'string', description: 'Override the name of the copied card (optional)' },
-    description: { type: 'string', description: 'Override the description of the copied card (optional)' },
-    keepFromSource: { type: 'string', description: 'Properties to copy: "all" or comma-separated list (attachments,checklists,comments,customFields,due,start,labels,members,stickers)' },
-    pos: { type: 'string', description: 'Position of the new card: "top", "bottom", or a positive float' },
-  }, ['sourceCardId', 'listId']),
+  toolSchema(
+    'attach_file_to_card',
+    'Attach a file to a card from URL',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      fileUrl: { type: 'string', description: 'URL of the file to attach' },
+      name: { type: 'string', description: 'Attachment name (optional)' },
+      mimeType: { type: 'string', description: 'MIME type (optional, auto-detected)' },
+    },
+    ['cardId', 'fileUrl'],
+  ),
+  toolSchema(
+    'attach_image_to_card',
+    'Attach an image to a card from URL',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      imageUrl: { type: 'string', description: 'URL of the image to attach' },
+      name: { type: 'string', description: 'Attachment name (optional)' },
+    },
+    ['cardId', 'imageUrl'],
+  ),
+  toolSchema(
+    'get_card_attachments',
+    'Get all attachments from a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+    },
+    ['cardId'],
+  ),
+  toolSchema(
+    'attach_data_to_card',
+    'Attach data (base64 or data URL) to a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      data: { type: 'string', description: 'Base64 data or data URL' },
+      name: { type: 'string', description: 'Filename (optional)' },
+      mimeType: { type: 'string', description: 'MIME type (optional)' },
+    },
+    ['cardId', 'data'],
+  ),
+  toolSchema(
+    'attach_image_data_to_card',
+    'Attach image data to a card (screenshot convenience)',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      imageData: { type: 'string', description: 'Base64 image data or data URL' },
+      name: { type: 'string', description: 'Image filename (optional)' },
+    },
+    ['cardId', 'imageData'],
+  ),
+  toolSchema(
+    'copy_card',
+    'Copy/duplicate a card to another list (even on different board)',
+    {
+      sourceCardId: { type: 'string', description: 'ID of the source card to copy' },
+      listId: { type: 'string', description: 'ID of the destination list' },
+      name: { type: 'string', description: 'Override the name of the copied card (optional)' },
+      description: { type: 'string', description: 'Override the description of the copied card (optional)' },
+      keepFromSource: {
+        type: 'string',
+        description:
+          'Properties to copy: "all" or comma-separated list (attachments,checklists,comments,customFields,due,start,labels,members,stickers)',
+      },
+      pos: { type: 'string', description: 'Position of the new card: "top", "bottom", or a positive float' },
+    },
+    ['sourceCardId', 'listId'],
+  ),
 
-  toolSchema('create_checklist', 'Create a checklist on a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    name: { type: 'string', description: 'Checklist name' },
-  }, ['cardId', 'name']),
-  toolSchema('add_checklist_item', 'Add an item to a checklist', {
-    checklistId: { type: 'string', description: 'ID of the checklist' },
-    name: { type: 'string', description: 'Item name' },
-    checked: { type: 'boolean', description: 'Mark as completed' },
-  }, ['checklistId', 'name']),
-  toolSchema('delete_checklist', 'Delete a checklist from a card', {
-    checklistId: { type: 'string', description: 'ID of the checklist to delete' },
-  }, ['checklistId']),
-  toolSchema('delete_checklist_item', 'Delete an item from a checklist', {
-    checklistId: { type: 'string', description: 'ID of the checklist' },
-    checkItemId: { type: 'string', description: 'ID of the checklist item' },
-  }, ['checklistId', 'checkItemId']),
-  toolSchema('update_checklist_item', 'Update a checklist item (name, checked state, position)', {
-    checklistId: { type: 'string', description: 'ID of the checklist' },
-    checkItemId: { type: 'string', description: 'ID of the checklist item' },
-    name: { type: 'string', description: 'New item name' },
-    checked: { type: 'boolean', description: 'New checked state' },
-    pos: { type: 'number', description: 'New position' },
-  }, ['checklistId', 'checkItemId']),
-  toolSchema('get_card_checklists', 'Get all checklists on a card with their items', {
-    cardId: { type: 'string', description: 'ID of the card' },
-  }, ['cardId']),
-  toolSchema('watch_card', 'Subscribe/unsubscribe from watching a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    add: { type: 'boolean', description: 'Set to true to start watching' },
-    remove: { type: 'boolean', description: 'Set to true to stop watching' },
-  }, ['cardId']),
-  toolSchema('watch_list', 'Subscribe/unsubscribe from watching a list', {
-    listId: { type: 'string', description: 'ID of the list' },
-    add: { type: 'boolean', description: 'Set to true to start watching' },
-    remove: { type: 'boolean', description: 'Set to true to stop watching' },
-  }, ['listId']),
-  toolSchema('get_card_activity', 'Get activity/actions on a card (comments, moves, updates)', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    filter: { type: 'string', description: 'Filter actions by type (e.g., \"commentCard\", \"moveCard\")' },
-    limit: { type: 'number', description: 'Number of actions to return (default: 50)' },
-  }, ['cardId']),
-  toolSchema('search_labels', 'Search labels on a board by name or color', {
-    boardId: { type: 'string', description: 'ID of the board' },
-    query: { type: 'string', description: 'Search query (label name or color)' },
-  }, ['boardId']),
-  toolSchema('remove_label_from_card', 'Remove a label from a card', {
-    cardId: { type: 'string', description: 'ID of the card' },
-    labelId: { type: 'string', description: 'ID of the label to remove' },
-  }, ['cardId', 'labelId']),
-  toolSchema('copy_checklist', 'Copy a checklist to another card', {
-    sourceChecklistId: { type: 'string', description: 'ID of the source checklist' },
-    cardId: { type: 'string', description: 'ID of the target card' },
-  }, ['sourceChecklistId', 'cardId']),
-  toolSchema('sort_list_cards', 'Sort cards in a list by specified criteria', {
-    listId: { type: 'string', description: 'ID of the list' },
-    sort: { type: 'string', description: 'Sort criteria: due, dueDate, listPosition, name, startDate' },
-  }, ['listId', 'sort']),
-  toolSchema('update_list', 'Update list details (name, position, closed state)', {
-    listId: { type: 'string', description: 'ID of the list' },
-    name: { type: 'string', description: 'New list name' },
-    closed: { type: 'boolean', description: 'Close/open the list' },
-    pos: { type: 'number', description: 'New position' },
-    subscribed: { type: 'boolean', description: 'Subscribe/unsubscribe' },
-  }, ['listId']),
+  toolSchema(
+    'create_checklist',
+    'Create a checklist on a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      name: { type: 'string', description: 'Checklist name' },
+    },
+    ['cardId', 'name'],
+  ),
+  toolSchema(
+    'add_checklist_item',
+    'Add an item to a checklist',
+    {
+      checklistId: { type: 'string', description: 'ID of the checklist' },
+      name: { type: 'string', description: 'Item name' },
+      checked: { type: 'boolean', description: 'Mark as completed' },
+    },
+    ['checklistId', 'name'],
+  ),
+  toolSchema(
+    'delete_checklist',
+    'Delete a checklist from a card',
+    {
+      checklistId: { type: 'string', description: 'ID of the checklist to delete' },
+    },
+    ['checklistId'],
+  ),
+  toolSchema(
+    'delete_checklist_item',
+    'Delete an item from a checklist',
+    {
+      checklistId: { type: 'string', description: 'ID of the checklist' },
+      checkItemId: { type: 'string', description: 'ID of the checklist item' },
+    },
+    ['checklistId', 'checkItemId'],
+  ),
+  toolSchema(
+    'update_checklist_item',
+    'Update a checklist item (name, checked state, position)',
+    {
+      checklistId: { type: 'string', description: 'ID of the checklist' },
+      checkItemId: { type: 'string', description: 'ID of the checklist item' },
+      name: { type: 'string', description: 'New item name' },
+      checked: { type: 'boolean', description: 'New checked state' },
+      pos: { type: 'number', description: 'New position' },
+    },
+    ['checklistId', 'checkItemId'],
+  ),
+  toolSchema(
+    'get_card_checklists',
+    'Get all checklists on a card with their items',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+    },
+    ['cardId'],
+  ),
+  toolSchema(
+    'watch_card',
+    'Subscribe/unsubscribe from watching a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      add: { type: 'boolean', description: 'Set to true to start watching' },
+      remove: { type: 'boolean', description: 'Set to true to stop watching' },
+    },
+    ['cardId'],
+  ),
+  toolSchema(
+    'watch_list',
+    'Subscribe/unsubscribe from watching a list',
+    {
+      listId: { type: 'string', description: 'ID of the list' },
+      add: { type: 'boolean', description: 'Set to true to start watching' },
+      remove: { type: 'boolean', description: 'Set to true to stop watching' },
+    },
+    ['listId'],
+  ),
+  toolSchema(
+    'get_card_activity',
+    'Get activity/actions on a card (comments, moves, updates)',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      filter: { type: 'string', description: 'Filter actions by type (e.g., \"commentCard\", \"moveCard\")' },
+      limit: { type: 'number', description: 'Number of actions to return (default: 50)' },
+    },
+    ['cardId'],
+  ),
+  toolSchema(
+    'search_labels',
+    'Search labels on a board by name or color',
+    {
+      boardId: { type: 'string', description: 'ID of the board' },
+      query: { type: 'string', description: 'Search query (label name or color)' },
+    },
+    ['boardId'],
+  ),
+  toolSchema(
+    'remove_label_from_card',
+    'Remove a label from a card',
+    {
+      cardId: { type: 'string', description: 'ID of the card' },
+      labelId: { type: 'string', description: 'ID of the label to remove' },
+    },
+    ['cardId', 'labelId'],
+  ),
+  toolSchema(
+    'copy_checklist',
+    'Copy a checklist to another card',
+    {
+      sourceChecklistId: { type: 'string', description: 'ID of the source checklist' },
+      cardId: { type: 'string', description: 'ID of the target card' },
+    },
+    ['sourceChecklistId', 'cardId'],
+  ),
+  toolSchema(
+    'sort_list_cards',
+    'Sort cards in a list by specified criteria',
+    {
+      listId: { type: 'string', description: 'ID of the list' },
+      sort: { type: 'string', description: 'Sort criteria: due, dueDate, listPosition, name, startDate' },
+    },
+    ['listId', 'sort'],
+  ),
+  toolSchema(
+    'update_list',
+    'Update list details (name, position, closed state)',
+    {
+      listId: { type: 'string', description: 'ID of the list' },
+      name: { type: 'string', description: 'New list name' },
+      closed: { type: 'boolean', description: 'Close/open the list' },
+      pos: { type: 'number', description: 'New position' },
+      subscribed: { type: 'boolean', description: 'Subscribe/unsubscribe' },
+    },
+    ['listId'],
+  ),
 ];
 
 // â”€â”€â”€ Main â”€â”€â”€
@@ -902,7 +1134,7 @@ stdin.on('data', (chunk) => {
       result(id, { tools: TOOLS });
     } else if (method === 'tools/call') {
       handleToolsCall(params.name, params.arguments || {})
-        .then(res => result(id, wrap(res)))
+        .then((res) => result(id, wrap(res)))
         .catch((err) => {
           error(id, -32603, err.message);
         });
@@ -915,11 +1147,3 @@ stdin.on('data', (chunk) => {
 stdin.on('end', () => {
   process.exit(0);
 });
-
-
-
-
-
-
-
-

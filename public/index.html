@@ -1,672 +1,823 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="trello-power-up" content="kaede" />
-  <title>KAEDE — Connection Ecosystem</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="js/components.js"></script>
-</head>
-<body class="bg-kaede-bg text-kaede-text font-sans antialiased">
-
-<!-- ===================================================================
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="trello-power-up" content="kaede" />
+    <title>KAEDE — Connection Ecosystem</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="js/components.js"></script>
+  </head>
+  <body class="bg-kaede-bg text-kaede-text font-sans antialiased">
+    <!-- ===================================================================
      IFRAME MODE — Trello Power-Up connector (hidden when direct visit)
      =================================================================== -->
-<div id="kaede-iframe" class="h-full hidden">
-  <main class="flex flex-col items-center justify-center h-full gap-4 px-4">
-    <div class="flex gap-1.5">
-      <span class="size-2 rounded-full bg-kaede-primary animate-kaede-pulse [animation-delay:0s]"></span>
-      <span class="size-2 rounded-full bg-kaede-primary animate-kaede-pulse [animation-delay:0.2s]"></span>
-      <span class="size-2 rounded-full bg-kaede-primary animate-kaede-pulse [animation-delay:0.4s]"></span>
+    <div id="kaede-iframe" class="h-full hidden">
+      <main class="flex flex-col items-center justify-center h-full gap-4 px-4">
+        <div class="flex gap-1.5">
+          <span class="size-2 rounded-full bg-kaede-primary animate-kaede-pulse [animation-delay:0s]"></span>
+          <span class="size-2 rounded-full bg-kaede-primary animate-kaede-pulse [animation-delay:0.2s]"></span>
+          <span class="size-2 rounded-full bg-kaede-primary animate-kaede-pulse [animation-delay:0.4s]"></span>
+        </div>
+        <p class="text-sm text-kaede-muted tracking-wide" id="status">Initializing KAEDE…</p>
+      </main>
     </div>
-    <p class="text-sm text-kaede-muted tracking-wide" id="status">Initializing KAEDE…</p>
-  </main>
-</div>
 
-<!-- ===================================================================
+    <!-- ===================================================================
      SITE MODE — Full landing page (hidden in Trello iframe)
      =================================================================== -->
-<div id="kaede-site" class="hidden">
+    <div id="kaede-site" class="hidden">
+      <!-- ── Navigation ── -->
+      <kaede-navbar></kaede-navbar>
 
-  <!-- ── Navigation ── -->
-  <kaede-navbar></kaede-navbar>
-
-  <!-- ── Hero ── -->
-  <section id="home" class="hero-glow min-h-screen flex flex-col items-center justify-center px-4 pt-14 text-center relative overflow-hidden">
-    <div class="max-w-3xl mx-auto">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-kaede-border bg-kaede-surface/50 text-[11px] font-medium text-kaede-muted mb-6 tracking-wide">
-        <span class="size-1.5 rounded-full bg-kaede-success"></span>
-        <span>PT Koneksi Jaringan Indonesia</span>
-      </div>
-      <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.05]">
-        <span class="text-kaede-primary">KAEDE</span>
-        <span class="text-kaede-text">.</span>
-      </h1>
-      <p class="mt-4 text-lg sm:text-xl text-kaede-muted leading-relaxed max-w-xl mx-auto">
-        A bridge between <strong class="text-kaede-text font-semibold">Trello</strong> and Koneksi's
-        <strong class="text-kaede-text font-semibold">Agentic Development</strong> ecosystem —
-        where teams unite, AI assists, and workflows run smoothly.
-      </p>
-      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <a href="#panduan" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-kaede-primary text-white text-sm font-medium no-underline hover:bg-kaede-primary-hover transition-colors">
-          Get Started with Power-Up
-          <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </a>
-        <a href="#ekosistem" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-kaede-border text-kaede-muted text-sm font-medium no-underline hover:border-kaede-primary hover:text-kaede-text transition-colors">
-          Learn Ecosystem
-        </a>
-      </div>
-    </div>
-    <!-- scroll indicator -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-kaede-muted">
-      <span class="text-[10px] font-medium tracking-widest uppercase">Scroll</span>
-      <svg class="size-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-    </div>
-  </section>
-
-  <!-- ── Tentang KAEDE ── -->
-  <section id="tentang" class="py-24 px-4 sm:px-6 max-w-6xl mx-auto fade-in">
-    <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div>
-        <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">About</span>
-        <h2 class="text-3xl sm:text-4xl font-bold mt-2 leading-tight">What is <span class="text-kaede-primary">KAEDE</span>?</h2>
-        <p class="mt-4 text-kaede-muted leading-relaxed">
-          KAEDE is an integration project owned by <strong class="text-kaede-text">PT Koneksi Jaringan Indonesia</strong>
-          that connects Trello — where teams plan and track work — with the
-          development ecosystem based on <strong class="text-kaede-text">Agentic AI</strong>.
-        </p>
-        <p class="mt-3 text-kaede-muted leading-relaxed">
-          Starting as a Trello Power-Up for environment management (Production / Staging / Development),
-          KAEDE has evolved into the <strong class="text-kaede-text">core bridge</strong> between team planning
-          on Trello and AI Agent execution via the OpenCode MCP protocol.
-        </p>
-        <div class="mt-6 flex flex-col gap-2">
-          <div class="flex items-start gap-3">
-            <span class="mt-0.5 flex items-center justify-center size-5 rounded bg-kaede-primary/20 text-kaede-primary text-[10px] font-bold shrink-0">1</span>
-            <span class="text-sm text-kaede-muted"><strong class="text-kaede-text font-semibold text-kaede-text">Trello Power-Up</strong> — Manage environments, badges, and authorization directly from Trello cards.</span>
+      <!-- ── Hero ── -->
+      <section
+        id="home"
+        class="hero-glow min-h-screen flex flex-col items-center justify-center px-4 pt-14 text-center relative overflow-hidden"
+      >
+        <div class="max-w-3xl mx-auto">
+          <div
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-kaede-border bg-kaede-surface/50 text-[11px] font-medium text-kaede-muted mb-6 tracking-wide"
+          >
+            <span class="size-1.5 rounded-full bg-kaede-success"></span>
+            <span>PT Koneksi Jaringan Indonesia</span>
           </div>
-          <div class="flex items-start gap-3">
-            <span class="mt-0.5 flex items-center justify-center size-5 rounded bg-kaede-primary/20 text-kaede-primary text-[10px] font-bold shrink-0">2</span>
-            <span class="text-sm text-kaede-muted"><strong class="text-kaede-text font-semibold text-kaede-text">MCP Bridge</strong> — Exposes Trello data for reading and writing by AI Agents via OpenCode MCP.</span>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="mt-0.5 flex items-center justify-center size-5 rounded bg-kaede-primary/20 text-kaede-primary text-[10px] font-bold shrink-0">3</span>
-            <span class="text-sm text-kaede-muted"><strong class="text-kaede-text font-semibold text-kaede-text">Knowledge Hub</strong> — The central information hub of the Koneksi ecosystem for all team members.</span>
-          </div>
-        </div>
-      </div>
-      <div class="flex items-center justify-center">
-        <div class="glass rounded-2xl p-8 w-full max-w-sm text-center">
-          <div class="flex items-center justify-center size-16 mx-auto rounded-xl bg-kaede-primary/20">
-            <span class="text-3xl font-bold text-kaede-primary">K</span>
-          </div>
-          <div class="mt-4 space-y-1">
-            <p class="text-sm font-semibold">KAEDE</p>
-            <p class="text-xs text-kaede-muted">Koneksi Automated Environment &amp; Developer Engineering</p>
-          </div>
-          <div class="mt-4 pt-4 border-t border-kaede-border text-xs text-kaede-muted">
-            <span class="text-kaede-primary font-medium">v1.0.0</span> &middot; Last updated June 2026
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Ekosistem ── -->
-  <section id="ekosistem" class="py-24 px-4 sm:px-6 bg-kaede-surface/30 fade-in">
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-16">
-        <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">Ecosystem</span>
-        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Empat Pilar Pengembangan Koneksi</h2>
-        <p class="mt-3 text-kaede-muted max-w-xl mx-auto">
-          Setiap repositori di organisasi Koneksi bisa memiliki keempat komponen ini.
-          Masing-masing punya peran yang berbeda tapi saling melengkapi.
-        </p>
-      </div>
-
-      <!-- pillars grid -->
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-        <!-- Playbook -->
-        <div class="glass rounded-xl p-5 border-t-2 border-t-kaede-warning">
-          <div class="flex items-center justify-center size-10 rounded-lg bg-kaede-warning/20 text-kaede-warning mb-3">
-            <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-          </div>
-          <h3 class="text-base font-semibold">Playbook</h3>
-          <p class="text-xs text-kaede-muted mt-1 leading-relaxed">
-            Panduan <strong class="text-kaede-text">manusia ke manusia</strong>.
-            Berisi workflow, SOP, standar kualitas, onboarding, ADR.
-            Disimpan di repositori <code class="text-kaede-warning text-[10px]">{org}/playbook</code>.
+          <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.05]">
+            <span class="text-kaede-primary">KAEDE</span>
+            <span class="text-kaede-text">.</span>
+          </h1>
+          <p class="mt-4 text-lg sm:text-xl text-kaede-muted leading-relaxed max-w-xl mx-auto">
+            A bridge between <strong class="text-kaede-text font-semibold">Trello</strong> and Koneksi's
+            <strong class="text-kaede-text font-semibold">Agentic Development</strong> ecosystem — where teams unite, AI
+            assists, and workflows run smoothly.
           </p>
-          <div class="mt-3 text-[11px] text-kaede-muted">
-            <span class="inline-flex items-center gap-1"><span class="size-1.5 rounded-full bg-kaede-warning"></span> Human → Human</span>
+          <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="#panduan"
+              class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-kaede-primary text-white text-sm font-medium no-underline hover:bg-kaede-primary-hover transition-colors"
+            >
+              Get Started with Power-Up
+              <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </a>
+            <a
+              href="#ekosistem"
+              class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-kaede-border text-kaede-muted text-sm font-medium no-underline hover:border-kaede-primary hover:text-kaede-text transition-colors"
+            >
+              Learn Ecosystem
+            </a>
           </div>
         </div>
-
-        <!-- OpenKB -->
-        <div class="glass rounded-xl p-5 border-t-2 border-t-kaede-success">
-          <div class="flex items-center justify-center size-10 rounded-lg bg-kaede-success/20 text-kaede-success mb-3">
-            <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          </div>
-          <h3 class="text-base font-semibold">OpenKB</h3>
-          <p class="text-xs text-kaede-muted mt-1 leading-relaxed">
-            Protokol komunikasi <strong class="text-kaede-text">AI ↔ Human</strong>.
-            File <code class="text-kaede-success text-[10px]">.openkb/</code> di setiap repo.
-            SHARED (glossary, decisions) + PERSONAL (catatan pribadi).
-          </p>
-          <div class="mt-3 text-[11px] text-kaede-muted">
-            <span class="inline-flex items-center gap-1"><span class="size-1.5 rounded-full bg-kaede-success"></span> AI ↔ Human</span>
-          </div>
+        <!-- scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-kaede-muted">
+          <span class="text-[10px] font-medium tracking-widest uppercase">Scroll</span>
+          <svg class="size-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
+      </section>
 
-        <!-- OpenCode -->
-        <div class="glass rounded-xl p-5 border-t-2 border-t-kaede-primary">
-          <div class="flex items-center justify-center size-10 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3">
-            <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-          </div>
-          <h3 class="text-base font-semibold">OpenCode</h3>
-          <p class="text-xs text-kaede-muted mt-1 leading-relaxed">
-            Konfigurasi <strong class="text-kaede-text">AI Agent</strong>.
-            File <code class="text-kaede-primary text-[10px]">.opencode/</code> di setiap repo.
-            Agent types, permissions, project context, aturan main.
-          </p>
-          <div class="mt-3 text-[11px] text-kaede-muted">
-            <span class="inline-flex items-center gap-1"><span class="size-1.5 rounded-full bg-kaede-primary"></span> Agent Config</span>
-          </div>
-        </div>
-
-        <!-- KAEDE -->
-        <div class="glass rounded-xl p-5 border-t-2 border-t-kaede-danger">
-          <div class="flex items-center justify-center size-10 rounded-lg bg-kaede-danger/20 text-kaede-danger mb-3">
-            <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-          </div>
-          <h3 class="text-base font-semibold">KAEDE</h3>
-          <p class="text-xs text-kaede-muted mt-1 leading-relaxed">
-            Jembatan <strong class="text-kaede-text">Trello ↔ MCP</strong>.
-            Power-Up Trello untuk menghubungkan perencanaan tim
-            dengan eksekusi agentic. Juga pusat informasi ekosistem ini.
-          </p>
-          <div class="mt-3 text-[11px] text-kaede-muted">
-            <span class="inline-flex items-center gap-1"><span class="size-1.5 rounded-full bg-kaede-danger"></span> Integration Bridge</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- how they connect -->
-      <div class="mt-12 glass rounded-xl p-6 sm:p-8 text-center">
-        <h3 class="text-sm font-semibold mb-4">Bagaimana Mereka Terhubung?</h3>
-        <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-medium">
-          <span class="px-3 py-1.5 rounded-md bg-kaede-warning/20 text-kaede-warning">Playbook</span>
-          <svg class="size-4 text-kaede-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          <span class="px-3 py-1.5 rounded-md bg-kaede-success/20 text-kaede-success">OpenKB</span>
-          <svg class="size-4 text-kaede-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          <span class="px-3 py-1.5 rounded-md bg-kaede-primary/20 text-kaede-primary">OpenCode</span>
-          <svg class="size-4 text-kaede-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          <span class="px-3 py-1.5 rounded-md bg-kaede-danger/20 text-kaede-danger">KAEDE</span>
-          <svg class="size-4 text-kaede-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          <span class="px-3 py-1.5 rounded-md border border-kaede-border text-kaede-muted">Trello</span>
-        </div>
-        <p class="mt-4 text-xs text-kaede-muted leading-relaxed max-w-lg mx-auto">
-          Manusia menulis panduan di <strong>Playbook</strong> → AI membaca konteks dari <strong>OpenKB</strong> →
-          Agent dikonfigurasi lewat <strong>OpenCode</strong> → <strong>KAEDE</strong> menghubungkan semuanya ke Trello.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── OpenKB ── -->
-  <section id="openkb" class="py-24 px-4 sm:px-6 max-w-6xl mx-auto fade-in">
-    <div class="grid md:grid-cols-2 gap-12 items-start">
-      <div>
-        <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-success">Protokol</span>
-        <h2 class="text-3xl sm:text-4xl font-bold mt-2 leading-tight">OpenKB</h2>
-        <p class="text-kaede-muted mt-1">Open Knowledge Base — bahasa komunikasi AI ↔ Human</p>
-        <p class="mt-4 text-kaede-muted leading-relaxed">
-          OpenKB adalah protokol yang memungkinkan <strong class="text-kaede-text">AI Agent</strong> dan
-          <strong class="text-kaede-text">manusia</strong> berbagi konteks secara dua arah.
-          Disimpan sebagai direktori <code class="text-kaede-success text-[11px] font-mono">.openkb/</code>
-          di setiap repositori.
-        </p>
-        <p class="mt-3 text-kaede-muted leading-relaxed">
-          Dua ruang penyimpanan:
-        </p>
-        <div class="mt-4 space-y-3">
-          <div class="glass rounded-lg p-4">
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-kaede-success/20 text-kaede-success">Tracked</span>
-              <span class="text-sm font-semibold">SHARED/</span>
+      <!-- ── Tentang KAEDE ── -->
+      <section id="tentang" class="py-24 px-4 sm:px-6 max-w-6xl mx-auto fade-in">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">About</span>
+            <h2 class="text-3xl sm:text-4xl font-bold mt-2 leading-tight">
+              What is <span class="text-kaede-primary">KAEDE</span>?
+            </h2>
+            <p class="mt-4 text-kaede-muted leading-relaxed">
+              KAEDE is an integration project owned by
+              <strong class="text-kaede-text">PT Koneksi Jaringan Indonesia</strong> that connects Trello — where teams
+              plan and track work — with the development ecosystem based on
+              <strong class="text-kaede-text">Agentic AI</strong>.
+            </p>
+            <p class="mt-3 text-kaede-muted leading-relaxed">
+              Starting as a Trello Power-Up for environment management (Production / Staging / Development), KAEDE has
+              evolved into the <strong class="text-kaede-text">core bridge</strong> between team planning on Trello and
+              AI Agent execution via the OpenCode MCP protocol.
+            </p>
+            <div class="mt-6 flex flex-col gap-2">
+              <div class="flex items-start gap-3">
+                <span
+                  class="mt-0.5 flex items-center justify-center size-5 rounded bg-kaede-primary/20 text-kaede-primary text-[10px] font-bold shrink-0"
+                  >1</span
+                >
+                <span class="text-sm text-kaede-muted"
+                  ><strong class="text-kaede-text font-semibold">Trello Power-Up</strong> — Manage environments, badges,
+                  and authorization directly from Trello cards.</span
+                >
+              </div>
+              <div class="flex items-start gap-3">
+                <span
+                  class="mt-0.5 flex items-center justify-center size-5 rounded bg-kaede-primary/20 text-kaede-primary text-[10px] font-bold shrink-0"
+                  >2</span
+                >
+                <span class="text-sm text-kaede-muted"
+                  ><strong class="text-kaede-text font-semibold">MCP Bridge</strong> — Exposes Trello data for reading
+                  and writing by AI Agents via OpenCode MCP.</span
+                >
+              </div>
+              <div class="flex items-start gap-3">
+                <span
+                  class="mt-0.5 flex items-center justify-center size-5 rounded bg-kaede-primary/20 text-kaede-primary text-[10px] font-bold shrink-0"
+                  >3</span
+                >
+                <span class="text-sm text-kaede-muted"
+                  ><strong class="text-kaede-text font-semibold">Knowledge Hub</strong> — The central information hub of
+                  the Koneksi ecosystem for all team members.</span
+                >
+              </div>
             </div>
-            <p class="text-xs text-kaede-muted mt-1">
-              Glossary istilah, referensi eksternal, keputusan arsitektur (decision-log).
-              Komit ke git — bisa dibaca semua orang dan AI.
+          </div>
+          <div class="flex items-center justify-center">
+            <div class="glass rounded-2xl p-8 w-full max-w-sm text-center">
+              <div class="flex items-center justify-center size-16 mx-auto rounded-xl bg-kaede-primary/20">
+                <span class="text-3xl font-bold text-kaede-primary">K</span>
+              </div>
+              <div class="mt-4 space-y-1">
+                <p class="text-sm font-semibold">KAEDE</p>
+                <p class="text-xs text-kaede-muted">Koneksi Automated Environment &amp; Developer Engineering</p>
+              </div>
+              <div class="mt-4 pt-4 border-t border-kaede-border text-xs text-kaede-muted">
+                <span class="text-kaede-primary font-medium">v1.0.0</span> &middot; Last updated June 2026
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Ekosistem ── -->
+      <section id="ekosistem" class="py-24 px-4 sm:px-6 bg-kaede-surface/30 fade-in">
+        <div class="max-w-6xl mx-auto">
+          <div class="text-center mb-16">
+            <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">Ecosystem</span>
+            <h2 class="text-3xl sm:text-4xl font-bold mt-2">Four Pillars of Koneksi Development</h2>
+            <p class="mt-3 text-kaede-muted max-w-xl mx-auto">
+              Every repository in the Koneksi organization can have all four components. Each has a distinct yet
+              complementary role.
             </p>
           </div>
-          <div class="glass rounded-lg p-4">
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-kaede-warning/20 text-kaede-warning">Gitignored</span>
-              <span class="text-sm font-semibold">PERSONAL/</span>
-            </div>
-            <p class="text-xs text-kaede-muted mt-1">
-              Catatan pribadi, preferensi lokal, eksperimen. Khusus individu —
-              tidak masuk git, tidak terbaca orang lain.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="glass rounded-xl p-5">
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Directory Structure</h4>
-          <div class="code-block">
-            <span class="cm"># Each repo can have this:</span><br/>
-            .openkb/<br/>
-            ├── SHARED/<br/>
-            │&nbsp;&nbsp; ├── glossary.md&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Terms &amp; abbreviations</span><br/>
-            │&nbsp;&nbsp; ├── references.md&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Links &amp; references</span><br/>
-            │&nbsp;&nbsp; ├── decision-log.md&nbsp;&nbsp;<span class="cm"># Architecture decisions</span><br/>
-            │&nbsp;&nbsp; └── project-context.md <span class="cm"># Project context</span><br/>
-            └── PERSONAL/<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp; └── .gitignore&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Not tracked</span>
-          </div>
-        </div>
-        <div class="mt-4 glass rounded-xl p-5">
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Communication Flow</h4>
-          <div class="text-xs text-kaede-muted space-y-2">
-            <div class="flex items-start gap-2">
-              <span class="text-kaede-success shrink-0">→</span>
-              <span><strong class="text-kaede-text">AI membaca OpenKB</strong> sebelum membantu — paham konteks, istilah, aturan.</span>
-            </div>
-            <div class="flex items-start gap-2">
-              <span class="text-kaede-success shrink-0">→</span>
-              <span><strong class="text-kaede-text">Manusia menulis OpenKB</strong> — catat keputusan, update glossary, tambah referensi.</span>
-            </div>
-            <div class="flex items-start gap-2">
-              <span class="text-kaede-success shrink-0">→</span>
-              <span><strong class="text-kaede-text">Dua arah</strong> — AI bisa rekomen update ke OpenKB, manusia review dan approve.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ── Playbook ── -->
-  <section id="playbook" class="py-24 px-4 sm:px-6 bg-kaede-surface/30 fade-in">
-    <div class="max-w-6xl mx-auto">
-      <div class="grid md:grid-cols-2 gap-12 items-start">
-        <div>
-          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-warning">Panduan</span>
-          <h2 class="text-3xl sm:text-4xl font-bold mt-2 leading-tight">Playbook</h2>
-          <p class="text-kaede-muted mt-1">Standard operasional untuk manusia</p>
-          <p class="mt-4 text-kaede-muted leading-relaxed">
-            Playbook adalah kumpulan dokumen <strong class="text-kaede-text">human-to-human</strong>
-            yang berisi standar, workflow, dan SOP pengembangan tim Koneksi.
-            Disimpan di repositori terpisah: <code class="text-kaede-warning text-[11px] font-mono">{org}/playbook</code>.
-          </p>
-          <div class="mt-4 space-y-2">
-            <div class="flex items-start gap-2 text-sm text-kaede-muted">
-              <span class="text-kaede-warning mt-0.5">📋</span>
-              <span>Filosofi &amp; prinsip engineering</span>
+          <!-- pillars grid -->
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Playbook -->
+            <div class="glass rounded-xl p-5 border-t-2 border-t-kaede-warning">
+              <div
+                class="flex items-center justify-center size-10 rounded-lg bg-kaede-warning/20 text-kaede-warning mb-3"
+              >
+                <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold">Playbook</h3>
+              <p class="text-xs text-kaede-muted mt-1 leading-relaxed">
+                <strong class="text-kaede-text">Human-to-human</strong> guidance. Workflows, SOPs, quality standards,
+                onboarding, ADRs. Stored in the
+                <code class="text-kaede-warning text-[10px]">{org}/playbook</code> repository.
+              </p>
+              <div class="mt-3 text-[11px] text-kaede-muted">
+                <span class="inline-flex items-center gap-1"
+                  ><span class="size-1.5 rounded-full bg-kaede-warning"></span> Human → Human</span
+                >
+              </div>
             </div>
-            <div class="flex items-start gap-2 text-sm text-kaede-muted">
-              <span class="text-kaede-warning mt-0.5">📋</span>
-              <span>Git &amp; GitHub workflow (branching, PR, commit)</span>
-            </div>
-            <div class="flex items-start gap-2 text-sm text-kaede-muted">
-              <span class="text-kaede-warning mt-0.5">📋</span>
-              <span>Trello integration — dari kartu ke kode</span>
-            </div>
-            <div class="flex items-start gap-2 text-sm text-kaede-muted">
-              <span class="text-kaede-warning mt-0.5">📋</span>
-              <span>Onboarding anggota tim baru</span>
-            </div>
-            <div class="flex items-start gap-2 text-sm text-kaede-muted">
-              <span class="text-kaede-warning mt-0.5">📋</span>
-              <span>Quality standard &amp; code review</span>
-            </div>
-          </div>
-        </div>
-        <div class="glass rounded-xl p-5">
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Playbook vs OpenKB</h4>
-          <div class="overflow-x-auto">
-            <table class="w-full text-xs">
-              <thead>
-                <tr class="border-b border-kaede-border">
-                  <th class="text-left py-2 pr-3 font-semibold text-kaede-text">Aspek</th>
-                  <th class="text-left py-2 pr-3 font-semibold text-kaede-warning">Playbook</th>
-                  <th class="text-left py-2 font-semibold text-kaede-success">OpenKB</th>
-                </tr>
-              </thead>
-              <tbody class="text-kaede-muted">
-                <tr class="border-b border-kaede-border/50">
-                  <td class="py-2 pr-3 text-kaede-text">Pembaca</td>
-                  <td class="py-2 pr-3">Manusia</td>
-                  <td class="py-2">AI Agent + Manusia</td>
-                </tr>
-                <tr class="border-b border-kaede-border/50">
-                  <td class="py-2 pr-3 text-kaede-text">Lokasi</td>
-                  <td class="py-2 pr-3">Repo sendiri</td>
-                  <td class="py-2">Di dalam tiap repo</td>
-                </tr>
-                <tr class="border-b border-kaede-border/50">
-                  <td class="py-2 pr-3 text-kaede-text">Format</td>
-                  <td class="py-2 pr-3">Dokumentasi naratif</td>
-                  <td class="py-2">Struktur direktori baku</td>
-                </tr>
-                <tr>
-                  <td class="py-2 pr-3 text-kaede-text">Scope</td>
-                  <td class="py-2 pr-3">Org-wide</td>
-                  <td class="py-2">Per repo</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ── OpenCode ── -->
-  <section id="opencode" class="py-24 px-4 sm:px-6 max-w-6xl mx-auto fade-in">
-    <div class="grid md:grid-cols-2 gap-12 items-start">
-      <div>
-        <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">Konfigurasi</span>
-        <h2 class="text-3xl sm:text-4xl font-bold mt-2 leading-tight">OpenCode</h2>
-        <p class="text-kaede-muted mt-1">Konfigurasi AI Agent di setiap repositori</p>
-        <p class="mt-4 text-kaede-muted leading-relaxed">
-          OpenCode adalah tools AI Agent yang digunakan tim Koneksi.
-          Setiap repositori bisa memiliki direktori <code class="text-kaede-primary text-[11px] font-mono">.opencode/</code>
-          yang mengkonfigurasi bagaimana AI Agent berperilaku di repo tersebut.
-        </p>
-        <div class="mt-4 space-y-3">
-          <div class="glass rounded-lg p-4">
-            <div class="text-sm font-semibold">Agent Types</div>
-            <p class="text-xs text-kaede-muted mt-1">
-              Setiap repo punya beberapa <em>agent</em> dengan peran berbeda:
-              <code class="text-[10px]">build</code> (eksekusi),
-              <code class="text-[10px]">plan</code> (perencanaan),
-              <code class="text-[10px]">review</code> (review),
-              <code class="text-[10px]">docs</code> (dokumentasi).
-              Masing-masing punya permission berbeda.
-            </p>
+            <!-- OpenKB -->
+            <div class="glass rounded-xl p-5 border-t-2 border-t-kaede-success">
+              <div
+                class="flex items-center justify-center size-10 rounded-lg bg-kaede-success/20 text-kaede-success mb-3"
+              >
+                <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold">OpenKB</h3>
+              <p class="text-xs text-kaede-muted mt-1 leading-relaxed">
+                <strong class="text-kaede-text">AI ↔ Human</strong> communication protocol.
+                <code class="text-kaede-success text-[10px]">.openkb/</code> directory in each repo. SHARED (glossary,
+                decisions) + PERSONAL (private notes).
+              </p>
+              <div class="mt-3 text-[11px] text-kaede-muted">
+                <span class="inline-flex items-center gap-1"
+                  ><span class="size-1.5 rounded-full bg-kaede-success"></span> AI ↔ Human</span
+                >
+              </div>
+            </div>
+
+            <!-- OpenCode -->
+            <div class="glass rounded-xl p-5 border-t-2 border-t-kaede-primary">
+              <div
+                class="flex items-center justify-center size-10 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3"
+              >
+                <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold">OpenCode</h3>
+              <p class="text-xs text-kaede-muted mt-1 leading-relaxed">
+                <strong class="text-kaede-text">AI Agent</strong> configuration.
+                <code class="text-kaede-primary text-[10px]">.opencode/</code> directory in each repo. Agent types,
+                permissions, project context, rules.
+              </p>
+              <div class="mt-3 text-[11px] text-kaede-muted">
+                <span class="inline-flex items-center gap-1"
+                  ><span class="size-1.5 rounded-full bg-kaede-primary"></span> Agent Config</span
+                >
+              </div>
+            </div>
+
+            <!-- KAEDE -->
+            <div class="glass rounded-xl p-5 border-t-2 border-t-kaede-danger">
+              <div
+                class="flex items-center justify-center size-10 rounded-lg bg-kaede-danger/20 text-kaede-danger mb-3"
+              >
+                <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold">KAEDE</h3>
+              <p class="text-xs text-kaede-muted mt-1 leading-relaxed">
+                <strong class="text-kaede-text">Trello ↔ MCP</strong> bridge. Trello Power-Up connecting team planning
+                with agentic execution. Also the ecosystem's information hub.
+              </p>
+              <div class="mt-3 text-[11px] text-kaede-muted">
+                <span class="inline-flex items-center gap-1"
+                  ><span class="size-1.5 rounded-full bg-kaede-danger"></span> Integration Bridge</span
+                >
+              </div>
+            </div>
           </div>
-          <div class="glass rounded-lg p-4">
-            <div class="text-sm font-semibold">Project Context</div>
-            <p class="text-xs text-kaede-muted mt-1">
-              File <code class="text-[10px]">SHARED/project-context.md</code> dan
-              <code class="text-[10px]">SHARED/agent-rules.md</code> memberi tahu AI
-              tentang stack teknis, tim, aturan main, dan kebiasaan repo tersebut.
+
+          <!-- how they connect -->
+          <div class="mt-12 glass rounded-xl p-6 sm:p-8 text-center">
+            <h3 class="text-sm font-semibold mb-4">How They Connect?</h3>
+            <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-medium">
+              <span class="px-3 py-1.5 rounded-md bg-kaede-warning/20 text-kaede-warning">Playbook</span>
+              <svg
+                class="size-4 text-kaede-muted shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+              <span class="px-3 py-1.5 rounded-md bg-kaede-success/20 text-kaede-success">OpenKB</span>
+              <svg
+                class="size-4 text-kaede-muted shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+              <span class="px-3 py-1.5 rounded-md bg-kaede-primary/20 text-kaede-primary">OpenCode</span>
+              <svg
+                class="size-4 text-kaede-muted shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+              <span class="px-3 py-1.5 rounded-md bg-kaede-danger/20 text-kaede-danger">KAEDE</span>
+              <svg
+                class="size-4 text-kaede-muted shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+              <span class="px-3 py-1.5 rounded-md border border-kaede-border text-kaede-muted">Trello</span>
+            </div>
+            <p class="mt-4 text-xs text-kaede-muted leading-relaxed max-w-lg mx-auto">
+              Humans write guidelines in <strong>Playbook</strong> → AI reads context from <strong>OpenKB</strong> →
+              Agent is configured via <strong>OpenCode</strong> → <strong>KAEDE</strong> connects everything to Trello.
             </p>
           </div>
         </div>
-      </div>
-      <div>
-        <div class="glass rounded-xl p-5">
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Example Structure</h4>
-          <div class="code-block">
-            .opencode/<br/>
-            ├── opencode.json&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># 4 agent types + permissions</span><br/>
-            └── SHARED/<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp; ├── project-context.md <span class="cm"># Stack, team, repo</span><br/>
-            &nbsp;&nbsp;&nbsp;&nbsp; └── agent-rules.md&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Agent rules</span>
+      </section>
+
+      <!-- ── OpenKB ── -->
+      <section id="openkb" class="py-24 px-4 sm:px-6 max-w-6xl mx-auto fade-in">
+        <div class="grid md:grid-cols-2 gap-12 items-start">
+          <div>
+            <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-success">Protocol</span>
+            <h2 class="text-3xl sm:text-4xl font-bold mt-2 leading-tight">OpenKB</h2>
+            <p class="text-kaede-muted mt-1">Open Knowledge Base — AI ↔ Human communication language</p>
+            <p class="mt-4 text-kaede-muted leading-relaxed">
+              OpenKB is a protocol that enables <strong class="text-kaede-text">AI Agents</strong> and
+              <strong class="text-kaede-text">humans</strong> to share context bidirectionally. Stored as a
+              <code class="text-kaede-success text-[11px] font-mono">.openkb/</code> directory in each repository.
+            </p>
+            <p class="mt-3 text-kaede-muted leading-relaxed">Two storage spaces:</p>
+            <div class="mt-4 space-y-3">
+              <div class="glass rounded-lg p-4">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-kaede-success/20 text-kaede-success"
+                    >Tracked</span
+                  >
+                  <span class="text-sm font-semibold">SHARED/</span>
+                </div>
+                <p class="text-xs text-kaede-muted mt-1">
+                  Term glossary, external references, architectural decisions (decision-log). Committed to git —
+                  readable by everyone and AI.
+                </p>
+              </div>
+              <div class="glass rounded-lg p-4">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-kaede-warning/20 text-kaede-warning"
+                    >Gitignored</span
+                  >
+                  <span class="text-sm font-semibold">PERSONAL/</span>
+                </div>
+                <p class="text-xs text-kaede-muted mt-1">
+                  Personal notes, local preferences, experiments. Individual only — not in git, not readable by others.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="glass rounded-xl p-5">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Directory Structure</h4>
+              <div class="code-block">
+                <span class="cm"># Each repo can have this:</span><br />
+                .openkb/<br />
+                ├── SHARED/<br />
+                │&nbsp;&nbsp; ├── glossary.md&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"
+                  ># Terms &amp; abbreviations</span
+                ><br />
+                │&nbsp;&nbsp; ├── references.md&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Links &amp; references</span
+                ><br />
+                │&nbsp;&nbsp; ├── decision-log.md&nbsp;&nbsp;<span class="cm"># Architecture decisions</span><br />
+                │&nbsp;&nbsp; └── project-context.md <span class="cm"># Project context</span><br />
+                └── PERSONAL/<br />
+                &nbsp;&nbsp;&nbsp;&nbsp; └── .gitignore&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"
+                  ># Not tracked</span
+                >
+              </div>
+            </div>
+            <div class="mt-4 glass rounded-xl p-5">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Communication Flow</h4>
+              <div class="text-xs text-kaede-muted space-y-2">
+                <div class="flex items-start gap-2">
+                  <span class="text-kaede-success shrink-0">→</span>
+                  <span
+                    ><strong class="text-kaede-text">AI reads OpenKB</strong> before assisting — understands context,
+                    terms, rules.</span
+                  >
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-kaede-success shrink-0">→</span>
+                  <span
+                    ><strong class="text-kaede-text">Humans write OpenKB</strong> — record decisions, update glossary,
+                    add references.</span
+                  >
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-kaede-success shrink-0">→</span>
+                  <span
+                    ><strong class="text-kaede-text">Bidirectional</strong> — AI can suggest updates to OpenKB, humans
+                    review and approve.</span
+                  >
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="mt-4 glass rounded-xl p-5">
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Integration with KAEDE</h4>
-          <p class="text-xs text-kaede-muted leading-relaxed">
-            Through <strong class="text-kaede-text">MCP (Model Context Protocol)</strong>,
-            OpenCode can call KAEDE to read and write Trello data —
-            creating cards, updating labels, checking assignments — directly from
-            conversations with the AI Agent.
+      </section>
+
+      <!-- ── Playbook ── -->
+      <section id="playbook" class="py-24 px-4 sm:px-6 bg-kaede-surface/30 fade-in">
+        <div class="max-w-6xl mx-auto">
+          <div class="grid md:grid-cols-2 gap-12 items-start">
+            <div>
+              <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-warning">Guide</span>
+              <h2 class="text-3xl sm:text-4xl font-bold mt-2 leading-tight">Playbook</h2>
+              <p class="text-kaede-muted mt-1">Operational standards for humans</p>
+              <p class="mt-4 text-kaede-muted leading-relaxed">
+                A Playbook is a collection of <strong class="text-kaede-text">human-to-human</strong> documents
+                containing standards, workflows, and SOPs for the Koneksi team. Stored in a separate repository:
+                <code class="text-kaede-warning text-[11px] font-mono">{org}/playbook</code>.
+              </p>
+              <div class="mt-4 space-y-2">
+                <div class="flex items-start gap-2 text-sm text-kaede-muted">
+                  <span class="text-kaede-warning mt-0.5">📋</span>
+                  <span>Philosophy &amp; engineering principles</span>
+                </div>
+                <div class="flex items-start gap-2 text-sm text-kaede-muted">
+                  <span class="text-kaede-warning mt-0.5">📋</span>
+                  <span>Git &amp; GitHub workflow (branching, PR, commit)</span>
+                </div>
+                <div class="flex items-start gap-2 text-sm text-kaede-muted">
+                  <span class="text-kaede-warning mt-0.5">📋</span>
+                  <span>Trello integration — from card to code</span>
+                </div>
+                <div class="flex items-start gap-2 text-sm text-kaede-muted">
+                  <span class="text-kaede-warning mt-0.5">📋</span>
+                  <span>New team member onboarding</span>
+                </div>
+                <div class="flex items-start gap-2 text-sm text-kaede-muted">
+                  <span class="text-kaede-warning mt-0.5">📋</span>
+                  <span>Quality standard &amp; code review</span>
+                </div>
+              </div>
+            </div>
+            <div class="glass rounded-xl p-5">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Playbook vs OpenKB</h4>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                  <thead>
+                    <tr class="border-b border-kaede-border">
+                      <th class="text-left py-2 pr-3 font-semibold text-kaede-text">Aspect</th>
+                      <th class="text-left py-2 pr-3 font-semibold text-kaede-warning">Playbook</th>
+                      <th class="text-left py-2 font-semibold text-kaede-success">OpenKB</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-kaede-muted">
+                    <tr class="border-b border-kaede-border/50">
+                      <td class="py-2 pr-3 text-kaede-text">Audience</td>
+                      <td class="py-2 pr-3">Humans</td>
+                      <td class="py-2">AI Agent + Humans</td>
+                    </tr>
+                    <tr class="border-b border-kaede-border/50">
+                      <td class="py-2 pr-3 text-kaede-text">Location</td>
+                      <td class="py-2 pr-3">Own repository</td>
+                      <td class="py-2">Inside each repo</td>
+                    </tr>
+                    <tr class="border-b border-kaede-border/50">
+                      <td class="py-2 pr-3 text-kaede-text">Format</td>
+                      <td class="py-2 pr-3">Narrative documentation</td>
+                      <td class="py-2">Standard directory structure</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 pr-3 text-kaede-text">Scope</td>
+                      <td class="py-2 pr-3">Org-wide</td>
+                      <td class="py-2">Per repo</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── OpenCode ── -->
+      <section id="opencode" class="py-24 px-4 sm:px-6 max-w-6xl mx-auto fade-in">
+        <div class="grid md:grid-cols-2 gap-12 items-start">
+          <div>
+            <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">Configuration</span>
+            <h2 class="text-3xl sm:text-4xl font-bold mt-2 leading-tight">OpenCode</h2>
+            <p class="text-kaede-muted mt-1">AI Agent configuration per repository</p>
+            <p class="mt-4 text-kaede-muted leading-relaxed">
+              OpenCode is the AI Agent tool used by the Koneksi team. Each repository can have an
+              <code class="text-kaede-primary text-[11px] font-mono">.opencode/</code>
+              directory that configures how AI Agents behave in that repo.
+            </p>
+            <div class="mt-4 space-y-3">
+              <div class="glass rounded-lg p-4">
+                <div class="text-sm font-semibold">Agent Types</div>
+                <p class="text-xs text-kaede-muted mt-1">
+                  Each repo has several <em>agents</em> with different roles:
+                  <code class="text-[10px]">build</code> (execution), <code class="text-[10px]">plan</code> (planning),
+                  <code class="text-[10px]">review</code> (review),
+                  <code class="text-[10px]">docs</code> (documentation). Each has different permissions.
+                </p>
+              </div>
+              <div class="glass rounded-lg p-4">
+                <div class="text-sm font-semibold">Project Context</div>
+                <p class="text-xs text-kaede-muted mt-1">
+                  Files like <code class="text-[10px]">SHARED/project-context.md</code> and
+                  <code class="text-[10px]">SHARED/agent-rules.md</code> inform the AI about the tech stack, team,
+                  rules, and repo conventions.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="glass rounded-xl p-5">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">Example Structure</h4>
+              <div class="code-block">
+                .opencode/<br />
+                ├── opencode.json&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"
+                  ># 4 agent types + permissions</span
+                ><br />
+                └── SHARED/<br />
+                &nbsp;&nbsp;&nbsp;&nbsp; ├── project-context.md <span class="cm"># Stack, team, repo</span><br />
+                &nbsp;&nbsp;&nbsp;&nbsp; └── agent-rules.md&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Agent rules</span>
+              </div>
+            </div>
+            <div class="mt-4 glass rounded-xl p-5">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-kaede-muted mb-3">
+                Integration with KAEDE
+              </h4>
+              <p class="text-xs text-kaede-muted leading-relaxed">
+                Through <strong class="text-kaede-text">MCP (Model Context Protocol)</strong>, OpenCode can call KAEDE
+                to read and write Trello data — creating cards, updating labels, checking assignments — directly from
+                conversations with the AI Agent.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Alur Kerja (TACO) ── -->
+      <section id="alur" class="py-24 px-4 sm:px-6 bg-kaede-surface/30 fade-in">
+        <div class="max-w-6xl mx-auto">
+          <div class="text-center mb-12">
+            <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">Workflow</span>
+            <h2 class="text-3xl sm:text-4xl font-bold mt-2">Team Agentic Coding Operation</h2>
+            <p class="mt-3 text-kaede-muted max-w-xl mx-auto">
+              Koneksi runs development with a <strong class="text-kaede-text">Human In The Loop</strong>
+              (HITL) approach — AI Agents assist execution, humans remain in control.
+            </p>
+          </div>
+
+          <!-- timeline -->
+          <div class="relative max-w-3xl mx-auto">
+            <!-- vertical line -->
+            <div class="absolute left-4.75 top-0 bottom-0 w-px bg-kaede-border"></div>
+
+            <!-- step 1 -->
+            <div class="relative pl-12 pb-10">
+              <div
+                class="absolute left-3 top-0 size-8 rounded-full bg-kaede-warning/20 border-2 border-kaede-warning flex items-center justify-center"
+              >
+                <span class="text-xs font-bold text-kaede-warning">1</span>
+              </div>
+              <div class="glass rounded-xl p-5">
+                <h3 class="text-sm font-semibold flex items-center gap-2">
+                  <span>Planning</span>
+                  <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-warning/20 text-kaede-warning"
+                    >Product + BA</span
+                  >
+                </h3>
+                <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
+                  Product Manager and Business Analyst define requirements in Trello: creating cards, setting
+                  priorities, attaching context. Each card can be assigned an environment label
+                  (Production/Staging/Development) via the KAEDE Power-Up.
+                </p>
+              </div>
+            </div>
+
+            <!-- step 2 -->
+            <div class="relative pl-12 pb-10">
+              <div
+                class="absolute left-3 top-0 size-8 rounded-full bg-kaede-success/20 border-2 border-kaede-success flex items-center justify-center"
+              >
+                <span class="text-xs font-bold text-kaede-success">2</span>
+              </div>
+              <div class="glass rounded-xl p-5">
+                <h3 class="text-sm font-semibold flex items-center gap-2">
+                  <span>AI Context</span>
+                  <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-success/20 text-kaede-success"
+                    >OpenKB</span
+                  >
+                </h3>
+                <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
+                  Before starting, the AI Agent reads <strong>OpenKB</strong> and <strong>OpenCode</strong> in the
+                  repository to understand the context: project terms, architectural decisions, tech stack, rules. The
+                  Agent can also read related Trello cards via KAEDE.
+                </p>
+              </div>
+            </div>
+
+            <!-- step 3 -->
+            <div class="relative pl-12 pb-10">
+              <div
+                class="absolute left-3 top-0 size-8 rounded-full bg-kaede-primary/20 border-2 border-kaede-primary flex items-center justify-center"
+              >
+                <span class="text-xs font-bold text-kaede-primary">3</span>
+              </div>
+              <div class="glass rounded-xl p-5">
+                <h3 class="text-sm font-semibold flex items-center gap-2">
+                  <span>Execution</span>
+                  <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-primary/20 text-kaede-primary"
+                    >Developer + Agent</span
+                  >
+                </h3>
+                <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
+                  Developers (Frontend, Backend, UI/UX, Junior) work with the assistance of AI Agents. The Agent helps
+                  write code, check patterns, run tests. The Developer stays in control — AI is a
+                  <em>pair programmer</em>, not a replacement.
+                </p>
+              </div>
+            </div>
+
+            <!-- step 4 -->
+            <div class="relative pl-12 pb-10">
+              <div
+                class="absolute left-3 top-0 size-8 rounded-full bg-kaede-danger/20 border-2 border-kaede-danger flex items-center justify-center"
+              >
+                <span class="text-xs font-bold text-kaede-danger">4</span>
+              </div>
+              <div class="glass rounded-xl p-5">
+                <h3 class="text-sm font-semibold flex items-center gap-2">
+                  <span>Review</span>
+                  <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-danger/20 text-kaede-danger"
+                    >Senior (HITL)</span
+                  >
+                </h3>
+                <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
+                  <strong>Human In The Loop</strong> — Senior Developer reviews all changes before merging. Ensures
+                  quality, consistency, and security. AI Agents assist with review (static analysis, pattern check) but
+                  the final decision remains with the human.
+                </p>
+              </div>
+            </div>
+
+            <!-- step 5 -->
+            <div class="relative pl-12">
+              <div
+                class="absolute left-3 top-0 size-8 rounded-full bg-kaede-text/20 border-2 border-kaede-text flex items-center justify-center"
+              >
+                <span class="text-xs font-bold text-kaede-text">5</span>
+              </div>
+              <div class="glass rounded-xl p-5">
+                <h3 class="text-sm font-semibold flex items-center gap-2">
+                  <span>Deploy &amp; Report</span>
+                  <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-text/20 text-kaede-text"
+                    >CI/CD</span
+                  >
+                </h3>
+                <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
+                  After merging, it is automatically deployed. Trello cards are updated — status, environment, deploy
+                  links. Everything is documented in the OpenKB decision-log for future context.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Panduan Power-Up ── -->
+      <section id="panduan" class="py-24 px-4 sm:px-6 max-w-6xl mx-auto fade-in">
+        <div class="text-center mb-12">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">Guide</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mt-2">Using KAEDE Power-Up</h2>
+          <p class="mt-3 text-kaede-muted max-w-xl mx-auto">
+            How to install and use KAEDE on your Koneksi team Trello.
           </p>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ── Alur Kerja (TACO) ── -->
-  <section id="alur" class="py-24 px-4 sm:px-6 bg-kaede-surface/30 fade-in">
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-12">
-        <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">Workflow</span>
-        <h2 class="text-3xl sm:text-4xl font-bold mt-2">Team Agentic Coding Operation</h2>
-        <p class="mt-3 text-kaede-muted max-w-xl mx-auto">
-          Koneksi menjalankan pengembangan dengan pendekatan <strong class="text-kaede-text">Human In The Loop</strong>
-          (HITL) — AI Agent membantu eksekusi, manusia tetap memegang kendali.
-        </p>
-      </div>
-
-      <!-- timeline -->
-      <div class="relative max-w-3xl mx-auto">
-        <!-- vertical line -->
-        <div class="absolute left-[19px] top-0 bottom-0 w-px bg-kaede-border"></div>
-
-        <!-- step 1 -->
-        <div class="relative pl-12 pb-10">
-          <div class="absolute left-3 top-0 size-8 rounded-full bg-kaede-warning/20 border-2 border-kaede-warning flex items-center justify-center">
-            <span class="text-xs font-bold text-kaede-warning">1</span>
-          </div>
-          <div class="glass rounded-xl p-5">
-            <h3 class="text-sm font-semibold flex items-center gap-2">
-              <span>Perencanaan</span>
-              <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-warning/20 text-kaede-warning">Product + BA</span>
-            </h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- 1 -->
+          <div class="glass rounded-xl p-5 text-center">
+            <div
+              class="flex items-center justify-center size-10 mx-auto rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3 text-sm font-bold"
+            >
+              1
+            </div>
+            <h3 class="text-sm font-semibold">Install Power-Up</h3>
             <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
-              Product Manager dan Business Analyst menyusun kebutuhan di Trello:
-              membuat kartu, menentukan prioritas, melampirkan konteks.
-              Setiap kartu bisa diberi label environment (Production/Staging/Development)
-              melalui KAEDE Power-Up.
+              Open <code class="text-[10px]">trello.com/power-ups/admin</code>, click <strong>Create</strong> or add an
+              existing KAEDE registration. Enter the URL:
+              <code class="text-[10px] break-all">https://kaede-powerup.netlify.app</code>
             </p>
           </div>
-        </div>
-
-        <!-- step 2 -->
-        <div class="relative pl-12 pb-10">
-          <div class="absolute left-3 top-0 size-8 rounded-full bg-kaede-success/20 border-2 border-kaede-success flex items-center justify-center">
-            <span class="text-xs font-bold text-kaede-success">2</span>
-          </div>
-          <div class="glass rounded-xl p-5">
-            <h3 class="text-sm font-semibold flex items-center gap-2">
-              <span>Konteks AI</span>
-              <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-success/20 text-kaede-success">OpenKB</span>
-            </h3>
+          <!-- 2 -->
+          <div class="glass rounded-xl p-5 text-center">
+            <div
+              class="flex items-center justify-center size-10 mx-auto rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3 text-sm font-bold"
+            >
+              2
+            </div>
+            <h3 class="text-sm font-semibold">Enable on Board</h3>
             <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
-              Sebelum memulai, AI Agent membaca <strong>OpenKB</strong> dan
-              <strong>OpenCode</strong> di repositori untuk memahami konteks:
-              istilah proyek, keputusan arsitektur, stack teknis, aturan main.
-              Agent juga bisa membaca kartu Trello terkait melalui KAEDE.
+              Open your team Trello board → <strong>Power-Ups</strong> → search for "KAEDE" → <strong>Enable</strong>.
+              The KAEDE button will appear in the board header.
             </p>
           </div>
-        </div>
-
-        <!-- step 3 -->
-        <div class="relative pl-12 pb-10">
-          <div class="absolute left-3 top-0 size-8 rounded-full bg-kaede-primary/20 border-2 border-kaede-primary flex items-center justify-center">
-            <span class="text-xs font-bold text-kaede-primary">3</span>
-          </div>
-          <div class="glass rounded-xl p-5">
-            <h3 class="text-sm font-semibold flex items-center gap-2">
-              <span>Eksekusi</span>
-              <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-primary/20 text-kaede-primary">Developer + Agent</span>
-            </h3>
+          <!-- 3 -->
+          <div class="glass rounded-xl p-5 text-center">
+            <div
+              class="flex items-center justify-center size-10 mx-auto rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3 text-sm font-bold"
+            >
+              3
+            </div>
+            <h3 class="text-sm font-semibold">Manage Environment</h3>
             <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
-              Developer (Frontend, Backend, UI/UX, Junior) bekerja dengan bantuan
-              AI Agent. Agent membantu menulis kode, mengecek pattern, menjalankan test.
-              Developer tetap memegang kendali — AI adalah <em>pair programmer</em>,
-              bukan pengganti.
+              Open a card → click <strong>KAEDE: Environment</strong> → select Production / Staging / Development. A
+              badge will appear on the card face.
             </p>
           </div>
         </div>
 
-        <!-- step 4 -->
-        <div class="relative pl-12 pb-10">
-          <div class="absolute left-3 top-0 size-8 rounded-full bg-kaede-danger/20 border-2 border-kaede-danger flex items-center justify-center">
-            <span class="text-xs font-bold text-kaede-danger">4</span>
+        <div class="mt-10 glass rounded-xl p-6 sm:p-8 text-center">
+          <h3 class="text-sm font-semibold flex items-center justify-center gap-2">
+            MCP Integration
+            <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-success/20 text-kaede-success">Live</span>
+          </h3>
+          <p class="text-xs text-kaede-muted mt-2 leading-relaxed max-w-lg mx-auto">
+            The KAEDE MCP Server is active. AI Agents in OpenCode can read and write Trello directly — all 22 tools are
+            available via
+            <code class="text-[10px]">dist/mcp-server.js</code>.
+          </p>
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-kaede-muted">
+            <span class="px-2.5 py-1 rounded bg-kaede-success/20 text-kaede-success">22 Tools</span>
+            <span class="px-2.5 py-1 rounded bg-kaede-border/50">Boards</span>
+            <span class="px-2.5 py-1 rounded bg-kaede-border/50">Lists</span>
+            <span class="px-2.5 py-1 rounded bg-kaede-border/50">Cards</span>
+            <span class="px-2.5 py-1 rounded bg-kaede-border/50">Members</span>
+            <span class="px-2.5 py-1 rounded bg-kaede-border/50">Labels</span>
+            <span class="px-2.5 py-1 rounded bg-kaede-border/50">Comments</span>
           </div>
-          <div class="glass rounded-xl p-5">
-            <h3 class="text-sm font-semibold flex items-center gap-2">
-              <span>Review</span>
-              <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-danger/20 text-kaede-danger">Senior (HITL)</span>
-            </h3>
-            <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
-              <strong>Human In The Loop</strong> — Senior Developer me-review semua
-              perubahan sebelum di-merge. Memastikan kualitas, konsistensi, dan
-              keamanan. AI Agent membantu review (static analysis, pattern check)
-              tapi keputusan akhir tetap di tangan manusia.
-            </p>
-          </div>
-        </div>
-
-        <!-- step 5 -->
-        <div class="relative pl-12">
-          <div class="absolute left-3 top-0 size-8 rounded-full bg-kaede-text/20 border-2 border-kaede-text flex items-center justify-center">
-            <span class="text-xs font-bold text-kaede-text">5</span>
-          </div>
-          <div class="glass rounded-xl p-5">
-            <h3 class="text-sm font-semibold flex items-center gap-2">
-              <span>Deploy &amp; Laporkan</span>
-              <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-text/20 text-kaede-text">CI/CD</span>
-            </h3>
-            <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
-              Setelah di-merge, otomatis terdeploy. Kartu Trello diupdate —
-              status, environment, link deploy. Semua terdokumentasi di
-              decision-log OpenKB untuk konteks masa depan.
-            </p>
+          <div class="mt-4 text-[11px] text-kaede-muted">
+            <code class="text-[10px] px-2 py-1 rounded bg-kaede-surface">bun dist/mcp-server.js</code>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- ── Footer ── -->
+      <kaede-footer></kaede-footer>
     </div>
-  </section>
+    <!-- /kaede-site -->
 
-  <!-- ── Panduan Power-Up ── -->
-  <section id="panduan" class="py-24 px-4 sm:px-6 max-w-6xl mx-auto fade-in">
-    <div class="text-center mb-12">
-      <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-primary">Panduan</span>
-      <h2 class="text-3xl sm:text-4xl font-bold mt-2">Menggunakan KAEDE Power-Up</h2>
-      <p class="mt-3 text-kaede-muted max-w-xl mx-auto">
-        Cara menginstall dan memanfaatkan KAEDE di Trello tim Koneksi.
-      </p>
-    </div>
-
-    <div class="grid md:grid-cols-3 gap-6">
-      <!-- 1 -->
-      <div class="glass rounded-xl p-5 text-center">
-        <div class="flex items-center justify-center size-10 mx-auto rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3 text-sm font-bold">1</div>
-        <h3 class="text-sm font-semibold">Install Power-Up</h3>
-        <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
-          Open <code class="text-[10px]">trello.com/power-ups/admin</code>,
-          klik <strong>Create</strong> atau tambahkan KAEDE yang sudah didaftarkan.
-          Masukkan URL: <code class="text-[10px] break-all">https://kaede-powerup.netlify.app</code>
-        </p>
-      </div>
-      <!-- 2 -->
-      <div class="glass rounded-xl p-5 text-center">
-        <div class="flex items-center justify-center size-10 mx-auto rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3 text-sm font-bold">2</div>
-        <h3 class="text-sm font-semibold">Aktifkan di Board</h3>
-        <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
-          Buka board Trello tim → <strong>Power-Ups</strong> → cari "KAEDE" →
-          <strong>Enable</strong>. Tombol KAEDE akan muncul di header board.
-        </p>
-      </div>
-      <!-- 3 -->
-      <div class="glass rounded-xl p-5 text-center">
-        <div class="flex items-center justify-center size-10 mx-auto rounded-lg bg-kaede-primary/20 text-kaede-primary mb-3 text-sm font-bold">3</div>
-        <h3 class="text-sm font-semibold">Kelola Environment</h3>
-        <p class="text-xs text-kaede-muted mt-2 leading-relaxed">
-          Buka kartu → klik <strong>KAEDE: Environment</strong> →
-          pilih Production / Staging / Development.
-          Badge akan muncul di muka kartu.
-        </p>
-      </div>
-    </div>
-
-    <div class="mt-10 glass rounded-xl p-6 sm:p-8 text-center">
-      <h3 class="text-sm font-semibold flex items-center justify-center gap-2">
-        Integrasi MCP
-        <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-kaede-success/20 text-kaede-success">Live</span>
-      </h3>
-      <p class="text-xs text-kaede-muted mt-2 leading-relaxed max-w-lg mx-auto">
-        The KAEDE MCP Server is active. AI Agents in OpenCode can read and write
-        Trello directly — all 22 tools are available via
-        <code class="text-[10px]">dist/mcp-server.js</code>.
-      </p>
-      <div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-kaede-muted">
-        <span class="px-2.5 py-1 rounded bg-kaede-success/20 text-kaede-success">22 Tools</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Boards</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Lists</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Cards</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Members</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Labels</span>
-        <span class="px-2.5 py-1 rounded bg-kaede-border/50">Comments</span>
-      </div>
-      <div class="mt-4 text-[11px] text-kaede-muted">
-        <code class="text-[10px] px-2 py-1 rounded bg-kaede-surface">bun dist/mcp-server.js</code>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Footer ── -->
-  <kaede-footer></kaede-footer>
-
-</div><!-- /kaede-site -->
-
-<!-- ===================================================================
+    <!-- ===================================================================
      JavaScript
      =================================================================== -->
-<script src="https://p.trellocdn.net/power-up.min.js"></script>
-<script src="js/kaede.js"></script>
-<script>
-(function () {
-  'use strict';
+    <script src="https://p.trellocdn.net/power-up.min.js"></script>
+    <script src="js/kaede.js"></script>
+    <script>
+      (function () {
+        'use strict';
 
-  var isIframe = window.self !== window.top;
-  var observer;
+        var isIframe = window.self !== window.top;
+        var observer;
 
-  var iframeRoot = document.getElementById('kaede-iframe');
-  var siteRoot   = document.getElementById('kaede-site');
+        var iframeRoot = document.getElementById('kaede-iframe');
+        var siteRoot = document.getElementById('kaede-site');
 
-  if (isIframe) {
-    // --- Trello Power-Up mode: iframe visible (init handled by kaede.js) ---
-    iframeRoot.classList.remove('hidden');
-    iframeRoot.classList.add('flex');
-    siteRoot.classList.add('hidden');
+        if (isIframe) {
+          // --- Trello Power-Up mode: iframe visible (init handled by kaede.js) ---
+          iframeRoot.classList.remove('hidden');
+          iframeRoot.classList.add('flex');
+          siteRoot.classList.add('hidden');
+        } else {
+          // --- Full site mode ---
+          iframeRoot.classList.add('hidden');
+          siteRoot.classList.remove('hidden');
 
-  } else {
-    // --- Full site mode ---
-    iframeRoot.classList.add('hidden');
-    siteRoot.classList.remove('hidden');
+          // ── Scroll-triggered fade-in ──
+          observer = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('visible');
+                  observer.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.1 },
+          );
 
-    // ── Scroll-triggered fade-in ──
-    observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
+          document.querySelectorAll('.fade-in').forEach(function (el) {
+            observer.observe(el);
+          });
+
+          // ── Smooth scroll for anchor links ──
+          document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+            a.addEventListener('click', function (e) {
+              var target = document.querySelector(this.getAttribute('href'));
+              if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            });
+          });
+
+          console.log('[KAEDE] Site mode ready.');
         }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.fade-in').forEach(function (el) {
-      observer.observe(el);
-    });
-
-    // ── Smooth scroll for anchor links ──
-    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        var target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
-
-    console.log('[KAEDE] Site mode ready.');
-  }
-})();
-</script>
-
-</body>
+      })();
+    </script>
+  </body>
 </html>
