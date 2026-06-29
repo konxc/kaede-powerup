@@ -2,9 +2,9 @@
 
 /**
  * KAEDE MCP - Get Test Card ID
- * 
+ *
  * Helper script untuk mendapatkan card ID dari test board.
- * 
+ *
  * Usage:
  *   node test/get-test-card.js
  */
@@ -39,7 +39,7 @@ function loadEnv(path) {
 function getSecrets() {
   const global = resolve(homedir(), '.config', 'kaede', 'secrets.env');
   const local = resolve(process.cwd(), 'secrets.env');
-  
+
   let merged = {};
   for (const p of [local, global]) {
     merged = { ...merged, ...loadEnv(p) };
@@ -76,7 +76,7 @@ async function main() {
   const env = getSecrets();
   if (!env.TRELLO_API_KEY || !env.TRELLO_TOKEN) {
     printError('TRELLO_API_KEY or TRELLO_TOKEN not configured');
-    console.error('    Run: node scripts/kaede.mjs setup');
+    console.error('    Run: bun scripts/kaede.mjs setup');
     process.exit(1);
   }
   printSuccess('Credentials loaded from global config');
@@ -103,9 +103,9 @@ async function main() {
     for (const list of lists) {
       console.log(`  List: ${list.name}`);
       printSeparator();
-      
+
       const cards = await client.getCardsByListId(list.id);
-      
+
       if (cards.length === 0) {
         console.log('    (no cards)');
       } else {
@@ -124,7 +124,7 @@ async function main() {
     console.log('  ──────────────────────────────────────');
     console.log('  Usage:');
     console.log('');
-    
+
     const allCards = [];
     for (const list of lists) {
       const cards = await client.getCardsByListId(list.id);

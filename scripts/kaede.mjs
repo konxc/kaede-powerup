@@ -116,12 +116,11 @@ async function cmdSetup() {
 async function cmdToday() {
   const secrets = getSecrets();
   if (!secrets.TRELLO_API_KEY || !secrets.TRELLO_TOKEN) {
-    console.error('  \x1b[31m  ✗ Trello credentials not found.\x1b[0m');
-    console.error('  \x1b[33m  Run `node scripts/kaede.mjs setup` first.\x1b[0m');
+    console.error('  \x1b[31m  \u2717 Trello credentials not found.\x1b[0m');
+    console.error('  \x1b[33m  Run `bun scripts/kaede.mjs setup` first.\x1b[0m');
     return;
   }
 
-  const { TRELLO_API_KEY, TRELLO_TOKEN } = secrets;
   const apiBase = 'https://api.trello.com/1';
   const auth = `key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`;
 
@@ -769,7 +768,7 @@ async function cmdStatus() {
 
   console.log('');
   if (!apiKeyOk || !tokenOk) {
-    console.log('  \x1b[33m  Run `node scripts/kaede.mjs setup` to configure.\x1b[0m');
+    console.log('  \x1b[33m  Run `bun scripts/kaede.mjs setup` to configure.\x1b[0m');
     console.log('');
   }
 }
@@ -1165,8 +1164,8 @@ async function cmdStart() {
 async function cmdTestTools() {
   const secrets = getSecrets();
   if (!secrets.TRELLO_API_KEY || !secrets.TRELLO_TOKEN) {
-    console.error('  \x1b[31m  ✗ Trello credentials not found.\x1b[0m');
-    console.error('  \x1b[33m  Run `node scripts/kaede.mjs setup` first.\x1b[0m');
+    console.error('  \x1b[31m  \u2717 Trello credentials not found.\x1b[0m');
+    console.error('  \x1b[33m  Run `bun scripts/kaede.mjs setup` first.\x1b[0m');
     return;
   }
 
@@ -1236,7 +1235,7 @@ function cmdHelp() {
   console.log('  \x1b[90mCLI tool untuk manajemen Trello & AI Agent\x1b[0m');
   console.log('');
   console.log('  \x1b[37mUsage:\x1b[0m');
-  console.log('    node scripts/kaede.mjs \x1b[36m<command>\x1b[0m');
+  console.log('    bun scripts/kaede.mjs \x1b[36m<command>\x1b[0m');
   console.log('');
   console.log('  \x1b[37mCommands:\x1b[0m');
   console.log('    \x1b[36msetup\x1b[0m     \x1b[90mKonfigurasi Trello API Key & Token\x1b[0m');

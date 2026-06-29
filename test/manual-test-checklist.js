@@ -2,7 +2,7 @@
 
 /**
  * KAEDE MCP - Checklist Tools Manual Test
- * 
+ *
  * Usage:
  *   node test/manual-test-checklist.js
  */
@@ -37,7 +37,7 @@ function loadEnv(path) {
 function getSecrets() {
   const global = resolve(homedir(), '.config', 'kaede', 'secrets.env');
   const local = resolve(process.cwd(), 'secrets.env');
-  
+
   let merged = {};
   for (const p of [local, global]) {
     merged = { ...merged, ...loadEnv(p) };
@@ -71,20 +71,20 @@ async function testGetChecklists(client, cardId) {
   try {
     const result = await client.getCardChecklists(cardId);
     console.log(`  Found ${result.checklists.length} checklist(s)`);
-    
+
     if (result.checklists.length > 0) {
       result.checklists.forEach((cl, i) => {
         console.log(`    [${i + 1}] ${cl.name}`);
         console.log(`        Items: ${cl.itemCount}`);
         if (cl.items.length > 0) {
-          cl.items.forEach(item => {
+          cl.items.forEach((item) => {
             const checkMark = item.checked ? '✓' : ' ';
             console.log(`          - [${checkMark}] ${item.name}`);
           });
         }
       });
     }
-    
+
     return { success: true, checklists: result.checklists };
   } catch (error) {
     printError(`Failed: ${error.message}`);
@@ -127,7 +127,7 @@ async function main() {
   const env = getSecrets();
   if (!env.TRELLO_API_KEY || !env.TRELLO_TOKEN) {
     printError('TRELLO_API_KEY or TRELLO_TOKEN not configured');
-    console.error('    Run: node scripts/kaede.mjs setup');
+    console.error('    Run: bun scripts/kaede.mjs setup');
     process.exit(1);
   }
   printSuccess('Credentials loaded from global config');
@@ -155,7 +155,7 @@ async function main() {
 
     // Test get checklists
     const getResult = await testGetChecklists(client, TEST_CARD_ID);
-    
+
     if (getResult.success && getResult.checklists.length > 0) {
       const firstChecklist = getResult.checklists[0];
       if (firstChecklist.items.length > 0) {

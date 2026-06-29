@@ -2,12 +2,12 @@
 
 /**
  * KAEDE MCP - Attachments Manual Test Script
- * 
+ *
  * Script untuk manual testing attachment tools dengan test board.
- * 
+ *
  * Usage:
  *   node test/manual-test-attachments.js
- * 
+ *
  * Prerequisites:
  * - secrets.env configured
  * - MCP server built (bun run build:mcp)
@@ -46,7 +46,7 @@ function loadEnv(path) {
 function getSecrets() {
   const global = resolve(homedir(), '.config', 'kaede', 'secrets.env');
   const local = resolve(process.cwd(), 'secrets.env');
-  
+
   let merged = {};
   for (const p of [local, global]) {
     merged = { ...merged, ...loadEnv(p) };
@@ -118,7 +118,7 @@ async function testGetAttachments(client, cardId) {
   try {
     const attachments = await client.getCardAttachments(cardId);
     printSuccess(`Found ${attachments.length} attachment(s)`);
-    
+
     if (attachments.length > 0) {
       attachments.forEach((att, i) => {
         console.log(`    [${i + 1}] ${att.name}`);
@@ -171,7 +171,7 @@ async function main() {
   const env = getSecrets();
   if (!env.TRELLO_API_KEY || !env.TRELLO_TOKEN) {
     printError('TRELLO_API_KEY or TRELLO_TOKEN not configured');
-    console.error('    Run: node scripts/kaede.mjs setup');
+    console.error('    Run: bun scripts/kaede.mjs setup');
     process.exit(1);
   }
   printSuccess('Credentials loaded from global config');
@@ -218,7 +218,7 @@ async function main() {
     // Summary
     console.log('');
     printSeparator();
-    console.log(`  Tests completed: ${results.filter(r => r).length}/${results.length} passed`);
+    console.log(`  Tests completed: ${results.filter((r) => r).length}/${results.length} passed`);
     printSeparator();
     console.log('');
 

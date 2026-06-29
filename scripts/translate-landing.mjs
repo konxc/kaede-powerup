@@ -2,7 +2,7 @@
  * Translate KAEDE landing page between Indonesian and English.
  *
  * The English version (public/index.html) is the source of truth.
- * Run: node scripts/translate-landing.mjs
+ * Run: bun scripts/translate-landing.mjs
  *   --to=en   (default) translate id.html → index.html
  *   --to=id   translate index.html → id.html
  *

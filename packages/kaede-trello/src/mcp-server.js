@@ -1096,7 +1096,7 @@ const TOOLS = [
 const auth = getAuth();
 if (!auth) {
   process.stderr.write('TRELLO_API_KEY or TRELLO_TOKEN not configured\n');
-  process.stderr.write('Run `node scripts/kaede.mjs setup` to configure\n');
+  process.stderr.write('Run `bun scripts/kaede.mjs setup` to configure\n');
   process.exit(1);
 }
 

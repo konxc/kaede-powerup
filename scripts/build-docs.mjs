@@ -4,7 +4,7 @@
  * Reads docs/*.md and docs/id/*.md, renders them to HTML,
  * outputs to dist-docs/ and dist-docs/id/ for GitHub Pages.
  *
- * Usage: node scripts/build-docs.mjs
+ * Usage: bun scripts/build-docs.mjs
  */
 
 import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync } from 'fs';
