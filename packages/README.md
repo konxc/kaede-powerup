@@ -30,7 +30,7 @@ OpenCode (AI Agent)
 ```
 
 `packages/kaede-trello` adalah **lib**, bukan MCP server. Digunakan langsung oleh
-kode KAEDE (`src/trello-client.js`) sebagai fallback/penyangga untuk fitur yang
+kode KAEDE (`src/trello-client.ts`) sebagai fallback/penyangga untuk fitur yang
 belum/tidak akan tersedia di upstream.
 
 ### Alur Kontribusi ke Upstream
@@ -91,10 +91,10 @@ Lihat `packages/kaede-trello/README.md` untuk detail lebih lanjut.
 
 ## Prioritas Pemilihan MCP Server (Client)
 
-`src/trello-client.js` menggunakan urutan fallback:
+`src/trello-client.ts` menggunakan urutan fallback:
 
 1. **Global opencode.json** — command dari `~/.config/opencode/opencode.json`
-2. **packages/kaede-trello** — `packages/kaede-trello/src/mcp-server.js` (lib)
+2. **packages/kaede-trello** — `packages/kaede-trello/src/mcp-server.ts` (lib)
 3. **packages/mcp-server-trello** — `packages/mcp-server-trello/build/index.js` (compiled output)
 4. **dist/** — `dist/mcp-server.js` (built fallback)
 5. **~/.kaede/** — `~/.kaede/dist/mcp-server.js` (global install fallback)

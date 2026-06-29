@@ -1,6 +1,6 @@
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { parsePlaybook } from '../src/orchestrator.js';
+import { parsePlaybook } from '../src/orchestrator.ts';
 
 describe('parsePlaybook', () => {
   it('parses full playbook with all sections (ID)', () => {

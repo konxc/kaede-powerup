@@ -5,7 +5,7 @@
  * Manual deploy tanpa CI/CD — push ./dist-docs ke branch gh-pages.
  * Menggunakan git worktree agar tidak merusak working directory.
  *
- * Usage: bun scripts/deploy-gh-pages.mjs
+ * Usage: bun scripts/deploy-gh-pages.ts
  */
 
 import { execSync } from 'child_process';
@@ -20,24 +20,24 @@ const WORKTREE = resolve(ROOT, '.worktree-gh-pages');
 const DATE = new Date().toISOString().split('T')[0];
 const BRANCH = 'gh-pages';
 
-function run(cmd, opts = {}) {
+function run(cmd: string, opts: Record<string, unknown> = {}): void {
   console.log(`  \x1b[36m  $\x1b[0m ${cmd}`);
-  return execSync(cmd, { cwd: ROOT, stdio: 'inherit', ...opts });
+  execSync(cmd, { cwd: ROOT, stdio: 'inherit', ...opts });
 }
 
-function capture(cmd, opts = {}) {
+function capture(cmd: string, opts: Record<string, unknown> = {}): string {
   return execSync(cmd, { cwd: ROOT, encoding: 'utf-8', stdio: 'pipe', ...opts })
     .toString()
     .trim();
 }
 
-function hasBranch(name) {
+function hasBranch(name: string): boolean {
   return capture(`git --no-pager branch`)
     .split('\n')
     .some((b) => b.trim().replace('*', '').trim() === name);
 }
 
-async function main() {
+async function main(): Promise<void> {
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════════╗\x1b[0m');
   console.log('  \x1b[35m║    KAEDE — Deploy GitHub Pages           ║\x1b[0m');
@@ -82,7 +82,7 @@ async function main() {
 
     const hasChanges = capture(`git -C ${WORKTREE} status --porcelain`, { cwd: WORKTREE });
     if (!hasChanges) {
-      console.log('  \x1b[33m  ⚠  No changes — gh-pages already up to date\x1b[0m');
+      console.log('  \x1b[33m  ⚠  No changes — skipping commit (gh-pages already up to date)\x1b[0m');
     } else {
       capture(`git -C ${WORKTREE} commit -m "docs: auto-deploy ${DATE}"`, { cwd: WORKTREE, stdio: 'pipe' });
       run(`git push --force origin ${BRANCH}`);
@@ -90,19 +90,21 @@ async function main() {
       console.log('  \x1b[32m  ✅  Deployed to gh-pages! \x1b[0m');
     }
   } catch (err) {
-    console.error(`  \x1b[31m  ✗ Deploy failed: ${err.message}\x1b[0m`);
+    console.error(`  \x1b[31m  ✗ Deploy failed: ${(err as Error).message}\x1b[0m`);
     process.exit(1);
   } finally {
     // 6. Bersihkan worktree
     if (existsSync(WORKTREE)) {
       try {
         capture(`git worktree remove --force ${WORKTREE}`, { stdio: 'pipe' });
-      } catch {}
+      } catch {
+        // ignore cleanup errors
+      }
     }
   }
 }
 
-main().catch((err) => {
+main().catch((err: Error) => {
   console.error('  \x1b[31m  ✗ Fatal:', err.message, '\x1b[0m');
   process.exit(1);
 });

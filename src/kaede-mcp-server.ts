@@ -2,26 +2,38 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const VERSION = '2024-11-05';
-const SERVER = { name: 'KAEDE Orchestrator MCP', version: '1.0.0' };
+const SERVER = { name: 'KAEDE Orchestrator MCP', version: '1.0.0' as const };
 
-function send(msg) {
+interface ToolSchema {
+  name: string;
+  description: string;
+  inputSchema: {
+    type: string;
+    properties: Record<string, unknown>;
+    required: string[];
+    additionalProperties: boolean;
+    $schema: string;
+  };
+}
+
+function send(msg: Record<string, unknown>): void {
   process.stdout.write(JSON.stringify(msg) + '\n');
 }
 
-function error(id, code, message) {
+function error(id: number | string | null, code: number, message: string): void {
   send({ jsonrpc: '2.0', id, error: { code, message } });
 }
 
-function result(id, data) {
+function result(id: number | string | null, data: unknown): void {
   send({ jsonrpc: '2.0', id, result: data });
 }
 
-function toolSchema(name, description, properties = {}, required = []) {
+function toolSchema(name: string, description: string, properties: Record<string, unknown> = {}, required: string[] = []): ToolSchema {
   return {
     name,
     description,
@@ -35,7 +47,7 @@ function toolSchema(name, description, properties = {}, required = []) {
   };
 }
 
-const TOOLS = [
+const TOOLS: ToolSchema[] = [
   toolSchema(
     'parse_playbook',
     'Parse a playbook markdown document into structured data (roles, workflow lists, conventions, labels)',
@@ -83,31 +95,31 @@ const TOOLS = [
   toolSchema('status', 'Check KAEDE status — version, playbook/openkb paths accessibility'),
 ];
 
-async function handleToolsCall(name, args) {
+async function handleToolsCall(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
   if (name === 'status') {
     let playbookOk = false;
     let openkbOk = false;
-    if (args.playbookPath) {
-      playbookOk = existsSync(args.playbookPath);
+    if (args.playbookPath as string) {
+      playbookOk = existsSync(args.playbookPath as string);
     }
-    if (args.openkbPath) {
-      openkbOk = existsSync(args.openkbPath);
+    if (args.openkbPath as string) {
+      openkbOk = existsSync(args.openkbPath as string);
     }
     return { server: SERVER, playbookPathAccessible: playbookOk, openkbPathAccessible: openkbOk };
   }
 
   if (name === 'parse_playbook') {
-    const { parsePlaybook } = await import(pathToFileURL(resolve(ROOT, 'src', 'orchestrator.js')).href);
-    const playbook = parsePlaybook(args.content);
+    const { parsePlaybook } = await import(resolve(ROOT, 'src/orchestrator'));
+    const playbook = parsePlaybook(args.content as string);
     return playbook;
   }
 
   if (name === 'bundle_context') {
-    const { bundleContext } = await import(pathToFileURL(resolve(ROOT, 'src', 'orchestrator.js')).href);
+    const { bundleContext } = await import(resolve(ROOT, 'src/orchestrator'));
     const ctx = bundleContext({
-      playbook: args.playbookPath,
-      openkb: args.openkbPath,
-      opencode: args.opencodePath,
+      playbook: args.playbookPath as string,
+      openkb: args.openkbPath as string,
+      opencode: args.opencodePath as string,
     });
     return {
       title: ctx.playbook?.title || null,
@@ -116,42 +128,39 @@ async function handleToolsCall(name, args) {
       labels: ctx.playbook?.conventions?.labels || [],
       openkbTerms: ctx.openkb.glossary?.length || 0,
       openkbDecisions: ctx.openkb.decisions?.length || 0,
-      hasMCP: !!ctx.opencode?.mcp?.trello,
+      hasMCP: !!(ctx.opencode as Record<string, unknown>)?.mcp,
     };
   }
 
   if (name === 'generate_plan') {
-    const { parsePlaybook, generatePlan } = await import(pathToFileURL(resolve(ROOT, 'src', 'orchestrator.js')).href);
+    const { parsePlaybook, generatePlan } = await import(resolve(ROOT, 'src/orchestrator'));
 
-    let context = {
+    interface PlaybookContext {
+      title: string;
+      roles: Array<Record<string, unknown>>;
+      workflow: { lists: string[] };
+      conventions: Record<string, unknown>;
+    }
+
+    let context: PlaybookContext = {
       title: '',
       roles: [],
       workflow: { lists: [] },
       conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
     };
-    if (args.playbook) {
-      context = parsePlaybook(args.playbook);
+    if (args.playbook as string) {
+      context = parsePlaybook(args.playbook as string) as PlaybookContext;
     }
 
-    const extraArgs = {};
+    const extraArgs: Record<string, unknown> = {};
     for (const key of [
-      'task',
-      'name',
-      'desc',
-      'list',
-      'member',
-      'memberId',
-      'color',
-      'cardId',
-      'text',
-      'from',
-      'to',
-      'items',
+      'task', 'name', 'desc', 'list', 'member', 'memberId',
+      'color', 'cardId', 'text', 'from', 'to', 'items',
     ]) {
       if (args[key] !== undefined) extraArgs[key] = args[key];
     }
 
-    const plan = generatePlan(args.goal, context, extraArgs);
+    const plan = generatePlan(args.goal as string, context, extraArgs);
     return { plan };
   }
 
@@ -164,14 +173,14 @@ let buffer = '';
 const stdin = process.stdin;
 stdin.setEncoding('utf-8');
 
-stdin.on('data', (chunk) => {
+stdin.on('data', (chunk: string) => {
   buffer += chunk;
   const lines = buffer.split('\n');
-  buffer = lines.pop();
+  buffer = lines.pop() || '';
 
   for (const line of lines) {
     if (!line.trim()) continue;
-    let msg;
+    let msg: { method?: string; id?: number; params?: Record<string, unknown> };
     try {
       msg = JSON.parse(line);
     } catch {
@@ -179,7 +188,7 @@ stdin.on('data', (chunk) => {
     }
 
     const method = msg.method;
-    const id = msg.id;
+    const id = msg.id ?? null;
     const params = msg.params || {};
 
     if (method === 'initialize') {
@@ -193,15 +202,15 @@ stdin.on('data', (chunk) => {
     } else if (method === 'tools/list') {
       result(id, { tools: TOOLS });
     } else if (method === 'tools/call') {
-      handleToolsCall(params.name, params.arguments || {})
+      handleToolsCall(params.name as string, (params.arguments || {}) as Record<string, unknown>)
         .then((res) => {
           const content =
             typeof res === 'string'
-              ? [{ type: 'text', text: res }]
-              : [{ type: 'text', text: JSON.stringify(res, null, 2) }];
+              ? [{ type: 'text' as const, text: res }]
+              : [{ type: 'text' as const, text: JSON.stringify(res, null, 2) }];
           result(id, { content });
         })
-        .catch((err) => {
+        .catch((err: Error) => {
           error(id, -32603, err.message);
         });
     } else {

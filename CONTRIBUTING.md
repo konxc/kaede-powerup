@@ -51,7 +51,7 @@ Terima kasih atas minat Anda untuk berkontribusi! Dokumen ini adalah panduan len
 
 3. **Setup Credentials (GLOBAL)**
    ```bash
-   bun scripts/kaede.mjs setup
+   bun scripts/kaede.ts setup
    ```
    
    Ini akan membuat file credentials di:
@@ -82,13 +82,13 @@ kaede-powerup/
 ├── packages/
 │   └── kaede-trello/
 │       └── src/
-│           ├── mcp-server.js          # Main MCP server
+│           ├── mcp-server.ts          # Main MCP server
 │           └── trello/
-│               └── attachments.js     # Utility module
+│               └── attachments.ts     # Utility module
 ├── src/
-│   ├── trello-client.js               # Client wrapper
-│   ├── kaede-mcp-server.js            # Orchestrator
-│   ├── api-server.mjs                 # API server
+│   ├── trello-client.ts               # Client wrapper
+│   ├── kaede-mcp-server.ts            # Orchestrator
+│   ├── api-server.ts                 # API server
 │   └── orchestrator.js                # Orchestrator logic
 ├── test/
 │   ├── manual-test-*.js               # Test scripts
@@ -148,7 +148,7 @@ bun run preview
 
 ### Step-by-Step Guide
 
-#### 1. Add Tool Handler (`packages/kaede-trello/src/mcp-server.js`)
+#### 1. Add Tool Handler (`packages/kaede-trello/src/mcp-server.ts`)
 
 Find the appropriate section and add your handler:
 
@@ -184,7 +184,7 @@ toolSchema('your_tool_name', 'Description of what it does', {
 }, ['arg1']), // Required arguments
 ```
 
-#### 3. Add Wrapper Method (`src/trello-client.js`)
+#### 3. Add Wrapper Method (`src/trello-client.ts`)
 
 ```javascript
 async yourToolName(arg1, arg2) {
@@ -216,10 +216,10 @@ Use test board: https://trello.com/b/rAKmlRj3/lab-testing-kaede
 2. **Run Test Script**
    ```bash
    # Windows PowerShell
-   $env:TEST_CARD_ID="67xxx..."; bun test/manual-test-attachments.js
+   $env:TEST_CARD_ID="67xxx..."; bun test/manual-test-attachments.ts
    
    # Linux/Mac
-   TEST_CARD_ID="67xxx..." bun test/manual-test-attachments.js
+   TEST_CARD_ID="67xxx..." bun test/manual-test-attachments.ts
    ```
 
 3. **Verify in Trello UI**
@@ -329,8 +329,8 @@ docs/[lang]/    ← Other languages (created by contributors)
 ```
 feat(mcp-server): add get_card_attachments tool
 
-- Implement handler in packages/kaede-trello/src/mcp-server.js
-- Add wrapper method in trello-client.js
+- Implement handler in packages/kaede-trello/src/mcp-server.ts
+- Add wrapper method in trello-client.ts
 - Add test script and documentation
 
 Closes #42

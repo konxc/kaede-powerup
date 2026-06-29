@@ -2,7 +2,7 @@
 /**
  * Build MCP Servers: Compile src/ → dist/ for both Trello MCP and KAEDE Orchestrator MCP
  *
- Usage: bun scripts/build-mcp.mjs
+ * Usage: bun scripts/build-mcp.ts
  */
 
 import { execSync } from 'child_process';
@@ -13,7 +13,7 @@ import { existsSync } from 'fs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
-function buildOne(label, src, dist) {
+function buildOne(label: string, src: string, dist: string): boolean {
   console.log(`  \x1b[36m  Building ${label}...\x1b[0m`);
   if (!existsSync(src)) {
     console.error(`  \x1b[31m  ✗ ${src} not found\x1b[0m`);
@@ -27,12 +27,12 @@ function buildOne(label, src, dist) {
     console.log(`  \x1b[32m  ✓ ${label} built\x1b[0m`);
     return true;
   } catch (err) {
-    console.error(`  \x1b[31m  ✗ ${label} build failed: ${err.message}\x1b[0m`);
+    console.error(`  \x1b[31m  ✗ ${label} build failed: ${(err as Error).message}\x1b[0m`);
     return false;
   }
 }
 
-async function main() {
+async function main(): Promise<void> {
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════════╗\x1b[0m');
   console.log('  \x1b[35m║      KAEDE — Build MCP Servers           ║\x1b[0m');
@@ -41,13 +41,13 @@ async function main() {
 
   const trelloOk = buildOne(
     'Trello MCP',
-    resolve(ROOT, 'packages', 'kaede-trello', 'src', 'mcp-server.js'),
+    resolve(ROOT, 'packages', 'kaede-trello', 'src', 'mcp-server.ts'),
     resolve(ROOT, 'dist', 'mcp-server.js'),
   );
 
   const kaedeOk = buildOne(
     'KAEDE Orchestrator MCP',
-    resolve(ROOT, 'src', 'kaede-mcp-server.js'),
+    resolve(ROOT, 'src', 'kaede-mcp-server.ts'),
     resolve(ROOT, 'dist', 'kaede-mcp-server.js'),
   );
 
@@ -64,7 +64,7 @@ async function main() {
   console.log('');
 }
 
-main().catch((err) => {
+main().catch((err: Error) => {
   console.error('  \x1b[31m  ✗ Build failed:\x1b[0m', err.message);
   process.exit(1);
 });

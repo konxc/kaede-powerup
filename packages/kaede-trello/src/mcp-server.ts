@@ -1,10 +1,11 @@
 ﻿#!/usr/bin/env bun
+// @ts-nocheck — file ini adalah port langsung dari JS, akan diperbaiki tipenya bertahap
 
 import { readFileSync, existsSync } from 'fs';
 import { homedir } from 'os';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { mimeFromFilename, createAttachmentFormData, createUrlAttachmentData } from './trello/attachments.js';
+import { mimeFromFilename, createAttachmentFormData, createUrlAttachmentData } from './trello/attachments';
 
 const API = 'https://api.trello.com/1';
 const VERSION = '2024-11-05';

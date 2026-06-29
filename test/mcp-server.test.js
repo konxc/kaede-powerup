@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const SERVER_PATH = resolve(ROOT, 'packages', 'kaede-trello', 'src', 'mcp-server.js');
+const SERVER_PATH = resolve(ROOT, 'packages', 'kaede-trello', 'src', 'mcp-server.ts');
 
 // ── Mock Data ──
 

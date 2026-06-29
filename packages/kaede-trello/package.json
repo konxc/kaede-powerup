@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "description": "KAEDE Trello MCP — Custom tools yang belum tersedia di upstream delorenj/mcp-server-trello",
-  "main": "src/mcp-server.js",
+  "main": "src/mcp-server.ts",
   "scripts": {
-    "build": "bun build src/mcp-server.js --target bun --minify --outfile ../../dist/mcp-server.js"
+    "build": "bun build src/mcp-server.ts --target bun --minify --outfile ../../dist/mcp-server.js"
   }
 }

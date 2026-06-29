@@ -1,7 +1,7 @@
 import { describe, it, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'events';
-import { TrelloMCPClient } from '../src/trello-client.js';
+import { TrelloMCPClient } from '../src/trello-client.ts';
 
 function createMockFn() {
   const fn = function (...args) {
@@ -9,7 +9,10 @@ function createMockFn() {
     return fn.mock.returnValue;
   };
   fn.mock = { calls: [] };
-  fn.mockReturnValue = function (v) { fn.mock.returnValue = v; return fn; };
+  fn.mockReturnValue = function (v) {
+    fn.mock.returnValue = v;
+    return fn;
+  };
   return fn;
 }
 
@@ -44,7 +47,7 @@ after(() => {
 describe('TrelloMCPClient', () => {
   it('constructor sets default server path', () => {
     const client = new TrelloMCPClient();
-    assert.ok(client.serverPath.includes('mcp-server.js'));
+    assert.ok(client.serverPath.includes('mcp-server'));
     assert.equal(client.rpcId, 0);
     assert.ok(client.pending instanceof Map);
   });
@@ -160,7 +163,9 @@ describe('TrelloMCPClient', () => {
         client.pending.delete(msg.id);
         res(msg.result);
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
 
     const result = await resultPromise;
     assert.deepEqual(result, { boards: [{ id: 'b1' }] });
@@ -187,7 +192,9 @@ describe('TrelloMCPClient', () => {
         client.pending.delete(msg.id);
         rej(new Error(msg.error.message));
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
 
     const err = await errPromise;
     assert.equal(err.message, 'Not found');

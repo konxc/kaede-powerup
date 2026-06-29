@@ -53,9 +53,9 @@
 │               └── attachments.js  # Attachment utilities
 ├── dist/                    # Build output (gitignored)
 ├── scripts/
-│   ├── kaede.mjs            # CLI tool (setup, today, init, push, env, status)
-│   ├── build-docs.mjs       # Build docs: Markdown → HTML
-│   └── build-mcp.mjs        # Compile MCP server via bun build
+│   ├── kaede.ts            # CLI tool (setup, today, init, push, env, status)
+│   ├── build-docs.ts       # Build docs: Markdown → HTML
+│   └── build-mcp.ts        # Compile MCP server via bun build
 ├── .opencode/
 │   ├── opencode.json        # Konfigurasi AI Agent
 │   └── SHARED/              # Project context & agent rules
@@ -73,7 +73,7 @@
 
 ```bash
 # Interaktif — masukkan API Key & Token Trello
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 ```
 
 Atau buat `secrets.env` manual:
@@ -86,14 +86,14 @@ TRELLO_TOKEN=your-token
 ### 2. Lihat Task Hari Ini
 
 ```bash
-bun scripts/kaede.mjs today
+bun scripts/kaede.ts today
 ```
 
 ### 3. Inisialisasi di Project Lain
 
 ```bash
 # Dari dalam project target
-bun path/to/kaede/scripts/kaede.mjs init .
+bun path/to/kaede/scripts/kaede.ts init .
 ```
 
 Ini akan menambahkan konfigurasi MCP Trello ke `.opencode/opencode.json` project kamu.
@@ -104,13 +104,13 @@ KAEDE sudah siap digunakan dengan Opencode. MCP Trello dikonfigurasi via wrapper
 
 ```bash
 # Cek status konfigurasi
-bun scripts/kaede.mjs status
+bun scripts/kaede.ts status
 
 # Export credentials ke session (PowerShell)
-bun scripts/kaede.mjs env | iex
+bun scripts/kaede.ts env | iex
 
 # Export credentials ke session (Bash)
-eval $(bun scripts/kaede.mjs env)
+eval $(bun scripts/kaede.ts env)
 ```
 
 ---

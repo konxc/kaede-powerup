@@ -4,7 +4,7 @@
 di upstream [`delorenj/mcp-server-trello`](https://github.com/delorenj/mcp-server-trello).
 
 Package ini adalah **lib** (bukan MCP server) yang digunakan langsung oleh
-kode KAEDE (`src/trello-client.js`) sebagai penyangga/fallback. Kode tetap
+kode KAEDE (`src/trello-client.ts`) sebagai penyangga/fallback. Kode tetap
 kompatibel dengan struktur upstream agar mudah di-port ke TypeScript dan
 di-PR-kan ke delorenj.
 
@@ -75,6 +75,6 @@ Output: `dist/mcp-server.js`
 
 ## Penggunaan
 
-`packages/kaede-trello` digunakan langsung oleh `src/trello-client.js` sebagai
+`packages/kaede-trello` digunakan langsung oleh `src/trello-client.ts` sebagai
 fallback. Tidak perlu registrasi MCP terpisah — cukup `mcp.trello` (upstream)
 dan `mcp.kaede` (orchestrator) di `.opencode/opencode.json`.

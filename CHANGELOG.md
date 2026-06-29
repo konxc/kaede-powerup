@@ -4,6 +4,17 @@ All notable changes to KAEDE MCP server implementation.
 
 _Note: Source files now reside under `packages/kaede-trello/` in the current monorepo architecture._
 
+## [1.0.0] — 2026-06-29
+
+### Changed — Restrukturasi Arsitektur
+
+- **Packages restructure** — `src/mcp-server.js` pindah ke `packages/kaede-trello/` sebagai lib, `packages/README.md` dan `packages/kaede-trello/README.md` sebagai dokumentasi arsitektur
+- **Git submodule** — `packages/mcp-server-trello` dari fork `sandikodev/mcp-server-trello` sebagai staging area kontribusi ke `delorenj/mcp-server-trello`
+- **Migrasi npm → Bun** — semua script menggunakan `#!/usr/bin/env bun`, `package.json` native bun, environment lebih bersih
+- **Deploy scripts** — `deploy:netlify` terverifikasi live di `kaede-powerup.netlify.app`, `deploy:gh-pages` skip commit jika tidak ada perubahan
+- **Terjemahan dokumentasi ID→EN** — 4 dokumen: `kaede-architecture`, `DEVELOPMENT-ROADMAP`, `CONTRIBUTION-GUIDE`, `FEATURE-SPECIFICATION`
+- **Harmonisasi dokumentasi** — tool count, path file, dan status diseragamkan di semua dokumen
+
 ## [Unreleased] — 2026-06-27
 
 ### Added — Phase 4: Sort & Advanced List Management

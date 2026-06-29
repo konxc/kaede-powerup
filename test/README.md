@@ -34,7 +34,7 @@ Untuk testing dengan Trello API asli (memerlukan credentials):
 ### 1. Setup Credentials (GLOBAL)
 
 ```bash
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 ```
 
 Credentials akan disimpan di `~/.config/kaede/secrets.env` (global, bukan di project!)
@@ -196,7 +196,7 @@ Baca dan ikuti langkah-langkah testing manual di dalamnya.
 
 **Solution:**
 ```bash
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 ```
 
 ### Error: "Connection failed"
@@ -219,7 +219,7 @@ bun test/get-test-card.js
 **Solution:**
 1. Buka https://trello.com/app-key
 2. Regenerate token
-3. Update credentials: `bun scripts/kaede.mjs setup`
+3. Update credentials: `bun scripts/kaede.ts setup`
 
 ---
 

@@ -22,7 +22,7 @@ KAEDE menyediakan **dua MCP server** yang saling melengkapi:
 | `mcp.kaede` | `dist/kaede-mcp-server.js` | **Orchestrator** — generate plan, parse playbook, bundle context |
 | `mcp.trello` | `@delorenj/mcp-server-trello` (bunx) | **Eksekutor utama** — 45+ tools Trello resmi dari upstream |
 
-`packages/kaede-trello/src/mcp-server.js` adalah **lib** (bukan MCP server) yang
+`packages/kaede-trello/src/mcp-server.ts` adalah **lib** (bukan MCP server) yang
 digunakan langsung oleh kode KAEDE sebagai penyangga fitur yang belum/tidak akan
 ada di upstream.
 
@@ -64,7 +64,7 @@ Setiap kali Anda diminta untuk melakukan tugas manajemen project (seperti membua
 - Cari referensi playbook di `opencode.json` → `references.playbook.path`.
 - Baca file playbook (seperti SOP, alur sprint, konvensi penamaan) sebelum menyentuh Trello.
 - *Aturan*: Tindakan Anda di Trello harus 100% patuh pada aturan playbook tersebut.
-- Gunakan CLI: `bun scripts/kaede.mjs playbook parse <path>` untuk melihat struktur playbook.
+- Gunakan CLI: `bun scripts/kaede.ts playbook parse <path>` untuk melihat struktur playbook.
 
 ### Langkah 2: Pahami Konteks Project (OpenKB)
 - Baca `.openkb/SHARED/glossary.md` untuk istilah-istilah spesifik.
@@ -83,7 +83,7 @@ Setelah dapat plan dari `mcp.kaede`, eksekusi setiap step ke Trello:
 - **Fallback ke `packages/kaede-trello`** (lib) jika tool yang dibutuhkan tidak tersedia di upstream.
 - Resolve nama member/list/board via tools yang tersedia (`search_members`, `get_board_lists`, dll).
 - Jika plan gagal di satu step, lanjutkan ke step berikutnya.
-- Untuk eksekusi cepat bisa juga via CLI: `bun scripts/kaede.mjs run --playbook <path> --board <id> "Mulai Sprint Alpha"`
+- Untuk eksekusi cepat bisa juga via CLI: `bun scripts/kaede.ts run --playbook <path> --board <id> "Mulai Sprint Alpha"`
 - Intent yang didukung CLI: mulai sprint, buat card, assign, pindah, komentar, report, tutup sprint
 
 Pastikan:

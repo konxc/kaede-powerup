@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const SERVER_PATH = resolve(ROOT, 'src', 'kaede-mcp-server.js');
+const SERVER_PATH = resolve(ROOT, 'src', 'kaede-mcp-server.ts');
 
 function rpc(proc, method, params = {}) {
   return new Promise((resolveMsg, reject) => {
@@ -73,7 +73,7 @@ describe('kaede-mcp-server (via stdio RPC)', () => {
   let proc;
 
   it('1. initialize returns protocol version', async () => {
-    proc = spawn('node', [SERVER_PATH], { stdio: ['pipe', 'pipe', 'pipe'] });
+    proc = spawn('bun', [SERVER_PATH], { stdio: ['pipe', 'pipe', 'pipe'] });
     const res = await rpc(proc, 'initialize', {
       protocolVersion: '2024-11-05',
       capabilities: {},
@@ -86,7 +86,7 @@ describe('kaede-mcp-server (via stdio RPC)', () => {
   it('2. tools/list returns 4 tools', async () => {
     const res = await rpc(proc, 'tools/list', {});
     const tools = res.result.tools;
-    const names = tools.map(t => t.name).sort();
+    const names = tools.map((t) => t.name).sort();
     assert.deepEqual(names, ['bundle_context', 'generate_plan', 'parse_playbook', 'status']);
   });
 
@@ -175,7 +175,7 @@ describe('kaede-mcp-server (via stdio RPC)', () => {
 
 describe('generatePlan (direct imports)', () => {
   it('parses playbook then generates plan for "mulai sprint"', async () => {
-    const { parsePlaybook, generatePlan } = await import('../src/orchestrator.js');
+    const { parsePlaybook, generatePlan } = await import('../src/orchestrator.ts');
     const pb = parsePlaybook(PLAYBOOK_SAMPLE);
     const plan = generatePlan('Mulai Sprint Alpha', pb);
     assert.equal(plan.length, 4);
@@ -185,8 +185,13 @@ describe('generatePlan (direct imports)', () => {
   });
 
   it('generates plan for "buat board"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('buat board', pb, { name: 'Sprint 2' });
     assert.equal(plan.length, 1);
     assert.equal(plan[0].action, 'create_board');
@@ -194,8 +199,13 @@ describe('generatePlan (direct imports)', () => {
   });
 
   it('generates plan for "assign"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('tugaskan', pb, { cardId: 'c1', memberId: 'm1' });
     assert.equal(plan.length, 1);
     assert.equal(plan[0].action, 'assign_member');
@@ -204,40 +214,65 @@ describe('generatePlan (direct imports)', () => {
   });
 
   it('generates plan for "buat label"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('buat label merah', pb, { name: 'Bug', color: 'merah' });
     assert.equal(plan[0].action, 'create_label');
     assert.equal(plan[0].params.color, 'merah');
   });
 
   it('generates plan for "arsipkan"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('arsipkan card', pb, { cardId: 'c123' });
     assert.equal(plan[0].action, 'archive_card');
     assert.equal(plan[0].params.cardId, 'c123');
   });
 
   it('generates plan for "komentar"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('tambah komentar', pb, { cardId: 'c1', text: 'Done' });
     assert.equal(plan[0].action, 'add_comment');
     assert.equal(plan[0].params.text, 'Done');
   });
 
   it('generates plan for "pindah"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('pindahkan card', pb, { cardId: 'c1', listName: 'Done' });
     assert.equal(plan[0].action, 'move_card');
     assert.equal(plan[0].params.listName, 'Done');
   });
 
   it('generates plan for "pindah semua"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('pindah semua', pb, { dari: 'To Do', ke: 'In Progress' });
     assert.equal(plan[0].action, 'move_all_cards');
     assert.equal(plan[0].params.fromListName, 'To Do');
@@ -245,23 +280,38 @@ describe('generatePlan (direct imports)', () => {
   });
 
   it('generates plan for "tutup sprint"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('close sprint', pb);
     assert.equal(plan[0].action, 'close_sprint');
   });
 
   it('generates plan for "buat checklist"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('buat checklist', pb, { cardId: 'c1', name: 'QA', items: ['Test A', 'Test B'] });
     assert.equal(plan[0].action, 'create_checklist');
     assert.equal(plan[0].params.name, 'QA');
   });
 
   it('generates plan for "report"', async () => {
-    const { generatePlan } = await import('../src/orchestrator.js');
-    const pb = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    const { generatePlan } = await import('../src/orchestrator.ts');
+    const pb = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     const plan = generatePlan('my cards', pb);
     assert.equal(plan[0].action, 'report');
   });

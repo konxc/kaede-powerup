@@ -84,9 +84,9 @@ KAEDE MCP telah berkembang menjadi **platform orkestrasi kolaboratif universal**
 
 | File | Changes | Size |
 |------|---------|------|
-| `packages/kaede-trello/src/mcp-server.js` | 42 tool handlers & definitions | ~1100 lines |
-| `src/trello-client.js` | Legacy wrapper | ~250 lines |
-| `packages/kaede-trello/src/trello/attachments.js` | Utility module | 228 lines |
+| `packages/kaede-trello/src/mcp-server.ts` | 42 tool handlers & definitions | ~1100 lines |
+| `src/trello-client.ts` | Legacy wrapper | ~250 lines |
+| `packages/kaede-trello/src/trello/attachments.ts` | Utility module | 228 lines |
 | `dist/mcp-server.js` | Compiled output (Bun) | — |
 
 ### Documentation & Testing
@@ -94,7 +94,7 @@ KAEDE MCP telah berkembang menjadi **platform orkestrasi kolaboratif universal**
 | File | Purpose |
 |------|---------|
 | `.env.example` | Reference for global credentials setup |
-| `test/manual-test-attachments.js` | Bun test script for attachments |
+| `test/manual-test-attachments.ts` | Bun test script for attachments |
 | `test/get-test-card.js` | Helper to get card IDs from board |
 | `test/MANUAL-TESTING.md` | Comprehensive testing guide |
 | `test/CHECKLIST-TESTING.md` | Checklist tools testing guide |
@@ -114,7 +114,7 @@ KAEDE menggunakan **global credentials** yang disimpan di:
 
 **Setup:**
 ```bash
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 ```
 
 **Manual:**
@@ -127,7 +127,7 @@ TRELLO_TOKEN=your-token
 
 ### Credential Loading Order
 
-Dari `packages/kaede-trello/src/mcp-server.js:34-49`:
+Dari `packages/kaede-trello/src/mcp-server.ts:34-49`:
 
 ```javascript
 function getAuth() {
@@ -158,7 +158,7 @@ function getAuth() {
 
 ```bash
 # Interactive setup
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 
 # Or manual edit
 # Edit: ~/.config/kaede/secrets.env
@@ -177,7 +177,7 @@ bun run build:mcp
 bun test/get-test-card.js
 
 # Run attachment tests
-bun test/manual-test-attachments.js
+bun test/manual-test-attachments.ts
 ```
 
 ---
@@ -199,7 +199,7 @@ bun test/manual-test-attachments.js
 
 3. **Helper Scripts**
    - `test/get-test-card.js` — List all cards in test board
-   - `test/manual-test-attachments.js` — Automated attachment tests
+   - `test/manual-test-attachments.ts` — Automated attachment tests
 
 ### Test Board
 
@@ -307,7 +307,7 @@ bun run build
 
 # Test (manual)
 bun test/get-test-card.js
-bun test/manual-test-attachments.js
+bun test/manual-test-attachments.ts
 ```
 
 ### File Structure
@@ -317,28 +317,28 @@ kaede-powerup/
 ├── packages/
 │   ├── kaede-trello/
 │   │   ├── src/
-│   │   │   ├── mcp-server.js          # MCP server (42 tools)
+│   │   │   ├── mcp-server.ts          # MCP server (42 tools)
 │   │   │   └── trello/
-│   │   │       └── attachments.js     # Utility module
+│   │   │       └── attachments.ts     # Utility module
 │   │   ├── package.json
 │   │   └── README.md
 │   ├── mcp-server-trello/             # Upstream fork (45+ tools)
 │   └── README.md
 ├── src/                               # Legacy wrappers
-│   ├── api-server.mjs
-│   ├── kaede-mcp-server.js
-│   ├── orchestrator.js
+│   ├── api-server.ts
+│   ├── kaede-mcp-server.ts
+│   ├── orchestrator.ts
 │   ├── style.css
-│   └── trello-client.js
+│   └── trello-client.ts
 ├── test/
-│   ├── manual-test-attachments.js
+│   ├── manual-test-attachments.ts
 │   ├── get-test-card.js
 │   ├── MANUAL-TESTING.md
 │   └── CHECKLIST-TESTING.md
 ├── docs/
 │   └── DEVELOPMENT-ROADMAP.md
 ├── scripts/
-│   └── kaede.mjs              # CLI tool
+│   └── kaede.ts              # CLI tool
 ├── dist/                       # Build output
 ├── .env.example               # Reference only
 ├── README.md
@@ -383,7 +383,7 @@ kaede-powerup/
 1. **Setup:**
    ```bash
    bun install
-   bun scripts/kaede.mjs setup
+   bun scripts/kaede.ts setup
    ```
 
 2. **Understand Architecture:**
@@ -392,9 +392,9 @@ kaede-powerup/
    - Review existing tool implementations
 
 3. **Add New Tool:**
-   - Add handler in `packages/kaede-trello/src/mcp-server.js`
+   - Add handler in `packages/kaede-trello/src/mcp-server.ts`
    - Add tool definition (toolSchema)
-   - Add wrapper in `src/trello-client.js`
+   - Add wrapper in `src/trello-client.ts`
    - Add tests in `test/`
    - Update documentation
 
