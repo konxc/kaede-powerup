@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — KAEDE</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <main class="min-w-0 flex-1">
+      <div class="glass rounded-2xl p-6 sm:p-10">
+        <div class="prose">
+<h1>Privacy Policy</h1>
+<p><strong>Last updated: June 27, 2026</strong></p>
+<p>KAEDE (Koneksi Automated Environment &amp; Developer Engineering) is a Trello Power-Up developed by <strong>PT Koneksi Jaringan Indonesia</strong> (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;). We are committed to protecting your privacy. This policy explains how we handle information when you use our Power-Up.</p>
+<h2>Data Storage</h2>
+<p>KAEDE <strong>does not store any personal data</strong> outside of Trello&#39;s infrastructure. All data created through the Power-Up — such as environment labels assigned to cards — is stored exclusively via Trello&#39;s built-in <strong>Shared Storage</strong> API. This data resides within Trello&#39;s servers and is subject to <a href="https://www.atlassian.com/legal/privacy-policy">Atlassian&#39;s Privacy Policy</a>.</p>
+<h2>MCP Server</h2>
+<p>KAEDE includes a local MCP (Model Context Protocol) server that runs entirely on your machine via stdio. It uses Trello API credentials stored in a local configuration file (<code>~/.config/kaede/secrets.env</code>). These credentials are:</p>
+<ul>
+<li>Stored only on your local machine, never transmitted to us</li>
+<li>Used solely to authenticate with Trello&#39;s API</li>
+<li>Never shared with any third party</li>
+</ul>
+<p>The MCP server processes board, list, card, and label data on your behalf — all communication is directly between your machine and Trello&#39;s servers via HTTPS.</p>
+<h2>Information We Collect</h2>
+<p>We do <strong>not</strong> collect, transmit, or store:</p>
+<ul>
+<li>Your name, email address, or avatar</li>
+<li>Your Trello username or account information</li>
+<li>Card content, board content, or workspace data</li>
+<li>IP addresses or device identifiers</li>
+<li>Cookies or tracking data</li>
+<li>Your Trello API credentials</li>
+</ul>
+<p>The only data processed through the Power-Up is the <strong>environment setting</strong> (production / staging / development) you optionally assign to a card, stored entirely within Trello&#39;s systems.</p>
+<h2>Third-Party Services</h2>
+<p>KAEDE relies on the following third-party services:</p>
+<ul>
+<li><strong>Trello (Atlassian)</strong> — provides the Power-Up platform, iframe sandbox, and shared storage.</li>
+<li><strong>Netlify</strong> — hosts the Power-Up&#39;s static assets (HTML, CSS, JavaScript). Netlify&#39;s standard server logs may capture anonymized request data (e.g., requested page, timestamp).</li>
+</ul>
+<p>We do not control how these third parties process data. Please review their respective privacy policies for more information.</p>
+<h2>Data Sharing</h2>
+<p>We do <strong>not</strong> sell, trade, or share your personal information with any third party. We do not use analytics services, tracking pixels, or advertising networks.</p>
+<h2>Changes to This Policy</h2>
+<p>We may update this privacy policy from time to time. Changes will be posted on this page with an updated revision date.</p>
+<h2>Contact</h2>
+<p>If you have questions about this policy, please contact us at:</p>
+<p>Email: <a href="mailto:androxoss@hotmail.com">androxoss@hotmail.com</a><br>Organization: PT Koneksi Jaringan Indonesia</p>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <kaede-footer></kaede-footer>
+</body>
+</html>

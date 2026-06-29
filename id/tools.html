@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dokumentasi — KAEDE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="../js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Dokumentasi</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Ikhtisar</a>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key & Token</a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">Referensi Tools</a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Peran SDLC</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Peran & Akses</a>
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Arsitektur & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Template Playbook</a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Sponsor</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Dokumentasi</a>
+              <span>/</span>
+              <span>Referensi Tools</span>
+            </p>
+<h1>Referensi Tools MCP Trello (KAEDE)</h1>
+<p>Daftar semua tools yang disediakan oleh <strong>KAEDE MCP Server</strong> (<code>dist/mcp-server.js</code>). Tools ini bisa dipanggil oleh AI Agent melalui OpenCode atau <code>TrelloMCPClient</code>.</p>
+<div class="not-prose p-4 rounded-xl bg-kaede-primary/10 border border-kaede-primary/20 mb-6"><p><strong>Format Panggilan</strong></p>
+<p>Cukup minta ke AI Agent dalam bahasa natural. Contoh: <em>&quot;Tolong cari kartu &#39;Fix login bug&#39; dan pindahkan ke list Done&quot;</em>.</p>
+</div><h2>Manajemen Board</h2>
+<div class="tool-group"><h3><code>list_boards</code></h3>
+<p>Menampilkan semua board Trello yang bisa diakses.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"list_boards"</span>, <span class="str">"arguments"</span>: {} }
+</div><h3><code>create_board</code></h3>
+<p>Membuat board Trello baru.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"create_board"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Sprint 24"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"desc"</span>: <span class="str">"Deskripsi board"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"idOrganization"</span>: <span class="str">"workspace123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"defaultLabels"</span>: <span class="kw">true</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"defaultLists"</span>: <span class="kw">true</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>list_workspaces</code></h3>
+<p>Menampilkan semua workspace/organisasi Trello.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"list_workspaces"</span>, <span class="str">"arguments"</span>: {} }
+</div></div><h2>Manajemen List</h2>
+<div class="tool-group"><h3><code>get_lists</code></h3>
+<p>Mendapatkan semua list di sebuah board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_lists"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"boardId"</span>: <span class="str">"board123"</span> } }
+</div><h3><code>add_list_to_board</code></h3>
+<p>Menambahkan list baru ke board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_list_to_board"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"boardId"</span>: <span class="str">"board123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Sprint 25"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>archive_list</code></h3>
+<p>Mengarsipkan list.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"archive_list"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"listId"</span>: <span class="str">"list123"</span> } }
+</div></div><h2>Manajemen Kartu</h2>
+<div class="tool-group"><h3><code>get_my_cards</code></h3>
+<p>Mendapatkan semua kartu yang assigned ke user saat ini.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_my_cards"</span>, <span class="str">"arguments"</span>: {} }
+</div><h3><code>get_cards_by_list_id</code></h3>
+<p>Mendapatkan semua kartu dari list tertentu.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_cards_by_list_id"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"listId"</span>: <span class="str">"list123"</span>, <span class="str">"boardId"</span>: <span class="str">"board123"</span> } }
+</div><h3><code>get_card</code></h3>
+<p>Mendapatkan detail lengkap kartu — label, member, due date, deskripsi.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"FdhbArbK"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"includeMarkdown"</span>: <span class="kw">false</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>add_card_to_list</code></h3>
+<p>Membuat kartu baru di list tertentu.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_card_to_list"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Setup CI/CD"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"description"</span>: <span class="str">"Implement pipeline"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"dueDate"</span>: <span class="str">"2026-07-01T12:00:00Z"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"labels"</span>: [<span class="str">"label-id-1"</span>]<br/>
+&nbsp;&nbsp;} }
+</div><h3><code>update_card_details</code></h3>
+<p>Mengupdate detail kartu — nama, deskripsi, due date, label.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"update_card_details"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"New name"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"dueComplete"</span>: <span class="kw">true</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>move_card</code></h3>
+<p>Memindahkan kartu ke list lain (antar board jika idBoard diberikan).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"move_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list456"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>archive_card</code></h3>
+<p>Mengarsipkan kartu.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"archive_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"cardId"</span>: <span class="str">"card123"</span> } }
+</div></div><h2>Manajemen Anggota</h2>
+<div class="tool-group"><h3><code>get_board_members</code></h3>
+<p>Mendapatkan semua anggota di board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_board_members"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"boardId"</span>: <span class="str">"board123"</span> } }
+</div><h3><code>assign_member_to_card</code></h3>
+<p>Menambahkan anggota ke kartu.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"assign_member_to_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"memberId"</span>: <span class="str">"member456"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>remove_member_from_card</code></h3>
+<p>Menghapus anggota dari kartu.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"remove_member_from_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"memberId"</span>: <span class="str">"member456"</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Manajemen Label</h2>
+<div class="tool-group"><h3><code>get_board_labels</code></h3>
+<p>Mendapatkan semua label di board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_board_labels"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"boardId"</span>: <span class="str">"board123"</span> } }
+</div><h3><code>create_label</code></h3>
+<p>Membuat label baru.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"create_label"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"boardId"</span>: <span class="str">"board123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Bug"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"color"</span>: <span class="str">"red"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>update_label</code></h3>
+<p>Mengupdate nama dan/atau warna label.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"update_label"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"labelId"</span>: <span class="str">"label123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Critical"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"color"</span>: <span class="str">"red"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>delete_label</code></h3>
+<p>Menghapus label.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"delete_label"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"labelId"</span>: <span class="str">"label123"</span> } }
+</div></div><h2>Checklist</h2>
+<div class="tool-group"><h3><code>create_checklist</code></h3>
+<p>Membuat checklist baru di kartu.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"create_checklist"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"QA Checklist"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>add_checklist_item</code></h3>
+<p>Menambahkan item ke checklist.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_checklist_item"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checklistId"</span>: <span class="str">"checklist123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Test login flow"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checked"</span>: <span class="kw">false</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Komentar</h2>
+<div class="tool-group"><h3><code>add_comment</code></h3>
+<p>Menambahkan komentar ke kartu.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_comment"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"text"</span>: <span class="str">"Sudah di-review, siap merge."</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>get_card_comments</code></h3>
+<p>Mendapatkan semua komentar dari kartu.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_card_comments"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"limit"</span>: <span class="num">100</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Tips Penggunaan</h2>
+<ul>
+<li><strong>boardId opsional:</strong> Jika tidak diberikan, beberapa tools menggunakan board default dari API key</li>
+<li><strong>Date format:</strong> Due date pakai ISO 8601 (<code>2026-07-01T12:00:00Z</code>), start date pakai <code>YYYY-MM-DD</code></li>
+<li><strong>Label IDs:</strong> Dapatkan dari Trello UI atau via <code>get_board_labels</code></li>
+<li><strong>Member IDs:</strong> Dapatkan via <code>get_board_members</code></li>
+<li><strong>Sumber kode:</strong> Tools ini dari <code>src/mcp-server.js</code> — custom KAEDE, bukan <code>@delorenj/mcp-server-trello</code></li>
+<li><strong>Client wrapper:</strong> Gunakan <code>TrelloMCPClient</code> di <code>src/trello-client.js</code> untuk akses terstruktur</li>
+</ul>
+<hr>
+<h2>✅ Status Implementasi</h2>
+<p>Semua tools di bawah sudah <strong>complete</strong> dan tersedia di <code>packages/kaede-trello/src/mcp-server.js</code> (lib) serta sebagian sudah di-PR ke upstream <code>@delorenj/mcp-server-trello</code>.</p>
+<p><strong>Jumlah tools:</strong></p>
+<ul>
+<li><code>packages/kaede-trello</code> (lib): <strong>42 tools</strong> — fitur custom/penyangga</li>
+<li><code>@delorenj/mcp-server-trello</code> (upstream): <strong>55+ tools</strong> — tools resmi</li>
+</ul>
+<p><strong>PR ke upstream (oleh sandikodev):</strong></p>
+<ul>
+<li><code>get_card_attachments</code> + <code>get_card_checklists</code> — <a href="https://github.com/delorenj/mcp-server-trello/pull/98">#98</a></li>
+<li><code>watch_card</code> + <code>watch_list</code> — <a href="https://github.com/delorenj/mcp-server-trello/pull/99">#99</a></li>
+<li><code>search_labels</code> + <code>remove_label_from_card</code> — <a href="https://github.com/delorenj/mcp-server-trello/pull/100">#100</a></li>
+</ul>
+<p><strong>Fitur yang tidak akan di-upstream</strong> (akan tetap di lib kaede-trello):</p>
+<ul>
+<li><code>copy_list</code>, <code>move_list</code> — membutuhkan Power-Up</li>
+<li><code>share_card</code>, <code>make_template</code> — dievaluasi</li>
+<li><code>create_jira_work_item</code>, <code>mirror_card</code>, <code>butler_automation</code>, <code>custom_fields</code>, <code>recurring_cards</code> — fitur Power-Up/plugin eksternal</li>
+</ul>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            OpenCode
+          </a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            Peran SDLC
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Ikhtisar</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key & Token</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Referensi Tools</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>Peran SDLC</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Peran & Akses</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Arsitektur & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Template Playbook</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsor</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>

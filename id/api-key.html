@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dokumentasi — KAEDE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="../js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Dokumentasi</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Ikhtisar</a>
+          <a href="api-key.html" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">API Key & Token</a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Referensi Tools</a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Peran SDLC</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Peran & Akses</a>
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Arsitektur & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Template Playbook</a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Sponsor</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Dokumentasi</a>
+              <span>/</span>
+              <span>API Key & Token</span>
+            </p>
+<h1>Mendapatkan Trello API Key &amp; Token</h1>
+<p>Untuk menghubungkan AI Agent dengan Trello, kamu memerlukan dua kredensial: <strong>API Key</strong> dan <strong>Token</strong>. Keduanya didapatkan melalui Trello Power-Up Admin.</p>
+<div class="not-prose p-4 rounded-xl bg-kaede-warning/10 border border-kaede-warning/20 mb-6"><p><strong>Prasyarat</strong></p>
+<ul>
+<li>Akun Trello (gratis)</li>
+<li>Akses ke <a href="https://trello.com/power-ups/admin">Trello Power-Up Admin</a></li>
+</ul>
+</div><h2>Metode 1: Melalui Power-Up Admin (Direkomendasikan)</h2>
+<div class="not-prose space-y-4"><div class="flex items-start gap-3">
+  <span class="step-num">1</span>
+  <div>
+    <p class="text-sm font-medium text-kaede-text">Buka Trello Power-Up Admin</p>
+    <p class="text-xs text-kaede-muted">Kunjungi <a href="https://trello.com/power-ups/admin" target="_blank" class="text-kaede-primary underline">trello.com/power-ups/admin</a> dan login dengan akun Trello kamu.</p>
+  </div>
+</div><div class="flex items-start gap-3">
+  <span class="step-num">2</span>
+  <div>
+    <p class="text-sm font-medium text-kaede-text">Buat Power-Up Baru</p>
+    <p class="text-xs text-kaede-muted">Klik tombol <strong class="text-kaede-text">New</strong>. Isi formulir:</p>
+    <ul class="text-xs text-kaede-muted mt-1 space-y-0.5">
+      <li><strong class="text-kaede-text">Integration Name:</strong> <code>KAEDE - Tim Koneksi</code></li>
+      <li><strong class="text-kaede-text">Email:</strong> Email tim Koneksi</li>
+      <li><strong class="text-kaede-text">Support:</strong> URL repositori atau email</li>
+      <li><strong class="text-kaede-text">Name:</strong> Nama Power-Up</li>
+    </ul>
+    <p class="text-xs text-kaede-muted mt-1">Pilih Trello instance yang sesuai, lalu klik <strong class="text-kaede-text">Create</strong>.</p>
+  </div>
+</div><div class="flex items-start gap-3">
+  <span class="step-num">3</span>
+  <div>
+    <p class="text-sm font-medium text-kaede-text">Generate API Key</p>
+    <p class="text-xs text-kaede-muted">Di halaman Power-Up yang sudah dibuat, navigasi ke tab <strong class="text-kaede-text">API Key</strong>. Klik tombol <strong class="text-kaede-text">Generate</strong> untuk mendapatkan API Key. <strong class="text-kaede-text">Salin API Key</strong> — kamu akan membutuhkannya nanti.</p>
+  </div>
+</div><div class="flex items-start gap-3">
+  <span class="step-num">4</span>
+  <div>
+    <p class="text-sm font-medium text-kaede-text">Generate Token</p>
+    <p class="text-xs text-kaede-muted">Di halaman yang sama, cari link <strong class="text-kaede-text">manually generate a Token</strong> (biasanya di samping deskripsi API Key). Klik link tersebut.</p>
+  </div>
+</div><div class="flex items-start gap-3">
+  <span class="step-num">5</span>
+  <div>
+    <p class="text-sm font-medium text-kaede-text">Authorize</p>
+    <p class="text-xs text-kaede-muted">Halaman Trello authorization akan terbuka. Klik tombol <strong class="text-kaede-text">Allow</strong> untuk memberikan akses ke akun Trello kamu.</p>
+  </div>
+</div><div class="flex items-start gap-3">
+  <span class="step-num">6</span>
+  <div>
+    <p class="text-sm font-medium text-kaede-text">Salin Token</p>
+    <p class="text-xs text-kaede-muted">Setelah di-allow, kamu akan melihat string Token. <strong class="text-kaede-text">Salin token tersebut</strong> dan simpan bersama API Key.</p>
+  </div>
+</div></div><h2>Metode 2: Cara Cepat</h2>
+<p>Jika sudah punya Power-Up, langsung buka:</p>
+<ol>
+<li>Kunjungi <a href="https://trello.com/app-key">trello.com/app-key</a></li>
+<li>Salin <strong>API Key</strong> dari halaman tersebut</li>
+<li>Klik link <strong>Token</strong> untuk generate token</li>
+<li>Klik <strong>Allow</strong> dan salin token yang muncul</li>
+</ol>
+<h2>Yang Perlu Diingat</h2>
+<ul>
+<li><strong>API Key</strong> dan <strong>Token</strong> bersifat rahasia — jangan commit ke git atau bagikan di publik</li>
+<li>Token bisa di-revoke kapan saja dari halaman Power-Up Admin</li>
+<li>Jika token expired, ulangi langkah generate token</li>
+<li>Simpan kredensial di <code>.env</code> file atau <code>~/.config/dev/*.env</code></li>
+</ul>
+<div class="not-prose p-4 rounded-xl bg-kaede-surface border border-kaede-border mt-6"><p><strong>Contoh .env</strong></p>
+<div class="code-block">
+<span class="cm"># Trello API credentials</span><br/>
+TRELLO_API_KEY=<span class="str">your-api-key-here</span><br/>
+TRELLO_TOKEN=<span class="str">your-token-here</span>
+</div></div><h2>Langkah Selanjutnya</h2>
+<p>Setelah mendapatkan API Key dan Token, lanjutkan ke panduan <a href="mcp-server.html">Setup MCP Server</a> untuk mengonfigurasi server Trello MCP.</p>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="." class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Ikhtisar
+          </a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            MCP Server
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Ikhtisar</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key & Token</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Referensi Tools</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>Peran SDLC</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Peran & Akses</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Arsitektur & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Template Playbook</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsor</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>

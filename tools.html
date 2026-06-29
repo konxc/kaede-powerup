@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation — KAEDE</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Documentation</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Overview</a>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key</a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">Tools Reference</a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">SDLC Roles</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Roles & Access</a>
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Architecture & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Playbook Template</a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Sponsorship</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Documentation</a>
+              <span>/</span>
+              <span>Tools Reference</span>
+            </p>
+<h1>Trello MCP Tools Reference (KAEDE)</h1>
+<p>Complete list of tools provided by <strong><code>packages/kaede-trello</code></strong>. These tools can be called by AI Agents via OpenCode or any MCP client.</p>
+<div class="not-prose p-4 rounded-xl bg-kaede-primary/10 border border-kaede-primary/20 mb-6"><p><strong>Call Format</strong></p>
+<p>Just ask your AI Agent in natural language. Example: <em>&quot;Please find card &#39;Fix login bug&#39; and move it to the Done list&quot;</em>.</p>
+</div><h2>Board Management</h2>
+<div class="tool-group"><h3><code>list_boards</code></h3>
+<p>List all Trello boards accessible to the user.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"list_boards"</span>, <span class="str">"arguments"</span>: {} }
+</div><h3><code>create_board</code></h3>
+<p>Create a new Trello board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"create_board"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Sprint 24"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"desc"</span>: <span class="str">"Board description"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"idOrganization"</span>: <span class="str">"workspace123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"defaultLabels"</span>: <span class="kw">true</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"defaultLists"</span>: <span class="kw">true</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>list_workspaces</code></h3>
+<p>List all Trello workspaces/organizations.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"list_workspaces"</span>, <span class="str">"arguments"</span>: {} }
+</div></div><h2>List Management</h2>
+<div class="tool-group"><h3><code>get_lists</code></h3>
+<p>Get all lists on a board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_lists"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"boardId"</span>: <span class="str">"board123"</span> } }
+</div><h3><code>add_list_to_board</code></h3>
+<p>Add a new list to a board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_list_to_board"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"boardId"</span>: <span class="str">"board123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Sprint 25"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>update_list</code></h3>
+<p>Update list details (name, position, closed state).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"update_list"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"New list name"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>archive_list</code></h3>
+<p>Archive a list.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"archive_list"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"listId"</span>: <span class="str">"list123"</span> } }
+</div><h3><code>sort_list_cards</code></h3>
+<p>Sort cards in a list by criteria (due, name, position, startDate).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"sort_list_cards"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"sort"</span>: <span class="str">"dueDate"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>watch_list</code></h3>
+<p>Subscribe/unsubscribe from watching a list.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"watch_list"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"add"</span>: <span class="kw">true</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Card Management</h2>
+<div class="tool-group"><h3><code>get_my_cards</code></h3>
+<p>Get all cards assigned to the current user.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_my_cards"</span>, <span class="str">"arguments"</span>: {} }
+</div><h3><code>get_cards_by_list_id</code></h3>
+<p>Get all cards from a specific list.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_cards_by_list_id"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"listId"</span>: <span class="str">"list123"</span>, <span class="str">"boardId"</span>: <span class="str">"board123"</span> } }
+</div><h3><code>get_card</code></h3>
+<p>Get detailed card information — labels, members, due date, description.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"FdhbArbK"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"includeMarkdown"</span>: <span class="kw">false</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>add_card_to_list</code></h3>
+<p>Create a new card in a specific list.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_card_to_list"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Setup CI/CD"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"description"</span>: <span class="str">"Implement pipeline"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"dueDate"</span>: <span class="str">"2026-07-01T12:00:00Z"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"labels"</span>: [<span class="str">"label-id-1"</span>]<br/>
+&nbsp;&nbsp;} }
+</div><h3><code>update_card_details</code></h3>
+<p>Update card details — name, description, due date, labels.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"update_card_details"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"New name"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"dueComplete"</span>: <span class="kw">true</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>move_card</code></h3>
+<p>Move a card to another list (cross-board if boardId provided).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"move_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list456"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>copy_card</code></h3>
+<p>Copy/duplicate a card to another list (even cross-board). Supports <code>keepFromSource</code> to selectively copy attachments, checklists, comments, labels, members, etc.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"copy_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"sourceCardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"listId"</span>: <span class="str">"list456"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"keepFromSource"</span>: <span class="str">"all"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>archive_card</code></h3>
+<p>Archive a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"archive_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"cardId"</span>: <span class="str">"card123"</span> } }
+</div><h3><code>watch_card</code></h3>
+<p>Subscribe/unsubscribe from watching a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"watch_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"add"</span>: <span class="kw">true</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>get_card_activity</code></h3>
+<p>Get activity/actions on a card (comments, moves, updates).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_card_activity"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"filter"</span>: <span class="str">"commentCard"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"limit"</span>: <span class="num">50</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>get_card_attachments</code></h3>
+<p>Get all attachments from a card. <strong>NEW contribution</strong> (missing in upstream).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_card_attachments"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"cardId"</span>: <span class="str">"card123"</span> } }
+</div><h3><code>get_card_checklists</code></h3>
+<p>Get all checklists on a card with their items. <strong>NEW contribution</strong> (missing in upstream).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_card_checklists"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"cardId"</span>: <span class="str">"card123"</span> } }
+</div></div><h2>Member Management</h2>
+<div class="tool-group"><h3><code>get_board_members</code></h3>
+<p>Get all members on a board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_board_members"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"boardId"</span>: <span class="str">"board123"</span> } }
+</div><h3><code>assign_member_to_card</code></h3>
+<p>Assign a member to a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"assign_member_to_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"memberId"</span>: <span class="str">"member456"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>remove_member_from_card</code></h3>
+<p>Remove a member from a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"remove_member_from_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"memberId"</span>: <span class="str">"member456"</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Label Management</h2>
+<div class="tool-group"><h3><code>get_board_labels</code></h3>
+<p>Get all labels on a board.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_board_labels"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"boardId"</span>: <span class="str">"board123"</span> } }
+</div><h3><code>search_labels</code></h3>
+<p>Search labels on a board by name or color.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"search_labels"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"boardId"</span>: <span class="str">"board123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"query"</span>: <span class="str">"bug"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>create_label</code></h3>
+<p>Create a new label.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"create_label"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"boardId"</span>: <span class="str">"board123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Bug"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"color"</span>: <span class="str">"red"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>update_label</code></h3>
+<p>Update label name and/or color.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"update_label"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"labelId"</span>: <span class="str">"label123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Critical"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"color"</span>: <span class="str">"red"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>delete_label</code></h3>
+<p>Delete a label.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"delete_label"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"labelId"</span>: <span class="str">"label123"</span> } }
+</div><h3><code>remove_label_from_card</code></h3>
+<p>Remove a single label from a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"remove_label_from_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"labelId"</span>: <span class="str">"label456"</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Checklist</h2>
+<div class="tool-group"><h3><code>create_checklist</code></h3>
+<p>Create a new checklist on a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"create_checklist"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"QA Checklist"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>add_checklist_item</code></h3>
+<p>Add an item to a checklist.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_checklist_item"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checklistId"</span>: <span class="str">"checklist123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"Test login flow"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checked"</span>: <span class="kw">false</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>update_checklist_item</code></h3>
+<p>Update checklist item (name, checked state, position).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"update_checklist_item"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checklistId"</span>: <span class="str">"checklist123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checkItemId"</span>: <span class="str">"item456"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checked"</span>: <span class="kw">true</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>delete_checklist</code></h3>
+<p>Delete a checklist from a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"delete_checklist"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: { <span class="str">"checklistId"</span>: <span class="str">"checklist123"</span> } }
+</div><h3><code>delete_checklist_item</code></h3>
+<p>Delete an item from a checklist.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"delete_checklist_item"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checklistId"</span>: <span class="str">"checklist123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"checkItemId"</span>: <span class="str">"item456"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>copy_checklist</code></h3>
+<p>Copy a checklist to another card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"copy_checklist"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"sourceChecklistId"</span>: <span class="str">"checklist123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card789"</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Comments</h2>
+<div class="tool-group"><h3><code>add_comment</code></h3>
+<p>Add a comment to a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"add_comment"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"text"</span>: <span class="str">"Reviewed and ready to merge."</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>get_card_comments</code></h3>
+<p>Get all comments from a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"get_card_comments"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"limit"</span>: <span class="num">100</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Attachments</h2>
+<div class="tool-group"><h3><code>attach_file_to_card</code></h3>
+<p>Attach a file to a card from a URL.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"attach_file_to_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"fileUrl"</span>: <span class="str">"https://example.com/file.pdf"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>attach_image_to_card</code></h3>
+<p>Attach an image to a card from a URL.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"attach_image_to_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"imageUrl"</span>: <span class="str">"https://example.com/screenshot.png"</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>attach_data_to_card</code></h3>
+<p>Attach data (base64 or data URL) to a card.</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"attach_data_to_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"data"</span>: <span class="str">"data:text/plain;base64,SGVsbG8="</span><br/>
+&nbsp;&nbsp;} }
+</div><h3><code>attach_image_data_to_card</code></h3>
+<p>Attach image data to a card (screenshot convenience — accepts base64 or data URL).</p>
+<div class="code-block">
+{ <span class="str">"name"</span>: <span class="str">"attach_image_data_to_card"</span>,<br/>
+&nbsp;&nbsp;<span class="str">"arguments"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"cardId"</span>: <span class="str">"card123"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"imageData"</span>: <span class="str">"data:image/png;base64,iVBORw0KGgo="</span><br/>
+&nbsp;&nbsp;} }
+</div></div><h2>Usage Tips</h2>
+<ul>
+<li><strong>boardId optional:</strong> If not provided, some tools use the default board from API key</li>
+<li><strong>Date format:</strong> Due date uses ISO 8601 (<code>2026-07-01T12:00:00Z</code>), start date uses <code>YYYY-MM-DD</code></li>
+<li><strong>Label IDs:</strong> Get from Trello UI or via <code>get_board_labels</code></li>
+<li><strong>Member IDs:</strong> Get via <code>get_board_members</code></li>
+<li><strong>Source code:</strong> These tools are from <code>packages/kaede-trello/src/mcp-server.js</code> — custom KAEDE, not <code>@delorenj/mcp-server-trello</code></li>
+</ul>
+<hr>
+<h2>✅ Status Implementasi</h2>
+<p>Semua tools di bawah sudah <strong>complete</strong> dan tersedia di <code>packages/kaede-trello/src/mcp-server.js</code> (lib) serta sebagian sudah di-PR ke upstream <code>@delorenj/mcp-server-trello</code>.</p>
+<p><strong>Tool count:</strong></p>
+<ul>
+<li><code>packages/kaede-trello</code> (lib): <strong>42 tools</strong> — fitur custom/penyangga</li>
+<li><code>@delorenj/mcp-server-trello</code> (upstream): <strong>55+ tools</strong> — tools resmi</li>
+</ul>
+<p><strong>PR ke upstream (oleh sandikodev):</strong></p>
+<ul>
+<li><code>get_card_attachments</code> + <code>get_card_checklists</code> — <a href="https://github.com/delorenj/mcp-server-trello/pull/98">#98</a></li>
+<li><code>watch_card</code> + <code>watch_list</code> — <a href="https://github.com/delorenj/mcp-server-trello/pull/99">#99</a></li>
+<li><code>search_labels</code> + <code>remove_label_from_card</code> — <a href="https://github.com/delorenj/mcp-server-trello/pull/100">#100</a></li>
+</ul>
+<p><strong>Fitur yang tidak akan di-upstream</strong> (akan tetap di lib kaede-trello):</p>
+<ul>
+<li><code>copy_list</code>, <code>move_list</code> — membutuhkan Power-Up</li>
+<li><code>share_card</code>, <code>make_template</code> — dievaluasi</li>
+<li><code>create_jira_work_item</code>, <code>mirror_card</code>, <code>butler_automation</code>, <code>custom_fields</code>, <code>recurring_cards</code> — fitur Power-Up/plugin eksternal</li>
+</ul>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            OpenCode
+          </a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            SDLC Roles
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Overview</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Tools Reference</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>SDLC Roles</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Roles & Access</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Architecture & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Playbook Template</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsorship</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>

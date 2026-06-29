@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dokumentasi — KAEDE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="../js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Dokumentasi</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Ikhtisar</a>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key & Token</a>
+          <a href="mcp-server.html" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Referensi Tools</a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Peran SDLC</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Peran & Akses</a>
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Arsitektur & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Template Playbook</a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Sponsor</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Dokumentasi</a>
+              <span>/</span>
+              <span>MCP Server</span>
+            </p>
+<h1>Setup Trello MCP Server</h1>
+<p><strong>MCP Server Trello</strong> (<a href="https://github.com/delorenj/mcp-server-trello">delorenj/mcp-server-trello</a>) adalah server open source yang menyediakan jembatan antara Trello API dan AI Agent melalui protokol MCP. Server ini menangani rate limiting, validasi input, dan error handling secara otomatis.</p>
+<div class="not-prose p-4 rounded-xl bg-kaede-success/10 border border-kaede-success/20 mb-6"><p><strong>Prasyarat</strong></p>
+<ul>
+<li>Node.js 18+ atau <strong>Bun</strong> v1.0+ (direkomendasikan — 2.8-4.4x lebih cepat)</li>
+<li>Trello API Key &amp; Token — <a href="api-key.html">lihat panduan</a></li>
+</ul>
+</div><h2>Installasi</h2>
+<h3>Opsi A: Menggunakan Bunx (Termudah)</h3>
+<pre><code class="language-bash">bunx @delorenj/mcp-server-trello
+</code></pre>
+<h3>Opsi B: Clone Repositori</h3>
+<pre><code class="language-bash">git clone https://github.com/delorenj/mcp-server-trello.git
+cd mcp-server-trello
+bun install
+bun run build
+</code></pre>
+<h2>Environment Variables</h2>
+<p>Buat file <code>.env</code> di direktori server:</p>
+<pre><code class="language-env"># Required: Trello API credentials
+TRELLO_API_KEY=your-api-key
+TRELLO_TOKEN=your-token
+
+# Optional: Default board ID (bisa diubah via set_active_board)
+TRELLO_BOARD_ID=your-board-id
+
+# Optional: Initial workspace ID
+TRELLO_WORKSPACE_ID=your-workspace-id
+
+# Optional: Proxy untuk corporate network
+https_proxy=http://your-proxy:8080
+
+# Optional: Batasi akses ke workspace tertentu
+TRELLO_ALLOWED_WORKSPACES=workspace-id-1,workspace-id-2
+</code></pre>
+<h2>Konfigurasi untuk OpenCode / Claude Desktop</h2>
+<p>Tambahkan MCP server ke file konfigurasi MCP client-mu:</p>
+<h3>Contoh untuk Claude Desktop</h3>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;trello&quot;: {
+      &quot;command&quot;: &quot;bunx&quot;,
+      &quot;args&quot;: [&quot;@delorenj/mcp-server-trello&quot;],
+      &quot;env&quot;: {
+        &quot;TRELLO_API_KEY&quot;: &quot;your-api-key&quot;,
+        &quot;TRELLO_TOKEN&quot;: &quot;your-token&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<h3>Contoh untuk OpenCode</h3>
+<pre><code class="language-json">{
+  &quot;mcp&quot;: {
+    &quot;trello&quot;: {
+      &quot;type&quot;: &quot;local&quot;,
+      &quot;command&quot;: &quot;bunx&quot;,
+      &quot;args&quot;: [&quot;@delorenj/mcp-server-trello&quot;],
+      &quot;env&quot;: {
+        &quot;TRELLO_API_KEY&quot;: &quot;your-api-key&quot;,
+        &quot;TRELLO_TOKEN&quot;: &quot;your-token&quot;
+      },
+      &quot;enabled&quot;: true
+    }
+  }
+}
+</code></pre>
+<h2>Verifikasi Setup</h2>
+<p>Untuk memastikan server berjalan dengan benar:</p>
+<ol>
+<li>Jalankan server: <code>bunx @delorenj/mcp-server-trello</code></li>
+<li>Buka MCP client (OpenCode / Claude Desktop)</li>
+<li>Coba perintah: <em>&quot;List all my Trello boards&quot;</em></li>
+<li>Jika response muncul, setup berhasil!</li>
+</ol>
+<h2>Manajemen Board &amp; Workspace</h2>
+<p>Server mendukung multiple board dan workspace. Kamu bisa:</p>
+<ul>
+<li><strong>Dynamic board selection:</strong> Gunakan <code>set_active_board</code> untuk berganti board tanpa restart</li>
+<li><strong>Multi-board support:</strong> Semua method menerima parameter <code>boardId</code> opsional</li>
+<li><strong>Workspace restriction:</strong> Batasi akses AI ke workspace tertentu via <code>TRELLO_ALLOWED_WORKSPACES</code></li>
+</ul>
+<p>Konfigurasi yang sudah dipilih akan persist di <code>~/.trello-mcp/config.json</code>.</p>
+<h2>Rate Limiting</h2>
+<p>Server menerapkan <strong>token bucket algorithm</strong> untuk mematuhi batas API Trello:</p>
+<ul>
+<li>300 requests per 10 detik per API key</li>
+<li>100 requests per 10 detik per token</li>
+<li>Request akan di-queue jika limit tercapai</li>
+</ul>
+<h2>KAEDE Custom Extensions</h2>
+<p>KAEDE MCP memiliki beberapa extensions di atas TRELLO MCP upstream:</p>
+<h3>Concern Separation</h3>
+<p>KAEDE mengimplementasikan <strong>concern separation</strong> yang jelas:</p>
+<ul>
+<li><strong>KAEDE MCP</strong> (<code>mcp.kaede</code>) — Pure context provider, playbook-aware, high-level intents</li>
+<li><strong>TRELLO MCP</strong> (<code>mcp.trello</code>) — Raw Trello API tools, low-level execution</li>
+</ul>
+<h3>Enhanced Features</h3>
+<p><strong>Attachments (Phase 1):</strong></p>
+<ul>
+<li><code>attach_file_to_card</code> — Attach from URL or local file</li>
+<li><code>attach_image_to_card</code> — Attach image from URL</li>
+<li><code>attach_data_to_card</code> — Attach from base64/data URL</li>
+<li><code>attach_image_data_to_card</code> — Attach image from base64 (screenshot)</li>
+<li><code>get_card_attachments</code> — <strong>NEW</strong> (missing di upstream!)</li>
+</ul>
+<p><strong>Copy Card (Phase 1):</strong></p>
+<ul>
+<li><code>copy_card</code> — Dengan <code>keepFromSource</code> options</li>
+</ul>
+<p><strong>Checklist Enhancements (Phase 2):</strong></p>
+<ul>
+<li><code>delete_checklist</code></li>
+<li><code>delete_checklist_item</code></li>
+<li><code>update_checklist_item</code></li>
+<li><code>get_card_checklists</code> — <strong>NEW</strong> (missing di upstream!)</li>
+</ul>
+<p><strong>Advanced Features (Phase 3):</strong></p>
+<ul>
+<li><code>watch_card</code> — Subscribe to card activity</li>
+<li><code>watch_list</code> — Subscribe to list activity</li>
+<li><code>get_card_activity</code> — Get card history</li>
+<li><code>search_labels</code> — Filter labels by name</li>
+<li><code>remove_label_from_card</code> — Remove single label</li>
+</ul>
+<h3>Comparison: KAEDE MCP vs TRELLO MCP</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>KAEDE MCP</th>
+<th>TRELLO MCP</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Core Tools</strong></td>
+<td>42 tools</td>
+<td>45+ tools</td>
+<td>KAEDE focused on essentials</td>
+</tr>
+<tr>
+<td><strong>Attachments</strong></td>
+<td>⬜ In Progress</td>
+<td>✅ Complete</td>
+<td>Phase 1</td>
+</tr>
+<tr>
+<td><strong>Copy Card</strong></td>
+<td>⬜ In Progress</td>
+<td>✅ Complete</td>
+<td>Phase 1</td>
+</tr>
+<tr>
+<td><strong>Checklist</strong></td>
+<td>⚠️ Partial</td>
+<td>✅ Complete</td>
+<td>Phase 2</td>
+</tr>
+<tr>
+<td><strong>Orchestrator</strong></td>
+<td>✅ Complete</td>
+<td>❌ Missing</td>
+<td>KAEDE unique feature</td>
+</tr>
+<tr>
+<td><strong>Playbook Integration</strong></td>
+<td>✅ Complete</td>
+<td>❌ Missing</td>
+<td>KAEDE unique feature</td>
+</tr>
+<tr>
+<td><strong>Custom Fields</strong></td>
+<td>❌ Not planned</td>
+<td>✅ Complete</td>
+<td>Power-Up feature</td>
+</tr>
+</tbody></table>
+<p><strong>Documentation:</strong></p>
+<ul>
+<li><a href="DEVELOPMENT-ROADMAP.html"><code>DEVELOPMENT-ROADMAP.md</code></a> — Master development plan</li>
+<li><a href="CONTRIBUTION-GUIDE.html"><code>CONTRIBUTION-GUIDE.md</code></a> — Upstream contribution guide</li>
+<li><a href="FEATURE-SPECIFICATION.html"><code>FEATURE-SPECIFICATION.md</code></a> — Detailed feature specs</li>
+</ul>
+<hr>
+<h2>Troubleshooting</h2>
+<div class="not-prose space-y-2 mt-3"><div class="p-3 rounded-lg bg-kaede-surface border border-kaede-border">
+  <p class="text-xs font-medium text-kaede-text">Error: <code>Suspicious link removed</code> pada board URL</p>
+  <p class="text-xs text-kaede-muted mt-1">Abaikan — ini adalah false positive dari Trello. Board ID tetap bisa digunakan.</p>
+</div><div class="p-3 rounded-lg bg-kaede-surface border border-kaede-border">
+  <p class="text-xs font-medium text-kaede-text">Error: <code>Authentication failed</code></p>
+  <p class="text-xs text-kaede-muted mt-1">Pastikan API Key dan Token benar. Generate ulang token jika perlu.</p>
+</div><div class="p-3 rounded-lg bg-kaede-surface border border-kaede-border">
+  <p class="text-xs font-medium text-kaede-text">Error: <code>Rate limit exceeded</code></p>
+  <p class="text-xs text-kaede-muted mt-1">Tunggu beberapa detik — server akan meng-queue request secara otomatis.</p>
+</div></div><h2>Langkah Selanjutnya</h2>
+<p>Jika server sudah berjalan, lanjut ke panduan <a href="opencode.html">Integrasi OpenCode</a> untuk mengonfigurasi AI Agent-mu.</p>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            API Key & Token
+          </a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            OpenCode
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Ikhtisar</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key & Token</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Referensi Tools</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>Peran SDLC</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Peran & Akses</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Arsitektur & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Template Playbook</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsor</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>

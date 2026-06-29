@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation — KAEDE</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Documentation</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Overview</a>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key</a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Tools Reference</a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">SDLC Roles</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Roles & Access</a>
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Architecture & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Playbook Template</a>
+          <a href="sponsorship.html" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">Sponsorship</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Documentation</a>
+              <span>/</span>
+              <span>Sponsorship</span>
+            </p>
+<h1>Sponsorship — Support KAEDE</h1>
+<p>KAEDE is a <strong>Trello Power-Up + MCP Server + CLI Orchestrator</strong> that bridges Trello with AI Agents. Built by Sandiko for PT Koneksi Jaringan Indonesia.</p>
+<p><strong>This document is transparent:</strong> every donation recorded here, every feature release tied to funding targets.</p>
+<hr>
+<h2>Why Support KAEDE?</h2>
+<h3>For Teams</h3>
+<ul>
+<li><strong>Free for internal use</strong> — proprietary license, no per-seat cost</li>
+<li><strong>Trello-based</strong> — your team already uses Trello, just add the Power-Up</li>
+<li><strong>Playbook enforcement</strong> — SOPs in Markdown, AI Agent executes them</li>
+</ul>
+<h3>For AI Agent Ecosystem</h3>
+<ul>
+<li><strong>44 MCP tools</strong> — most comprehensive Trello access from AI Agent</li>
+<li><strong>Intent-driven</strong> — just say &quot;Start Sprint Alpha&quot;, AI Agent does the work</li>
+<li><strong>Dual MCP architecture</strong> — <code>mcp.kaede</code> + <code>mcp.trello</code>, clean separation</li>
+</ul>
+<h3>For Open Source</h3>
+<ul>
+<li><strong>3 upstream PRs</strong> to <code>delorenj/mcp-server-trello</code> (new features for everyone)</li>
+<li><strong>CONTRIBUTING.md</strong> — guide to add new tools, anyone can contribute</li>
+<li><strong>Active ecosystem contributor</strong> — features first, upstream PRs later</li>
+</ul>
+<hr>
+<h2>Ways to Support</h2>
+<h3>1. Trakteer.id (One-time / Monthly — Indonesia)</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Amount</th>
+<th>Reward</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Support</strong></td>
+<td>Any amount</td>
+<td>Name listed on Sponsors page</td>
+</tr>
+</tbody></table>
+<p><a href="https://trakteer.id/sandikodev"><strong>Trakteer now →</strong></a></p>
+<h3>2. GitHub Sponsors (Monthly — Global)</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Amount</th>
+<th>Reward</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Coffee</strong></td>
+<td>$3/month</td>
+<td>Listed in README</td>
+</tr>
+<tr>
+<td><strong>Developer</strong></td>
+<td>$10/month</td>
+<td>Listed + feature voting</td>
+</tr>
+<tr>
+<td><strong>Team</strong></td>
+<td>$25/month</td>
+<td>Listed + vote on public roadmap</td>
+</tr>
+<tr>
+<td><strong>Enterprise</strong></td>
+<td>$100/month</td>
+<td>Priority support + onboarding</td>
+</tr>
+</tbody></table>
+<p><a href="https://github.com/sponsors/sandikodev"><strong>Sponsor via GitHub →</strong></a></p>
+<h3>3. Non-Financial Contributions</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Code</strong></td>
+<td>Pull Request — follow <a href="../CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a></td>
+</tr>
+<tr>
+<td><strong>Documentation</strong></td>
+<td>Fix typos, add examples, translate</td>
+</tr>
+<tr>
+<td><strong>Bug Report</strong></td>
+<td><a href="https://github.com/konxc/kaede-powerup/issues">Open an issue</a></td>
+</tr>
+<tr>
+<td><strong>Feedback</strong></td>
+<td>Test, critique, suggest — via issues or community</td>
+</tr>
+<tr>
+<td><strong>Spread the word</strong></td>
+<td>Share with your team, Telegram groups, subreddits</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Development Roadmap</h2>
+<h3>🎯 Current Phase — v0.5 (Foundation)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Status</th>
+<th>Funded?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>44 MCP tools</td>
+<td>✅ Done</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MCP Orchestrator (<code>mcp.kaede</code>)</td>
+<td>✅ Done</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Playbook parser</td>
+<td>✅ Done</td>
+<td>—</td>
+</tr>
+<tr>
+<td>CLI tool (15+ commands)</td>
+<td>✅ Done</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Dual MCP architecture</td>
+<td>✅ Done</td>
+<td>—</td>
+</tr>
+<tr>
+<td>3 upstream PRs</td>
+<td>⏳ Awaiting review</td>
+<td>—</td>
+</tr>
+</tbody></table>
+<h3>🚀 Target v1.0 — Rp 2,000,000</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Estimate</th>
+<th>Funds Needed</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Domain kaede.sh</strong></td>
+<td>Rp 350,000/year</td>
+<td>Rp 350,000</td>
+</tr>
+<tr>
+<td><strong>Self-hosted docs site</strong> (small VPS)</td>
+<td>Rp 100,000/month</td>
+<td>Rp 300,000 (3 months)</td>
+</tr>
+<tr>
+<td><strong>Power-Up UI redesign</strong></td>
+<td>2 weeks</td>
+<td>Rp 500,000</td>
+</tr>
+<tr>
+<td><strong>Playbook visual editor (web)</strong></td>
+<td>3 weeks</td>
+<td>Rp 500,000</td>
+</tr>
+<tr>
+<td><strong>Video tutorial &amp; demo</strong></td>
+<td>Production + editing</td>
+<td>Rp 350,000</td>
+</tr>
+</tbody></table>
+<p><strong>Collected:</strong> Rp 0 / Rp 2,000,000</p>
+<h3>🔮 Target v2.0 — Rp 10,000,000</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Estimate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Multi-board orchestration</strong></td>
+<td>Start sprint across 5 boards at once</td>
+</tr>
+<tr>
+<td><strong>Slack/Discord notification bridge</strong></td>
+<td>Notifications from Trello to chat</td>
+</tr>
+<tr>
+<td><strong>Web dashboard (graphical)</strong></td>
+<td>Monitor all boards from one page</td>
+</tr>
+<tr>
+<td><strong>Playbook marketplace</strong></td>
+<td>Download community playbook templates</td>
+</tr>
+<tr>
+<td><strong>GitHub Actions integration</strong></td>
+<td>Auto-update Trello from CI/CD</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Financial Transparency</h2>
+<h3>Income</h3>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Platform</th>
+<th>Amount</th>
+<th>From</th>
+<th>Recorded</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><em>None yet</em></td>
+</tr>
+</tbody></table>
+<h3>Expenses</h3>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Purpose</th>
+<th>Amount</th>
+<th>Receipt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><em>None yet</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>This page is updated manually on every transaction.</p>
+</blockquote>
+<hr>
+<h2>Current Sponsors</h2>
+<div align="center"><p><em>Empty — be the first sponsor!</em></p>
+<p><a href="https://trakteer.id/sandikodev"><img src="https://img.shields.io/badge/Trakteer-Be_First_Sponsor-red?logo=buymeacoffee&style=for-the-badge" alt="Trakteer"></a></p>
+</div><hr>
+<h2>FAQ</h2>
+<p><strong>Q: I don&#39;t have money — how can I help?</strong><br>A: <strong>Plenty of ways.</strong> Share with your team, make a tutorial, report bugs, contribute code — all valuable.</p>
+<p><strong>Q: Will features be locked for sponsors?</strong><br>A: <strong>No.</strong> All features remain free for internal use. Sponsor rewards are ceremonial &amp; priority — not a paywall.</p>
+<p><strong>Q: What exactly does the funding go to?</strong><br>A: Domain, hosting, content production, and contributor incentives. Transaction details above.</p>
+<p><strong>Q: What happens when the funding target is reached?</strong><br>A: The next target opens immediately. This is a long-term project.</p>
+<hr>
+<h2>Links</h2>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Trakteer</td>
+<td><a href="https://trakteer.id/sandikodev">trakteer.id/sandikodev</a></td>
+</tr>
+<tr>
+<td>GitHub Sponsors</td>
+<td><a href="https://github.com/sponsors/sandikodev">github.com/sponsors/sandikodev</a></td>
+</tr>
+<tr>
+<td>Repository</td>
+<td><a href="https://github.com/konxc/kaede-powerup">github.com/konxc/kaede-powerup</a></td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td><a href="https://konxc.github.io/kaede-powerup">konxc.github.io/kaede-powerup</a></td>
+</tr>
+<tr>
+<td>Power-Up</td>
+<td><a href="https://kaede-powerup.netlify.app">kaede-powerup.netlify.app</a></td>
+</tr>
+</tbody></table>
+<hr>
+<p><em>Thank you for considering supporting KAEDE. Every bit of support — no matter how small — keeps this project alive.</em></p>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Playbook Template
+          </a>
+          <span></span>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Overview</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Tools Reference</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>SDLC Roles</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Roles & Access</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Architecture & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Playbook Template</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsorship</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>

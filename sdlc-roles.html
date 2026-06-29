@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation — KAEDE</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Documentation</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Overview</a>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key</a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Tools Reference</a>
+          <a href="sdlc-roles.html" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">SDLC Roles</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Roles & Access</a>
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Architecture & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Playbook Template</a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Sponsorship</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Documentation</a>
+              <span>/</span>
+              <span>SDLC Roles</span>
+            </p>
+<h1>SDLC Roles — Who Needs KAEDE?</h1>
+<p>KAEDE bridges Trello project management with AI Agents across the entire Software Development Life Cycle. Here is who benefits and how.</p>
+<hr>
+<h2>Product Manager / Project Manager</h2>
+<p><strong>Pain points:</strong></p>
+<ul>
+<li>Sprint setup is repetitive: create lists, cards, labels, assign members</li>
+<li>Team members forget to follow SOPs (label conventions, list workflows)</li>
+<li>Hard to get a daily snapshot of what everyone is working on</li>
+</ul>
+<p><strong>How KAEDE helps:</strong></p>
+<pre><code>&quot;Mulai Sprint Alpha&quot; → KAEDE auto-creates sprint lists, populates cards,
+applies correct labels, assigns members per playbook rules
+</code></pre>
+<ul>
+<li>Intent-driven orchestration: <code>kaede run --intent &quot;Mulai Sprint Alpha&quot;</code></li>
+<li>Playbook enforcement: write SOPs once in Markdown, AI Agent applies them</li>
+<li><code>kaede today</code> — quick daily view of all assigned tasks across boards</li>
+<li>Dashboard popup on each Trello board with environment statistics</li>
+</ul>
+<hr>
+<h2>Developer / Engineer</h2>
+<p><strong>Pain points:</strong></p>
+<ul>
+<li>Context switching between IDE, Trello, and chat to update card status</li>
+<li>Manual card updates feel like overhead during coding flow</li>
+<li>Attaching screenshots to cards requires multiple steps</li>
+</ul>
+<p><strong>How KAEDE helps:</strong></p>
+<pre><code>Paste screenshot from clipboard → AI Agent attaches to Trello card
+via base64, no file upload needed
+</code></pre>
+<ul>
+<li>44 MCP tools — comprehensive Trello API access from AI Agent</li>
+<li>Clipboard-to-card attachment (base64 screenshots)</li>
+<li>Full checklist CRUD: create, update, delete, copy across cards</li>
+<li><code>kaede init</code> — one-command MCP setup in any project</li>
+<li><code>kaede setup</code> — global credentials, no per-project env vars</li>
+</ul>
+<hr>
+<h2>QA / Tester</h2>
+<p><strong>Pain points:</strong></p>
+<ul>
+<li>Repeating the same checklist items across multiple cards</li>
+<li>Need to track card history to verify what changed and when</li>
+<li>Sorting through cards by due date or priority is manual</li>
+</ul>
+<p><strong>How KAEDE helps:</strong></p>
+<pre><code>Copy QA checklist template to 10 cards in one command via AI Agent
+</code></pre>
+<ul>
+<li>Checklist templates: copy QA, DoD, Sprint Planning checklists between cards</li>
+<li><code>get_card_activity</code> — full audit trail of comments, moves, updates</li>
+<li><code>sort_list_cards</code> — auto-sort cards by due date, name, or position</li>
+<li>Label management: search, create, update, delete — fine-grained control</li>
+</ul>
+<hr>
+<h2>Tech Lead / Architect</h2>
+<p><strong>Pain points:</strong></p>
+<ul>
+<li>Maintaining consistent workflow standards across multiple teams</li>
+<li>Ensuring AI Agents respect project governance rules</li>
+<li>Need clean separation between context logic and execution</li>
+</ul>
+<p><strong>How KAEDE helps:</strong></p>
+<pre><code>Playbook → OpenKB → OpenCode → mcp.kaede (orchestration) → mcp.trello (execution)
+</code></pre>
+<ul>
+<li><strong>Dual MCP architecture</strong>: <code>mcp.kaede</code> (4 context tools) + <code>mcp.trello</code> (40+ execution tools)</li>
+<li>Playbook parser — structured SOP enforcement from human-readable Markdown</li>
+<li>OpenKB integration — shared glossary &amp; decision log for AI Agent</li>
+<li>Role-based access control per <code>docs/role-management.md</code></li>
+<li>Rate limiting (token bucket) — automatic Trello API compliance</li>
+</ul>
+<hr>
+<h2>Stakeholder / Business Owner</h2>
+<p><strong>Pain points:</strong></p>
+<ul>
+<li>Want visibility into project progress without learning Trello</li>
+<li>Need high-level status without team overhead</li>
+<li>Cost concerns with per-seat licensing</li>
+</ul>
+<p><strong>How KAEDE helps:</strong></p>
+<ul>
+<li>Trello badges show environment status (PROD/STAG/DEV) directly on card faces</li>
+<li>Read-only board access for non-technical viewers</li>
+<li>Proprietary license allows unlimited internal use — no per-seat cost</li>
+<li><code>kaede status --mcp</code> — health check of the entire integration</li>
+</ul>
+<hr>
+<h2>AI / ML Engineer &amp; MCP Developer</h2>
+<p><strong>Pain points:</strong></p>
+<ul>
+<li>Building MCP servers from scratch for each tool integration</li>
+<li>Adding new Trello capabilities requires deep API knowledge</li>
+<li>No standardized way to contribute back to the ecosystem</li>
+</ul>
+<p><strong>How KAEDE helps:</strong></p>
+<ul>
+<li>42 tools from packages/kaede-trello + 45+ tools from upstream @delorenj/mcp-server-trello</li>
+<li><code>CONTRIBUTING.md</code> — step-by-step guide to add new tools</li>
+<li>Auto-built MCP server via <code>bun run build:mcp</code></li>
+<li>3 upstream PRs contributed to <code>delorenj/mcp-server-trello</code></li>
+</ul>
+<hr>
+<h2>Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Key Benefit</th>
+<th>Entry Point</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PM/PM</td>
+<td>Intent-driven sprint automation</td>
+<td><code>kaede run --intent</code></td>
+</tr>
+<tr>
+<td>Developer</td>
+<td>42 tools (lib) + 55+ tools (upstream) via AI Agent</td>
+<td><code>kaede init</code></td>
+</tr>
+<tr>
+<td>QA/Tester</td>
+<td>Checklist templates + card history</td>
+<td><code>get_card_activity</code></td>
+</tr>
+<tr>
+<td>Tech Lead</td>
+<td>Playbook-enforced governance</td>
+<td>Playbook parser</td>
+</tr>
+<tr>
+<td>Stakeholder</td>
+<td>Zero-config visibility</td>
+<td>Trello badges</td>
+</tr>
+<tr>
+<td>AI Engineer</td>
+<td>Extensible MCP architecture</td>
+<td><code>CONTRIBUTING.md</code></td>
+</tr>
+</tbody></table>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="tools.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Tools Reference
+          </a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            Roles & Access
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Overview</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Tools Reference</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>SDLC Roles</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Roles & Access</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Architecture & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Playbook Template</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsorship</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>

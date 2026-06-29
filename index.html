@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation — KAEDE</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Documentation</span>
+          <a href="." class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">Overview</a>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key</a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Tools Reference</a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">SDLC Roles</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Roles & Access</a>
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Architecture & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Playbook Template</a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Sponsorship</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+
+<h1>KAEDE Documentation</h1>
+<p>KAEDE bridges Trello project management with AI Agents — from getting API credentials to full OpenCode integration and MCP orchestration.</p>
+<h2>Quick Start</h2>
+<p>Follow these 3 steps to start using Trello MCP:</p>
+<ol>
+<li><strong><a href="api-key.html">Get API Key &amp; Token</a></strong> — Create a Trello Power-Up and generate credentials.</li>
+<li><strong><a href="mcp-server.html">Setup MCP Server</a></strong> — Install and configure <code>@delorenj/mcp-server-trello</code>.</li>
+<li><strong><a href="opencode.html">OpenCode Integration</a></strong> — Add the MCP server to your <code>opencode.json</code>.</li>
+</ol>
+<h2>Page Index</h2>
+<h3>User Documentation</h3>
+<div class="grid sm:grid-cols-2 gap-4 not-prose"><a href="api-key.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-2 text-sm font-bold">1</div>
+  <h3 class="text-sm font-semibold text-kaede-text">API Key & Token</h3>
+  <p class="text-xs text-kaede-muted mt-1">Step-by-step guide to obtain Trello API credentials via Power-Up admin.</p>
+</a><a href="mcp-server.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-success/20 text-kaede-success mb-2 text-sm font-bold">2</div>
+  <h3 class="text-sm font-semibold text-kaede-text">MCP Server</h3>
+  <p class="text-xs text-kaede-muted mt-1">Install and configure the Trello MCP server, environment variables, and board/workspace management.</p>
+</a><a href="opencode.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-warning/20 text-kaede-warning mb-2 text-sm font-bold">3</div>
+  <h3 class="text-sm font-semibold text-kaede-text">OpenCode Integration</h3>
+  <p class="text-xs text-kaede-muted mt-1">How to add Trello MCP to your opencode.json and use tools from your AI Agent.</p>
+</a><a href="tools.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-danger/20 text-kaede-danger mb-2 text-sm font-bold">4</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Tools Reference</h3>
+  <p class="text-xs text-kaede-muted mt-1">Complete list of all MCP tools: cards, lists, checklists, comments, attachments, custom fields.</p>
+</a></div><h3>Development Documentation</h3>
+<div class="grid sm:grid-cols-2 gap-4 not-prose mt-6"><a href="sdlc-roles.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-2 text-sm font-bold">👥</div>
+  <h3 class="text-sm font-semibold text-kaede-text">SDLC Roles</h3>
+  <p class="text-xs text-kaede-muted mt-1">Who uses KAEDE across the software development lifecycle — PM, Dev, QA, Tech Lead, Stakeholder.</p>
+</a><a href="DEVELOPMENT-ROADMAP.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-2 text-sm font-bold">📋</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Development Roadmap</h3>
+  <p class="text-xs text-kaede-muted mt-1">Master development plan: 3-phase implementation, timeline, upstream contribution strategy.</p>
+</a><a href="CONTRIBUTING.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-success/20 text-kaede-success mb-2 text-sm font-bold">🤝</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Contribution Guide</h3>
+  <p class="text-xs text-kaede-muted mt-1">Upstream contribution guide for Trello MCP: PR workflow, testing, communication templates.</p>
+</a><a href="FEATURE-SPECIFICATION.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-warning/20 text-kaede-warning mb-2 text-sm font-bold">⚙️</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Feature Specification</h3>
+  <p class="text-xs text-kaede-muted mt-1">Detailed specs: attachments, copy card, checklist enhancements, advanced features.</p>
+</a><a href="kaede-architecture.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-danger/20 text-kaede-danger mb-2 text-sm font-bold">🏗️</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Architecture</h3>
+  <p class="text-xs text-kaede-muted mt-1">KAEDE architecture, concern separation, orchestration layer, ecosystem overview.</p>
+</a><a href="playbook-template.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-warning/20 text-kaede-warning mb-2 text-sm font-bold">📄</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Playbook Template</h3>
+  <p class="text-xs text-kaede-muted mt-1">Universal playbook template for team SOPs, workflow, and AI Agent collaboration.</p>
+</a></div><h2>About Trello MCP</h2>
+<p><strong>MCP (Model Context Protocol)</strong> is an open standard that enables AI Agents to communicate with external tools. <strong>Trello MCP Server</strong> (<a href="https://github.com/delorenj/mcp-server-trello">delorenj/mcp-server-trello</a>) bridges the Trello API with AI Agents — allowing agents to read, create, and update Trello cards directly from conversation.</p>
+<p>The server handles rate limiting (300 req/10s per API key, 100 req/10s per token), input validation, and error handling automatically.</p>
+<h2>Quick Links</h2>
+<ul>
+<li><a href="https://trello.com/power-ups/admin">Trello Power-Up Admin</a> — Create and manage Power-Ups</li>
+<li><a href="https://github.com/delorenj/mcp-server-trello">GitHub: delorenj/mcp-server-trello</a> — Main repository</li>
+<li><a href="https://www.npmjs.com/package/@delorenj/mcp-server-trello">npm: @delorenj/mcp-server-trello</a> — npm package</li>
+</ul>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <span></span>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            API Key
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Overview</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Tools Reference</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>SDLC Roles</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Roles & Access</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Architecture & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Playbook Template</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsorship</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>

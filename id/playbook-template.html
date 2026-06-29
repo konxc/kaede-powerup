@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dokumentasi — KAEDE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="../js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Dokumentasi</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Ikhtisar</a>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key & Token</a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Referensi Tools</a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Peran SDLC</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Peran & Akses</a>
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Arsitektur & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">Template Playbook</a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Sponsor</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Dokumentasi</a>
+              <span>/</span>
+              <span>Template Playbook</span>
+            </p>
+<h1>Template Playbook Kolaboratif Human+AI</h1>
+<p>Playbook adalah dokumen rujukan utama (<em>source of truth</em>) bagi <strong>manusia dan AI Agent</strong> untuk berkolaborasi dalam satu tim. Dokumen ini mendefinisikan aturan main, peran, alur kerja (SOP), konvensi teknis, dan budaya tim.</p>
+<blockquote>
+<p><strong>Cara menggunakan</strong>: Copy file ini ke repo project kamu, edit sesuai kebutuhan, lalu jalankan <code>kaede init</code> untuk menghubungkannya dengan KAEDE orchestrator.</p>
+</blockquote>
+<hr>
+<h2>1. Tim &amp; Peran</h2>
+<h3>1.1 Struktur Tim</h3>
+<table>
+<thead>
+<tr>
+<th>Person</th>
+<th>Role</th>
+<th>GitHub</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>(nama)</td>
+<td>Project Manager</td>
+<td>@username</td>
+</tr>
+<tr>
+<td>(nama)</td>
+<td>Tech Lead</td>
+<td>@username</td>
+</tr>
+<tr>
+<td>(nama)</td>
+<td>Developer</td>
+<td>@username</td>
+</tr>
+<tr>
+<td>(nama)</td>
+<td>Product Analyst</td>
+<td>@username</td>
+</tr>
+<tr>
+<td>(nama)</td>
+<td>Stakeholder</td>
+<td>@username</td>
+</tr>
+</tbody></table>
+<h3>1.2 Definisi Peran</h3>
+<h4>Peran: Project Manager (PM)</h4>
+<ul>
+<li><strong>Tanggung Jawab</strong>: Menentukan visi produk, memprioritaskan backlog, menyetujui UAT, mengelola stakeholder.</li>
+<li><strong>Akses Trello</strong>: Admin (semua board).</li>
+<li><strong>AI Agent Instructions</strong>: Bantu PM merangkum status sprint harian, deteksi card yang stagnan (&gt;2 hari di list yang sama), dan draft release notes.</li>
+</ul>
+<h4>Peran: Tech Lead</h4>
+<ul>
+<li><strong>Tanggung Jawab</strong>: Arsitektur solusi, code review, mentoring developer, standar kode.</li>
+<li><strong>Akses Trello</strong>: Admin (Sprint Board), View (Product Roadmap).</li>
+<li><strong>AI Agent Instructions</strong>: Bantu Tech Lead review PR secara otomatis, cek kepatuhan kode terhadap standar, dan breakdown task teknis.</li>
+</ul>
+<h4>Peran: Developer</h4>
+<ul>
+<li><strong>Tanggung Jawab</strong>: Implementasi fitur, bug fixing, self-review, unit testing.</li>
+<li><strong>Akses Trello</strong>: View/Edit (Sprint Board).</li>
+<li><strong>AI Agent Instructions</strong>: Bantu developer menulis kode, generate test, dan update status Trello secara otomatis.</li>
+</ul>
+<h4>Peran: Product Analyst</h4>
+<ul>
+<li><strong>Tanggung Jawab</strong>: Requirement gathering, user story, UAT, komunikasi stakeholder.</li>
+<li><strong>Akses Trello</strong>: Edit (Product Roadmap), View/Edit (Sprint Board).</li>
+<li><strong>AI Agent Instructions</strong>: Bantu Analyst menyusun user story, draft acceptance criteria, dan validasi hasil UAT.</li>
+</ul>
+<h4>Peran: Stakeholder</h4>
+<ul>
+<li><strong>Tanggung Jawab</strong>: Validasi visi, approve milestone, provide resource.</li>
+<li><strong>Akses Trello</strong>: View/Comment (semua board).</li>
+<li><strong>AI Agent Instructions</strong>: Sediakan ringkasan eksekutif tiap sprint untuk stakeholder.</li>
+</ul>
+<hr>
+<h2>2. Alur Kerja Sprint</h2>
+<h3>2.1 Siklus Sprint</h3>
+<table>
+<thead>
+<tr>
+<th>Fase</th>
+<th>Durasi</th>
+<th>Aktivitas</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Sprint Planning</strong></td>
+<td>Hari 1 (1-2 jam)</td>
+<td>Review backlog, commit story points, breakdown task</td>
+</tr>
+<tr>
+<td><strong>Eksekusi</strong></td>
+<td>Hari 2-9</td>
+<td>Developer mengerjakan task, daily standup via Trello comment</td>
+</tr>
+<tr>
+<td><strong>Code Review</strong></td>
+<td>Continue</td>
+<td>Setiap PR harus di-review &lt;24 jam</td>
+</tr>
+<tr>
+<td><strong>UAT</strong></td>
+<td>Hari 9-10</td>
+<td>Product Analyst &amp; Stakeholder validasi</td>
+</tr>
+<tr>
+<td><strong>Sprint Review</strong></td>
+<td>Hari 10 (1 jam)</td>
+<td>Demo ke stakeholder, retrospective</td>
+</tr>
+</tbody></table>
+<h3>2.2 List Trello &amp; Alur Card</h3>
+<pre><code>Product Backlog → Ready for Dev → In Progress → Code Review → UAT/Testing → Done
+</code></pre>
+<ol>
+<li><strong>Product Backlog</strong>: Semua ide/rencana. Setiap card harus punya user story &amp; acceptance criteria minimal.</li>
+<li><strong>Ready for Dev</strong>: Card yang sudah siap dikerjakan (DoR terpenuhi). Di-prioritaskan oleh PM.</li>
+<li><strong>In Progress</strong>: Sedang dikerjakan. <strong>Maksimal 3 card aktif per developer</strong>.</li>
+<li><strong>Code Review</strong>: PR sudah dibuat. Wajib di-review &lt;24 jam.</li>
+<li><strong>UAT/Testing</strong>: Menunggu validasi Product Analyst / Stakeholder.</li>
+<li><strong>Done</strong>: Semua DoD terpenuhi, sudah di-merge ke main.</li>
+</ol>
+<h3>2.3 Definition of Ready (DoR)</h3>
+<p>Card siap dikerjakan jika:</p>
+<ul>
+<li>User story lengkap dengan format: <em>Sebagai [X], saya ingin [Y], sehingga [Z]</em></li>
+<li>Acceptance Criteria jelas &amp; testable (bisa dicek ya/tidak)</li>
+<li>Dependencies teridentifikasi &amp; resolved</li>
+<li>Story points sudah di-assign</li>
+<li>Technical breakdown sudah dilakukan (bila perlu)</li>
+</ul>
+<h3>2.4 Definition of Done (DoD)</h3>
+<p>Card dinyatakan selesai jika:</p>
+<ul>
+<li>Code complete &amp; sudah di-commit</li>
+<li>Unit test &gt;70% coverage (minimum)</li>
+<li>Feature/E2E test written untuk critical path</li>
+<li>Code review approved (minimal 1 reviewer)</li>
+<li>PR sudah di-merge ke branch utama</li>
+<li>UAT passed (bila ada)</li>
+<li>Dokumentasi diupdate (bila perlu)</li>
+</ul>
+<hr>
+<h2>3. Konvensi Trello</h2>
+<h3>3.1 Judul Card</h3>
+<p>Gunakan format: <code>&lt;tipe&gt;: &lt;deskripsi singkat&gt;</code></p>
+<table>
+<thead>
+<tr>
+<th>Tipe</th>
+<th>Contoh</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>feat</code></td>
+<td><code>feat: Tambah halaman login SSO</code></td>
+</tr>
+<tr>
+<td><code>fix</code></td>
+<td><code>fix: Perbaiki validasi email duplikat</code></td>
+</tr>
+<tr>
+<td><code>docs</code></td>
+<td><code>docs: Update API documentation</code></td>
+</tr>
+<tr>
+<td><code>refactor</code></td>
+<td><code>refactor: Pisahkan UserController jadi service layer</code></td>
+</tr>
+<tr>
+<td><code>test</code></td>
+<td><code>test: Tambah unit test untuk AttendanceService</code></td>
+</tr>
+<tr>
+<td><code>chore</code></td>
+<td><code>chore: Upgrade dependency Laravel 10→11</code></td>
+</tr>
+<tr>
+<td><code>perf</code></td>
+<td><code>perf: Optimasi query presensi harian</code></td>
+</tr>
+</tbody></table>
+<h3>3.2 Deskripsi Card (Template)</h3>
+<pre><code class="language-markdown">## Deskripsi
+[Apa masalahnya? Apa yang ingin dicapai?]
+
+## User Story
+Sebagai [Peran], saya ingin [Tindakan], sehingga [Manfaat].
+
+## Acceptance Criteria
+- [ ] Kriteria 1
+- [ ] Kriteria 2
+- [ ] Kriteria 3
+
+## Technical Notes
+- Stack: [Laravel / React / dll]
+- Database: [tabel yang terpengaruh]
+- Migration: [file migration baru?]
+
+## Environment
+- Target: [PROD / STAG / DEV]
+- Deploy URL: [opsional]
+</code></pre>
+<h3>3.3 Label Warna (Prioritas)</h3>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Warna</th>
+<th>Arti</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Merah</strong></td>
+<td>🔴</td>
+<td>Prioritas Tinggi / Hotfix / Critical</td>
+</tr>
+<tr>
+<td><strong>Kuning</strong></td>
+<td>🟡</td>
+<td>Prioritas Sedang / Fitur Reguler</td>
+</tr>
+<tr>
+<td><strong>Hijau</strong></td>
+<td>🟢</td>
+<td>Prioritas Rendah / Refactoring / Tech Debt</td>
+</tr>
+<tr>
+<td><strong>Biru</strong></td>
+<td>🔵</td>
+<td>Dokumentasi / Research / Learning</td>
+</tr>
+<tr>
+<td><strong>Ungu</strong></td>
+<td>🟣</td>
+<td>Task Internal / Admin / Meeting</td>
+</tr>
+</tbody></table>
+<h3>3.4 Label Environment (Kustom)</h3>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Arti</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Production</code></td>
+<td>Sudah di-deploy ke production</td>
+</tr>
+<tr>
+<td><code>Staging</code></td>
+<td>Sedang diuji di staging</td>
+</tr>
+<tr>
+<td><code>Development</code></td>
+<td>Masih dalam pengembangan lokal</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>4. Konvensi Coding &amp; Git</h2>
+<h3>4.1 Branch Naming</h3>
+<table>
+<thead>
+<tr>
+<th>Tujuan</th>
+<th>Format</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fitur baru</td>
+<td><code>feature/ISSUE-12-description</code></td>
+</tr>
+<tr>
+<td>Bug fix</td>
+<td><code>bugfix/ISSUE-15-description</code></td>
+</tr>
+<tr>
+<td>Hotfix</td>
+<td><code>hotfix/ISSUE-20-description</code></td>
+</tr>
+<tr>
+<td>Refactor</td>
+<td><code>refactor/ISSUE-22-description</code></td>
+</tr>
+<tr>
+<td>Docs</td>
+<td><code>docs/update-readme</code></td>
+</tr>
+<tr>
+<td>Chore</td>
+<td><code>chore/upgrade-deps</code></td>
+</tr>
+</tbody></table>
+<h3>4.2 Commit Messages (Conventional Commits)</h3>
+<pre><code class="language-bash">&lt;type&gt;(&lt;scope&gt;): &lt;description&gt;
+
+[optional body]
+
+[optional footer]
+</code></pre>
+<p>Contoh:</p>
+<pre><code>feat(auth): implementasi login dengan Google SSO
+
+- Tambah Google OAuth2 provider
+- Buat callback handler
+- Simpan refresh token ke database
+
+Closes #42
+</code></pre>
+<h3>4.3 Code Review Standards</h3>
+<ol>
+<li><strong>Self-review dulu</strong> sebelum minta review: cek ulang diff sendiri, pastikan tidak ada debug code/comment</li>
+<li><strong>PR deskriptif</strong>: isi template PR dengan lengkap, screenshoot untuk UI changes</li>
+<li><strong>Review &lt;24 jam</strong>: setiap PR wajib di-review dalam 1 hari kerja</li>
+<li><strong>Minimal 1 approval</strong>: tidak boleh merge sendiri</li>
+<li><strong>Semua CI hijau</strong>: jangan merge kalau ada test failure</li>
+</ol>
+<h3>4.4 Engineering Standards</h3>
+<ul>
+<li><strong>Type Safety</strong>: Hindari <code>any</code> (TypeScript) / <code>mixed</code> (PHP). Gunakan type/interface yang eksplisit.</li>
+<li><strong>Error Handling</strong>: Semua operasi I/O, API call, dan query database harus punya error handling.</li>
+<li><strong>Logging</strong>: Log error dengan konteks yang cukup untuk debugging (jangan log password/token).</li>
+<li><strong>Security</strong>: Validasi &amp; sanitize semua input user. Jangan pernah commit credential.</li>
+</ul>
+<hr>
+<h2>5. Testing Strategy</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Tools</th>
+<th>Coverage Target</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unit Test</td>
+<td>PHPUnit / Jest / Vitest</td>
+<td>&gt;70%</td>
+</tr>
+<tr>
+<td>Feature Test</td>
+<td>PHPUnit / Playwright</td>
+<td>Critical path</td>
+</tr>
+<tr>
+<td>E2E</td>
+<td>Playwright / Cypress</td>
+<td>Flow utama</td>
+</tr>
+<tr>
+<td>Manual UAT</td>
+<td>Checklist by Product Analyst</td>
+<td>100% AC</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>6. Access Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th align="center">PM</th>
+<th align="center">Tech Lead</th>
+<th align="center">Developer</th>
+<th align="center">Product Analyst</th>
+<th align="center">Stakeholder</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Source Code</strong></td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+<td align="center">write (branch)</td>
+<td align="center">read</td>
+<td align="center">read</td>
+</tr>
+<tr>
+<td><strong>Playbook</strong></td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+<td align="center">write</td>
+<td align="center">write</td>
+<td align="center">read</td>
+</tr>
+<tr>
+<td><strong>Trello Sprint Board</strong></td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+<td align="center">view/edit</td>
+<td align="center">view/edit</td>
+<td align="center">view/comment</td>
+</tr>
+<tr>
+<td><strong>Trello Roadmap</strong></td>
+<td align="center">admin</td>
+<td align="center">view</td>
+<td align="center">view</td>
+<td align="center">edit</td>
+<td align="center">view/comment</td>
+</tr>
+<tr>
+<td><strong>Staging</strong></td>
+<td align="center">full</td>
+<td align="center">full</td>
+<td align="center">operate</td>
+<td align="center">view</td>
+<td align="center">view</td>
+</tr>
+<tr>
+<td><strong>Production</strong></td>
+<td align="center">full</td>
+<td align="center">full</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td align="center">view</td>
+</tr>
+<tr>
+<td><strong>Database (prod)</strong></td>
+<td align="center">❌</td>
+<td align="center">emergency</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>7. Arsitektur &amp; ADR</h2>
+<h3>7.1 Apa itu ADR?</h3>
+<p><em>Architecture Decision Record</em> (ADR) adalah catatan keputusan arsitektur penting. Simpan di <code>docs/adr/</code>.</p>
+<h3>7.2 Template ADR</h3>
+<pre><code class="language-markdown"># ADR-XXX: [Judul Keputusan]
+
+**Status**: [Proposed / Accepted / Deprecated]
+**Date**: YYYY-MM-DD
+
+## Context
+[Mengapa keputusan ini perlu dibuat?]
+
+## Decision
+[Keputusan yang diambil]
+
+## Consequences
+[Dampak positif &amp; negatif dari keputusan ini]
+</code></pre>
+<hr>
+<h2>8. Komunikasi &amp; Meeting</h2>
+<table>
+<thead>
+<tr>
+<th>Jenis</th>
+<th>Frekuensi</th>
+<th>Durasi</th>
+<th>Peserta</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Daily Standup</td>
+<td>Setiap hari</td>
+<td>15 menit</td>
+<td>Developer + PM</td>
+</tr>
+<tr>
+<td>Sprint Planning</td>
+<td>Awal sprint</td>
+<td>1-2 jam</td>
+<td>Semua tim</td>
+</tr>
+<tr>
+<td>Sprint Review</td>
+<td>Akhir sprint</td>
+<td>1 jam</td>
+<td>Semua tim + stakeholder</td>
+</tr>
+<tr>
+<td>Retrospective</td>
+<td>Akhir sprint</td>
+<td>1 jam</td>
+<td>Developer + PM</td>
+</tr>
+</tbody></table>
+<h3>Daily Standup Format (via Trello comment)</h3>
+<ol>
+<li><strong>Kemarin</strong>: Apa yang saya kerjakan?</li>
+<li><strong>Hari ini</strong>: Apa yang akan saya kerjakan?</li>
+<li><strong>Blocker</strong>: Ada kendala?</li>
+</ol>
+<hr>
+<h2>9. Labeling &amp; Metadata (KAEDE MCP)</h2>
+<p>Template ini otomatis dibaca oleh <strong>KAEDE Orchestrator</strong> saat menjalankan perintah:</p>
+<ul>
+<li><code>kaede orchestrate --playbook &lt;path&gt;</code> — memuat konteks tim, sprint, dan aturan</li>
+<li><code>kaede run --playbook &lt;path&gt; &quot;intent&quot;</code> — mengeksekusi intent berdasarkan aturan playbook</li>
+<li><code>kaede playbook parse &lt;path&gt;</code> — menampilkan hasil parsing playbook</li>
+</ul>
+<h3>Label Color Mapping (untuk KAEDE)</h3>
+<table>
+<thead>
+<tr>
+<th>Kata Kunci</th>
+<th>Warna Trello</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>merah, high, critical, hotfix</td>
+<td><code>red</code></td>
+</tr>
+<tr>
+<td>kuning, medium, normal</td>
+<td><code>yellow</code></td>
+</tr>
+<tr>
+<td>hijau, low, refactor, tech debt</td>
+<td><code>green</code></td>
+</tr>
+<tr>
+<td>biru, blue, docs, documentation</td>
+<td><code>blue</code></td>
+</tr>
+<tr>
+<td>ungu, purple, admin, meeting</td>
+<td><code>purple</code></td>
+</tr>
+</tbody></table>
+<hr>
+<p><em>Template ini adalah contoh. Edit sesuai kebutuhan tim kamu. Setelah selesai, hubungkan ke KAEDE dengan <code>kaede init --playbook path/to/playbook.md</code>.</em></p>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="kaede-architecture.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Arsitektur & Roadmap
+          </a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            Sponsor
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Ikhtisar</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key & Token</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Referensi Tools</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>Peran SDLC</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Peran & Akses</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Arsitektur & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Template Playbook</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsor</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kebijakan Privasi — KAEDE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="../js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <main class="min-w-0 flex-1">
+      <div class="glass rounded-2xl p-6 sm:p-10">
+        <div class="prose">
+<h1>Kebijakan Privasi</h1>
+<p><strong>Berlaku efektif: 1 Januari 2026</strong></p>
+<p>KAEDE (&quot;Koneksi Automated Environment DE&quot;) adalah Trello Power-Up yang dikembangkan dan dioperasikan oleh PT Koneksi Jaringan Indonesia (&quot;Koneksi&quot;, &quot;kami&quot;, &quot;kita&quot;).</p>
+<h2>Data yang Dikumpulkan</h2>
+<p>KAEDE beroperasi sebagai jembatan antara Trello dan lingkungan eksternal. Kami mengumpulkan data minimal berikut:</p>
+<table>
+<thead>
+<tr>
+<th>Jenis Data</th>
+<th>Tujuan</th>
+<th>Masa Simpan</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Token API Trello</strong></td>
+<td>Otentikasi sesi Power-Up</td>
+<td>Hanya selama sesi aktif, tidak disimpan</td>
+</tr>
+<tr>
+<td><strong>ID Board, List, Card</strong></td>
+<td>Operasi Power-Up (konteks lingkungan)</td>
+<td>Tidak disimpan secara permanen</td>
+</tr>
+<tr>
+<td><strong>Environment name/value</strong></td>
+<td>Dikonfigurasi user, ditampilkan di card Trello</td>
+<td>Hingga user mengubahnya</td>
+</tr>
+<tr>
+<td><strong>Log error anonim</strong></td>
+<td>Debugging dan perbaikan bug</td>
+<td>30 hari</td>
+</tr>
+</tbody></table>
+<h2>Cara Kami Menggunakan Data</h2>
+<p>Data hanya digunakan untuk:</p>
+<ol>
+<li>Menampilkan environment indicator di kartu Trello</li>
+<li>Mengelola koneksi ke environment staging/produksi</li>
+<li>Menyediakan fungsi navigasi yang diminta user</li>
+<li>Diagnostik dan perbaikan error</li>
+</ol>
+<h2>Penyimpanan dan Keamanan</h2>
+<ul>
+<li><strong>Semua data disimpan secara lokal</strong> di browser user (localStorage) atau di Trello (melalui API)</li>
+<li><strong>Tidak ada server backend</strong> yang menyimpan data user</li>
+<li><strong>Token API disimpan di Trello</strong> sebagai bagian dari otorisasi Power-Up</li>
+<li>Kami tidak menjual, menyewakan, atau membagikan data ke pihak ketiga</li>
+<li>Koneksi ke Trello API menggunakan enkripsi HTTPS</li>
+</ul>
+<h2>Data Anak di Bawah 16 Tahun</h2>
+<p>KAEDE tidak ditujukan untuk pengguna di bawah 16 tahun. Kami tidak sengaja mengumpulkan data dari anak-anak. Jika kami mengetahui adanya data dari anak di bawah 16 tahun, data tersebut akan segera dihapus.</p>
+<h2>Hak Pengguna</h2>
+<p>Pengguna berhak untuk:</p>
+<ul>
+<li><strong>Mengetahui</strong> data apa yang dikumpulkan (lihat tabel di atas)</li>
+<li><strong>Menghapus</strong> data lokal dengan membersihkan browser cache/localStorage</li>
+<li><strong>Mencabut akses</strong> dengan menghapus Power-Up dari board Trello</li>
+<li><strong>Menonaktifkan</strong> Power-Up kapan saja melalui Trello Power-Up admin</li>
+</ul>
+<h2>Perubahan Kebijakan</h2>
+<p>Kebijakan ini dapat diperbarui dari waktu ke waktu. Perubahan akan diumumkan melalui halaman ini dan/atau melalui channel komunikasi tim Koneksi.</p>
+<h2>Kontak</h2>
+<p>Untuk pertanyaan tentang kebijakan privasi ini, hubungi:</p>
+<p><strong>PT Koneksi Jaringan Indonesia</strong><br>Email: <a href="mailto:privasi@koneksi.co.id">privasi@koneksi.co.id</a></p>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <kaede-footer></kaede-footer>
+</body>
+</html>

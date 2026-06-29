@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation — KAEDE</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="js/components.js"></script>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased min-h-screen">
+  <!-- Nav -->
+  <kaede-navbar></kaede-navbar>
+
+  <!-- Layout -->
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <div class="flex gap-8">
+      <!-- Sidebar -->
+      <aside class="hidden lg:block w-56 shrink-0">
+        <nav class="sticky top-20 flex flex-col gap-1 text-sm">
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-kaede-muted mb-2">Documentation</span>
+          <a href="." class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Overview</a>
+          <a href="api-key.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">API Key</a>
+          <a href="mcp-server.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">MCP Server</a>
+          <a href="opencode.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">OpenCode</a>
+          <a href="tools.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Tools Reference</a>
+          <a href="sdlc-roles.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">SDLC Roles</a>
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Roles & Access</a>
+          <a href="kaede-architecture.html" class="text-kaede-primary font-medium no-underline px-3 py-1.5 rounded-md bg-kaede-primary/10">Architecture & Roadmap</a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Playbook Template</a>
+          <a href="sponsorship.html" class="text-kaede-muted hover:text-kaede-text no-underline px-3 py-1.5 rounded-md hover:bg-kaede-surface transition-colors">Sponsorship</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="min-w-0 flex-1">
+        <div class="glass rounded-2xl p-6 sm:p-10">
+          <div class="prose">
+            <p class="text-sm text-kaede-muted flex items-center gap-2">
+              <a href="." class="text-kaede-primary no-underline hover:underline">Documentation</a>
+              <span>/</span>
+              <span>Architecture & Roadmap</span>
+            </p>
+<h1>KAEDE Architecture &amp; Roadmap — Human+AI Collaborative Orchestration System</h1>
+<p>KAEDE (Koneksi Automated Environment DE) is developed as a <strong>Universal Collaborative Orchestration Platform</strong>. KAEDE bridges high-level communication (work reference documents) with low-level technical execution on Trello, enabling teams of Humans and AI to work together synergistically without friction.</p>
+<hr>
+<h2>1. Big Vision &amp; Architecture Philosophy</h2>
+<h3>1.1 Core Problem: Manual MCP Overhead</h3>
+<p>Using an AI Agent to manage tasks on Trello manually (e.g. using a basic Trello MCP) is exhausting and error-prone. Every interaction requires the Agent to repeatedly call raw tools (<code>create_card</code>, <code>add_label</code>, <code>move_card</code>, <code>assign_member</code>, etc.) without full business context understanding. AI Agents often get &quot;lost&quot; trying to grasp team rules, sprint flow, or writing conventions.</p>
+<h3>1.2 KAEDE Solution: Intent-Driven Orchestrator</h3>
+<p>KAEDE acts as an intelligence &amp; orchestration layer sitting above technical execution. Under this system, humans/PMs simply define SOPs and priorities, and KAEDE converts them into a unified set of instructions understood by the AI Agent (Opencode) to execute the Trello MCP automatically and precisely.</p>
+<hr>
+<h2>2. Data Flow &amp; Four-Pillar Ecosystem</h2>
+<p>The collaborative system within the PT Koneksi Jaringan Indonesia ecosystem is organized into the following four pillars:</p>
+<pre><code>        ┌────────────────────────────────────────────────────────┐
+        │                        PLAYBOOK                        │
+        │      (Human → Human: SOP, Workflow, Work References)     │
+        │    Written by Manager, PM, Lead, or business owner      │
+        └───────────────────────────┬────────────────────────────┘
+                                    │ KAEDE reads &amp; integrates
+                                    ▼
+        ┌────────────────────────────────────────────────────────┐
+        │                        OPENKB                          │
+        │        (Human ↔ AI: Glossary, Decision Log, Context)   │
+        │          Located in every Workspace / Project          │
+        └───────────────────────────┬────────────────────────────┘
+                                    │ Loaded as instructions
+                                    ▼
+        ┌────────────────────────────────────────────────────────┐
+        │                       OPENCODE                         │
+        │       (Agent Config: Execution Rules, Commands)        │
+        │          Located in every Workspace / Project          │
+        └───────────────────────────┬────────────────────────────┘
+                                    │ Directs execution
+                                    ▼
+        ┌────────────────────────────────────────────────────────┐
+        │                  MCP.KAEDE (Pure Context)              │
+        │        (kaede-mcp-server.js — 4 context tools)         │
+        │   parse_playbook, bundle_context, generate_plan, status │
+        └──────────────────────┬─────────────────────────────────┘
+                               │ Plan (ActionStep[] with names)
+                               ▼
+        ┌────────────────────────────────────────────────────────┐
+        │                  MCP.TRELLO (Executor)                 │
+        │            (@delorenj/mcp-server-trello — 45+ tools)       │
+        └──────────────────────┬─────────────────────────────────┘
+                              │ stdio JSON-RPC
+                              ▼
+        ┌────────────────────────────────────────────────────────┐
+        │                        TRELLO                          │
+        │              (Board, Lists, Cards, Labels)             │
+        └────────────────────────────────────────────────────────┘
+
+        Both MCP servers (mcp.kaede &amp; mcp.trello) are registered in
+        ~/.config/opencode/opencode.json as separate entries.
+        The AI Agent calls mcp.kaede for context &amp; plan,
+        then mcp.trello for execution on Trello.
+</code></pre>
+<h3>Detailed Flow Explanation:</h3>
+<ol>
+<li><strong>Playbook (Human → Human)</strong>: Markdown/YAML documents containing team SOPs, sprint rules, role responsibilities (ROLES), and work conventions. The Playbook dictates how humans collaborate with other humans.</li>
+<li><strong>OpenKB (Human ↔ AI)</strong>: Provides a shared knowledge bridge. Stores a glossary of terms, project references, and technical decision history (decision log) so the AI Agent understands team-specific terminology.</li>
+<li><strong>OpenCode (Agent Config)</strong>: Contains the <code>.opencode/opencode.json</code> manifest that configures the AI Agent&#39;s technical capabilities, the list of allowed MCP tools, and custom commands.</li>
+<li><strong>KAEDE (Orchestrator)</strong>: Integrates the three documents above. KAEDE reads the Playbook to understand &quot;how tasks should be organized&quot; and reads OpenKB to understand &quot;what the project context is&quot;, then directs the AI Agent to act intelligently when managing Trello via the Trello MCP Server.</li>
+</ol>
+<hr>
+<h2>3. Codebase Structure &amp; Current Implementation Status</h2>
+<h3>3.1 Project Directory Structure</h3>
+<pre><code>powerup-konxc/
+├── .github/workflows/docs.yml   # CI/CD auto-deploy Markdown documentation → HTML
+├── .opencode/
+│   ├── opencode.json            # AI Agent &amp; local MCP Server configuration
+│   └── SHARED/
+│       ├── agent-rules.md       # Basic AI Agent behavior rules
+│       └── project-context.md   # KAEDE global project context
+├── .openkb/
+│   ├── TEMPLATE.md              # Standard knowledge base template
+│   └── SHARED/
+│       ├── decision-log.md      # Architecture &amp; feature decision records
+│       ├── glossary.md          # 14 key terms of the KAEDE ecosystem
+│       └── references.md        # Repository links &amp; external tools
+├── dist/
+│   └── mcp-server.js            # Compiled Trello MCP Server (target: Bun)
+├── docs/
+│   ├── index.md                 # Documentation overview
+│   ├── api-key.md               # Guide for obtaining Trello credentials
+│   ├── mcp-server.md            # Trello MCP Server configuration
+│   ├── opencode.md              # Opencode integration documentation
+│   ├── tools.md                 # Description of available tools
+│   ├── role-management.md       # AI Agent role &amp; Trello integration details
+│   └── kaede-architecture.md    # [THIS DOCUMENT] In-depth architecture &amp; roadmap
+├── public/                      # Static Assets (Netlify Deploy)
+│   ├── index.html               # Dual-Mode: Power-Up Connector &amp; Landing Page
+│   ├── board.html               # Static Dashboard Popup (Env stats)
+│   ├── card.html                # Per-card Environment manager (PROD/STAG/DEV)
+│   ├── auth.html                # Mock Authorization page
+│   ├── privacy.html             # Multilingual privacy policy
+│   └── js/kaede.js              # Implementation of 7 Trello Power-Up Capabilities
+├── packages/
+│   ├── README.md                # Dokumentasi arsitektur packages
+│   ├── mcp-server-trello/       # Git submodule → delorenj/mcp-server-trello (upstream)
+│   └── kaede-trello/
+│       └── src/
+│           ├── mcp-server.js    # Lib Trello (42 tools, fallback/penyangga)
+│           └── trello/
+│               └── attachments.js  # Attachment utilities
+├── scripts/
+│   ├── kaede.mjs                # Main CLI Tool (15+ commands)
+│   ├── build-docs.mjs           # Markdown → HTML compilation script
+│   └── build-mcp.mjs            # Build MCP servers via bun build
+├── src/
+│   ├── kaede-mcp-server.js      # KAEDE Orchestrator MCP (4 tools)
+│   ├── trello-client.js         # Trello MCP Client wrapper — 42+ tool wrappers
+│   ├── orchestrator.js          # Orchestrator — parsePlaybook, executeIntent, bundleContext, generatePlan
+│   ├── api-server.mjs           # HTTP API server (port 3456)
+│   ├── style.css                # CSS Source (Tailwind v4 + custom utility)
+│   └── index.html               # Landing page (deployed to Netlify)
+├── .gitmodules                  # Submodule config untuk mcp-server-trello
+├── package.json                 # Build scripts + CLI entry
+</code></pre>
+<h3>3.2 File-by-File Analysis &amp; Gap Assessment</h3>
+<h4>A. Frontend Power-Up (<code>public/</code>)</h4>
+<ul>
+<li><strong><code>index.html</code></strong>: A very clever dual-mode design. When loaded inside a Trello iframe, it hides the site visuals and activates the Power-Up connector. When accessed directly, it acts as the ecosystem landing page.</li>
+<li><strong><code>js/kaede.js</code></strong>: Successfully registers 7 Trello capabilities (board button, card button, badge, show-card panel, auth hooks, locale, lifecycle).<ul>
+<li><em>Gap</em>: All frontend operations still depend on Trello&#39;s local Shared Storage and <code>localStorage</code>. Not yet connected to real-time status from the MCP Server or a centralized database.</li>
+</ul>
+</li>
+<li><strong><code>card.html</code> &amp; <code>board.html</code></strong>: Successfully provide minimal UI for environment management (PROD, STAG, DEV).<ul>
+<li><em>Gap</em>: Static state. Environment selection on cards does not yet trigger actual Label addition on Trello dynamically. Board popup environment status calculations are buggy because they only increment without tracking previous state.</li>
+</ul>
+</li>
+</ul>
+<h4>B. CLI Tool (<code>scripts/kaede.mjs</code>)</h4>
+<ul>
+<li>15+ commands: <code>playbook parse/show</code>, <code>orchestrate</code>, <code>run</code> (+dry-run), <code>build</code>, <code>start</code>, <code>install</code>, <code>init</code>, <code>setup</code>, <code>today</code>, <code>status</code> (+--mcp), <code>test-tools</code>, <code>env</code>, <code>push</code>.</li>
+<li><em>Gap</em>: No direct integration with Google Calendar / academic schedule for auto-syncing sprint timelines yet.</li>
+</ul>
+<p>C.1. Trello MCP Server (<code>packages/kaede-trello/src/mcp-server.js</code>) — Executor</p>
+<ul>
+<li>Provides a standalone MCP protocol implementation with 42 tools. Functions purely as an executor — receives commands with Trello IDs and executes them.<ul>
+<li><em>Gap</em>: No multi-tool chaining feature yet. Use the context layer above it (<code>mcp.kaede</code>) for that.</li>
+</ul>
+</li>
+</ul>
+<h4>C.2. KAEDE Orchestrator MCP (<code>src/kaede-mcp-server.js</code>) — Pure Context</h4>
+<ul>
+<li>The second MCP server that stands alone as a pure context provider. Has no access to Trello.</li>
+<li><strong>4 tools</strong>: <code>parse_playbook</code> (parse playbook → structured), <code>bundle_context</code> (merge playbook + openkb + opencode), <code>generate_plan</code> (intent → ActionStep[] with names), <code>status</code> (check playbook &amp; openkb paths).</li>
+<li>Designed to be called by the AI Agent as the first step: <code>mcp.kaede.generate_plan</code> → receive plan → resolve IDs via <code>mcp.trello.*</code> → execute.</li>
+<li>Does not import <code>trello-client.js</code>, no Trello dependencies whatsoever.</li>
+<li><em>Gap</em>: No automatic validation that resolved Trello IDs are correct before execution.</li>
+</ul>
+<hr>
+<h2>4. Strategic Gap Analysis (Current vs Target Vision)</h2>
+<table>
+<thead>
+<tr>
+<th>Feature / Dimension</th>
+<th>Current State (As-Is)</th>
+<th>Target Vision (To-Be)</th>
+<th>Gaps</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Trello Execution</strong></td>
+<td>Plan via <code>mcp.kaede.generate_plan</code> (16 intent → ActionStep[]), execution via <code>mcp.trello.*</code> (45+ tools)</td>
+<td>Automated multi-step orchestration (1 intent → chained execution)</td>
+<td>Plan → execute is still manual (AI agent chain), no auto-chaining on server</td>
+<td><strong>🟡 Medium</strong></td>
+</tr>
+<tr>
+<td><strong>Playbook Integration</strong></td>
+<td>Active parsing (Markdown → section map → bundle context)</td>
+<td>Parsed + enforced in real-time by the AI Agent</td>
+<td>Parse output is still a dictionary, not fully structured for auto-enforcement</td>
+<td><strong>🟡 Medium</strong></td>
+</tr>
+<tr>
+<td><strong>Trello State Sync</strong></td>
+<td>Direct MCP (via trello-client.js wrapper, 45+ tools)</td>
+<td>Real-time Label &amp; Metadata Sync via Trello API directly</td>
+<td>Power-Up frontend still uses Shared Storage, not via MCP</td>
+<td><strong>🟡 Medium</strong></td>
+</tr>
+<tr>
+<td><strong>API Server</strong></td>
+<td>HTTP bridge active (port 3456, endpoint /api/mcp &amp; /api/health)</td>
+<td>Visual dashboard with real-time sprint metrics</td>
+<td>Only a REST proxy, no dashboard UI yet</td>
+<td><strong>🟡 Medium</strong></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>5. Development Plan &amp; Roadmap</h2>
+<h3>✅ Phase 1 — Cleanup &amp; Context Strengthening (COMPLETE)</h3>
+<ol>
+<li><strong>✅ Reference Cleanup</strong>: All project-specific references (smauii/laravel) removed from KAEDE OpenKB. KAEDE is now purely universal.</li>
+<li><strong>✅ Auto-Compilation</strong>: <code>scripts/build-mcp.mjs</code> + <code>kaede build</code> command for building the MCP server.</li>
+<li><strong>✅ Playbook Parser</strong>: <code>parsePlaybook</code> in <code>src/orchestrator.js</code> — shared between CLI and orchestrator.</li>
+<li><strong>✅ Intent-Driven Orchestrator</strong>: <code>executeIntent</code> with 16 handlers (7 original + 9 additional: create label, archive, move all, create board, remove member, add label, archive list, update card, create checklist).</li>
+<li><strong>✅ generatePlan()</strong>: 16 intent pattern handlers → returns ActionStep[] with names (without Trello IDs).</li>
+<li><strong>✅ Pure Context Refactor</strong>: <code>mcp.kaede</code> separated from Trello — 4 tools, zero Trello dependencies.</li>
+</ol>
+<h3>✅ Phase 2 — MCP Enhancements &amp; Concern Separation (COMPLETE)</h3>
+<ol>
+<li><strong>✅ Attachments Implementation</strong> (5 tools): <code>attach_file_to_card</code>, <code>attach_image_to_card</code>, <code>attach_data_to_card</code>, <code>attach_image_data_to_card</code>, <code>get_card_attachments</code> (PR submitted)</li>
+<li><strong>✅ Copy Card</strong> (1 tool): <code>copy_card</code> with keepFromSource options</li>
+<li><strong>✅ Checklist Enhancements</strong> (4 tools): Delete checklist/item, update checklist item, get card checklists (PR submitted)</li>
+<li><strong>✅ Advanced Features</strong> (5 tools): Watch card/list, get card activity, search labels, remove label from card (PR submitted)</li>
+<li><strong>✅ Upstream Contribution</strong> (3 PRs): PR #98, #99, #100 submitted to delorenj/mcp-server-trello</li>
+<li><strong>✅ Code Architecture Refactor</strong>: Modular structure (packages/kaede-trello/ + submodule) completed</li>
+</ol>
+<p><strong>Documentation:</strong></p>
+<ul>
+<li><a href="DEVELOPMENT-ROADMAP.html"><code>DEVELOPMENT-ROADMAP.md</code></a> — Master development plan</li>
+<li><a href="CONTRIBUTION-GUIDE.html"><code>CONTRIBUTION-GUIDE.md</code></a> — Upstream contribution guide</li>
+<li><a href="FEATURE-SPECIFICATION.html"><code>FEATURE-SPECIFICATION.md</code></a> — Detailed feature specs</li>
+</ul>
+<h3>🟡 Phase 3 — Frontend Power-Up Integration (PHASED)</h3>
+<ol>
+<li><strong>✅ API Server</strong>: <code>src/api-server.mjs</code> — HTTP bridge port 3456, endpoints <code>/api/health</code> &amp; <code>/api/mcp</code>.</li>
+<li><strong>✅ Power-Up MCP Panel</strong>: <code>public/mcp.html</code> — intent control panel directly from Trello popup.</li>
+<li><strong>⬜ Sync Label Environment</strong>: Connect environment buttons in <code>card.html</code> to the MCP API for auto-adding labels.</li>
+<li><strong>⬜ Dynamic Dashboard</strong>: <code>board.html</code> real-time stats via MCP API.</li>
+</ol>
+<hr>
+<p><em>This document is the official architecture reference for KAEDE, PT Koneksi Jaringan Indonesia.</em></p>
+
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6 text-sm">
+          <a href="role-management.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Roles & Access
+          </a>
+          <a href="playbook-template.html" class="text-kaede-muted hover:text-kaede-primary no-underline flex items-center gap-1">
+            Playbook Template
+            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 border-t border-kaede-border/50 bg-kaede-bg/95 backdrop-blur-md">
+    <div class="flex items-center justify-around py-2 text-[10px] font-medium text-kaede-muted">
+          <a href="." class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span>Overview</span></a>
+          <a href="api-key.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg><span>API Key</span></a>
+          <a href="mcp-server.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg><span>MCP Server</span></a>
+          <a href="opencode.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg><span>OpenCode</span></a>
+          <a href="tools.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg><span>Tools Reference</span></a>
+          <a href="sdlc-roles.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4l2 3m0 0l3-3m-3 3v6"/></svg><span>SDLC Roles</span></a>
+          <a href="role-management.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg><span>Roles & Access</span></a>
+          <a href="kaede-architecture.html" class="flex flex-col items-center gap-0.5 text-kaede-primary no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Architecture & Roadmap</span></a>
+          <a href="playbook-template.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg><span>Playbook Template</span></a>
+          <a href="sponsorship.html" class="flex flex-col items-center gap-0.5 text-kaede-muted hover:text-kaede-text no-underline"><svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>Sponsorship</span></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mb-12 lg:mb-0">
+    <kaede-footer></kaede-footer>
+  </div>
+</body>
+</html>
