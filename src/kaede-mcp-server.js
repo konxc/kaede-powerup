@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { readFileSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
@@ -36,9 +36,14 @@ function toolSchema(name, description, properties = {}, required = []) {
 }
 
 const TOOLS = [
-  toolSchema('parse_playbook', 'Parse a playbook markdown document into structured data (roles, workflow lists, conventions, labels)', {
-    content: { type: 'string', description: 'Playbook markdown content' },
-  }, ['content']),
+  toolSchema(
+    'parse_playbook',
+    'Parse a playbook markdown document into structured data (roles, workflow lists, conventions, labels)',
+    {
+      content: { type: 'string', description: 'Playbook markdown content' },
+    },
+    ['content'],
+  ),
 
   toolSchema('bundle_context', 'Load and combine project context from playbook, OpenKB, and OpenCode config', {
     playbookPath: { type: 'string', description: 'Path to playbook markdown file' },
@@ -46,22 +51,34 @@ const TOOLS = [
     opencodePath: { type: 'string', description: 'Path to .opencode directory' },
   }),
 
-  toolSchema('generate_plan', 'Generate a context-aware execution plan from a natural language goal and playbook. Returns action steps with names only (no IDs) — chain with mcp.trello for execution', {
-    goal: { type: 'string', description: 'Natural language goal/intent. Examples: "mulai sprint", "buat card", "buat board", "assign", "pindah", "komentar", "buat label", "arsipkan", "tutup sprint", "report", "buat checklist"' },
-    playbook: { type: 'string', description: 'Playbook markdown content for context-aware planning' },
-    task: { type: 'string', description: 'Task/card name for "buat card"' },
-    name: { type: 'string', description: 'Name for "buat board", "buat label"' },
-    desc: { type: 'string', description: 'Description for "buat card"' },
-    list: { type: 'string', description: 'Target list name for "buat card", "pindah"' },
-    member: { type: 'string', description: 'Member name/ID for "assign"' },
-    memberId: { type: 'string', description: 'Member ID for "hapus anggota"' },
-    color: { type: 'string', description: 'Color for "buat label" (red, orange, yellow, green, blue, purple, pink, lime, sky, black)' },
-    cardId: { type: 'string', description: 'Card name/ID for "pindah", "arsipkan", "komentar", "update card"' },
-    text: { type: 'string', description: 'Comment text for "komentar"' },
-    from: { type: 'string', description: 'Source list name for "pindah semua"' },
-    to: { type: 'string', description: 'Target list name for "pindah semua"' },
-    items: { type: 'array', items: { type: 'string' }, description: 'Checklist items for "buat checklist"' },
-  }, ['goal']),
+  toolSchema(
+    'generate_plan',
+    'Generate a context-aware execution plan from a natural language goal and playbook. Returns action steps with names only (no IDs) — chain with mcp.trello for execution',
+    {
+      goal: {
+        type: 'string',
+        description:
+          'Natural language goal/intent. Examples: "mulai sprint", "buat card", "buat board", "assign", "pindah", "komentar", "buat label", "arsipkan", "tutup sprint", "report", "buat checklist"',
+      },
+      playbook: { type: 'string', description: 'Playbook markdown content for context-aware planning' },
+      task: { type: 'string', description: 'Task/card name for "buat card"' },
+      name: { type: 'string', description: 'Name for "buat board", "buat label"' },
+      desc: { type: 'string', description: 'Description for "buat card"' },
+      list: { type: 'string', description: 'Target list name for "buat card", "pindah"' },
+      member: { type: 'string', description: 'Member name/ID for "assign"' },
+      memberId: { type: 'string', description: 'Member ID for "hapus anggota"' },
+      color: {
+        type: 'string',
+        description: 'Color for "buat label" (red, orange, yellow, green, blue, purple, pink, lime, sky, black)',
+      },
+      cardId: { type: 'string', description: 'Card name/ID for "pindah", "arsipkan", "komentar", "update card"' },
+      text: { type: 'string', description: 'Comment text for "komentar"' },
+      from: { type: 'string', description: 'Source list name for "pindah semua"' },
+      to: { type: 'string', description: 'Target list name for "pindah semua"' },
+      items: { type: 'array', items: { type: 'string' }, description: 'Checklist items for "buat checklist"' },
+    },
+    ['goal'],
+  ),
 
   toolSchema('status', 'Check KAEDE status — version, playbook/openkb paths accessibility'),
 ];
@@ -106,13 +123,31 @@ async function handleToolsCall(name, args) {
   if (name === 'generate_plan') {
     const { parsePlaybook, generatePlan } = await import(pathToFileURL(resolve(ROOT, 'src', 'orchestrator.js')).href);
 
-    let context = { title: '', roles: [], workflow: { lists: [] }, conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] } };
+    let context = {
+      title: '',
+      roles: [],
+      workflow: { lists: [] },
+      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+    };
     if (args.playbook) {
       context = parsePlaybook(args.playbook);
     }
 
     const extraArgs = {};
-    for (const key of ['task', 'name', 'desc', 'list', 'member', 'memberId', 'color', 'cardId', 'text', 'from', 'to', 'items']) {
+    for (const key of [
+      'task',
+      'name',
+      'desc',
+      'list',
+      'member',
+      'memberId',
+      'color',
+      'cardId',
+      'text',
+      'from',
+      'to',
+      'items',
+    ]) {
       if (args[key] !== undefined) extraArgs[key] = args[key];
     }
 
@@ -160,9 +195,10 @@ stdin.on('data', (chunk) => {
     } else if (method === 'tools/call') {
       handleToolsCall(params.name, params.arguments || {})
         .then((res) => {
-          const content = typeof res === 'string'
-            ? [{ type: 'text', text: res }]
-            : [{ type: 'text', text: JSON.stringify(res, null, 2) }];
+          const content =
+            typeof res === 'string'
+              ? [{ type: 'text', text: res }]
+              : [{ type: 'text', text: JSON.stringify(res, null, 2) }];
           result(id, { content });
         })
         .catch((err) => {

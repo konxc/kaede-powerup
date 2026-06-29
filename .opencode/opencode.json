@@ -76,9 +76,17 @@
     }
   },
   "mcp": {
+    "kaede": {
+      "type": "local",
+      "command": ["bun", "dist/kaede-mcp-server.js"],
+      "description": "Orchestrator — generate_plan, parse_playbook, bundle_context, status",
+      "enabled": true,
+      "timeout": 60000
+    },
     "trello": {
       "type": "local",
-      "command": ["bun", "packages/kaede-trello/src/mcp-server.js"],
+      "command": ["bunx", "@delorenj/mcp-server-trello"],
+      "description": "Eksekutor upstream — 45+ tools Trello resmi",
       "enabled": true,
       "timeout": 30000
     }

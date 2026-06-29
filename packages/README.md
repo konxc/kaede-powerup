@@ -1,40 +1,85 @@
-# Packages — KAEDE Modular Architecture
+# Packages — Arsitektur Modular KAEDE
 
-`packages/` adalah direktori untuk kode modular yang dipisahkan dari inti project
-(`src/`, `scripts/`). Setiap package memiliki tanggung jawab spesifik dan bisa
-dibangun, diuji, dan dikembangkan secara independen.
+## Tujuan
 
-## Strategi Upstream + Staging
+Direktori `packages/` adalah rumah bagi komponen Trello MCP dalam ekosistem KAEDE.
+Memisahkan concerns antara **upstream** dan **staging area** agar codebase punya arah yang jelas.
 
-KAEDE menggunakan arsitektur **dual-track Trello MCP**:
+## Struktur
 
 ```
-delorenj/mcp-server-trello (upstream)
-  └── packages/mcp-server-trello/  — git submodule, upstream source
-  └── packages/kaede-trello/       — staging area, custom tools
-
-Alur:
-  1. Fitur baru dikembangkan di packages/kaede-trello/
-  2. PR dikirim ke delorenj/mcp-server-trello (via fork sandikodev)
-  3. Setelah PR di-merge, fitur dianggap stabil
-  4. packages/kaede-trello → fallback only, upstream jadi primary
+packages/
+├── mcp-server-trello/     ← Git submodule dari delorenj/mcp-server-trello
+│                            (via fork sandikodev untuk kontribusi PR)
+│
+└── kaede-trello/           ← Staging area untuk fitur custom KAEDE
+                             (sebelum di-PR ke upstream)
 ```
 
-### packages/mcp-server-trello
+## Aliran Data (Runtime)
+
+```
+OpenCode (AI Agent)
+    │
+    ├── mcp.kaede (dist/kaede-mcp-server.js)
+    │   → Orchestrator: parse_playbook, bundle_context, generate_plan, status
+    │   → Output: ActionStep[] (nama action saja, tanpa ID Trello)
+    │
+    └── mcp.trello (@delorenj/mcp-server-trello via bunx)
+        → Eksekutor: menjalankan ActionStep ke Trello API
+        → 45+ tools resmi dari upstream
+```
+
+> **Catatan Penting:** `mcp.trello` di runtime mengarah ke **upstream**
+> `@delorenj/mcp-server-trello` (via npm/bunx), BUKAN ke `packages/kaede-trello/`.
+> `packages/kaede-trello/` adalah staging ground untuk pengembangan.
+
+## Strategi Kontribusi
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  1. Ide fitur baru                                       │
+│     ↓                                                    │
+│  2. Implementasi di packages/kaede-trello/ (JavaScript)  │
+│     ↓                                                    │
+│  3. Uji & stabilkan                                      │
+│     ↓                                                    │
+│  4. Port ke TypeScript                                   │
+│     ↓                                                    │
+│  5. PR ke packages/mcp-server-trello/ (fork → upstream)  │
+│     ↓                                                    │
+│  6. PR di-merge oleh delorenj                            │
+│     ↓                                                    │
+│  7. Sync submodule ke versi terbaru                      │
+│     ↓                                                    │
+│  8. Hapus fitur dari packages/kaede-trello/              │
+│     (sudah ada di upstream)                              │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Kenapa Submodule?
+
+- **Landasan kontribusi** — source upstream bisa dimodifikasi dan di-PR langsung
+- **Riwayat terpisah** — tidak campur aduk dengan KAEDE
+- **Update** cukup `git submodule update --remote`
+
+## packages/mcp-server-trello
 
 **Git submodule** ke `github.com/sandikodev/mcp-server-trello` (fork dari
-`delorenj/mcp-server-trello`). Berisi source upstream yang bisa dijalankan
-langsung tanpa build. Untuk berkontribusi:
+`delorenj/mcp-server-trello`). Berisi source TypeScript upstream.
 
+Untuk berkontribusi:
 ```bash
 cd packages/mcp-server-trello
 git checkout main
-# buat branch, commit, push ke origin, PR ke upstream
+# buat branch, implementasi, commit, push ke origin, PR ke upstream
 ```
 
-### packages/kaede-trello
+## packages/kaede-trello
 
-**Staging area** untuk tools Trello MCP yang belum tersedia di upstream.
+**Staging area** — tempat pengembangan fitur Trello MCP yang belum tersedia
+di upstream. Setelah fitur di-PR dan di-merge, staging area bisa dikosongkan.
+
 Berisi `mcp-server.js` (42 tools) dengan fitur tambahan seperti:
 - Attachments via base64/data URL
 - Copy card dengan keepFromSource
@@ -45,17 +90,24 @@ Berisi `mcp-server.js` (42 tools) dengan fitur tambahan seperti:
 
 Lihat `packages/kaede-trello/README.md` untuk detail lebih lanjut.
 
-## Cara Mendaftarkan ke OpenCode
+## Registrasi di OpenCode
 
-MCP Trello didaftarkan di `.opencode/opencode.json` atau
-`~/.config/opencode/opencode.json`:
+Konfigurasi runtime di `.opencode/opencode.json`:
 
 ```json
 {
   "mcp": {
+    "kaede": {
+      "type": "local",
+      "command": ["bun", "dist/kaede-mcp-server.js"],
+      "description": "Orchestrator — generate_plan, parse_playbook, bundle_context, status",
+      "enabled": true,
+      "timeout": 60000
+    },
     "trello": {
       "type": "local",
-      "command": ["bun", "packages/kaede-trello/src/mcp-server.js"],
+      "command": ["bunx", "@delorenj/mcp-server-trello"],
+      "description": "Eksekutor upstream — 45+ tools Trello resmi",
       "enabled": true,
       "timeout": 30000
     }
@@ -63,28 +115,16 @@ MCP Trello didaftarkan di `.opencode/opencode.json` atau
 }
 ```
 
-Atau jika ingin menggunakan upstream langsung:
+> **Untuk pengembangan:** Jika ingin menguji fitur staging, arahkan sementara
+> `mcp.trello` ke `packages/kaede-trello/src/mcp-server.js`.
+> Jangan commit perubahan ini ke production.
 
-```json
-{
-  "mcp": {
-    "trello": {
-      "type": "local",
-      "command": ["bun", "packages/mcp-server-trello/src/index.js"],
-      "enabled": true,
-      "timeout": 30000
-    }
-  }
-}
-```
+## Prioritas Pemilihan MCP Server (Client)
 
-## Prioritas Pemilihan MCP Server
-
-`src/trello-client.js` otomatis memilih server dengan urutan:
+`src/trello-client.js` menggunakan urutan fallback ini:
 
 1. **Global opencode.json** — command dari `~/.config/opencode/opencode.json`
 2. **packages/kaede-trello** — `packages/kaede-trello/src/mcp-server.js`
 3. **packages/mcp-server-trello** — `packages/mcp-server-trello/src/index.js`
 4. **dist/** — `dist/mcp-server.js` (built fallback)
 5. **~/.kaede/** — `~/.kaede/dist/mcp-server.js` (global install fallback)
-6. **cwd/dist/** — `process.cwd()/dist/mcp-server.js`

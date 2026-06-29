@@ -36,8 +36,11 @@ Sebelum menyentuh Trello, gunakan `mcp.kaede` untuk menghasilkan rencana eksekus
 
 ### Langkah 4: Eksekusi via mcp.trello
 Setelah dapat plan dari `mcp.kaede`, eksekusi setiap step ke Trello:
-- Gunakan tools `mcp.trello` (42 tools) yang tersedia di `packages/kaede-trello/src/mcp-server.js`
-  atau upstream `packages/mcp-server-trello/src/index.js` (jika submodule terdaftar).
+- Gunakan tools `mcp.trello` (45+ tools) dari upstream `@delorenj/mcp-server-trello`.
+- Di OpenCode, `mcp.trello` sudah terdaftar via `bunx @delorenj/mcp-server-trello`.
+- **Untuk fitur yang belum tersedia di upstream**, sementara bisa menggunakan
+  `packages/kaede-trello/src/mcp-server.js` (42 tools) sebagai fallback.
+  Lihat `packages/README.md` untuk strategi staging.
 - Resolve nama member/list/board via `mcp.trello` tools (`search_members`, `get_board_lists`, dll).
 - Jika plan gagal di satu step, lanjutkan ke step berikutnya.
 - Untuk eksekusi cepat bisa juga via CLI: `bun scripts/kaede.mjs run --playbook <path> --board <id> "Mulai Sprint Alpha"`
