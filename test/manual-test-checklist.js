@@ -1,10 +1,10 @@
-﻿#!/usr/bin/env node
+﻿#!/usr/bin/env bun
 
 /**
  * KAEDE MCP - Checklist Tools Manual Test
  *
  * Usage:
- *   node test/manual-test-checklist.js
+ *   bun test/manual-test-checklist.js
  */
 
 import { TrelloMCPClient } from '../src/trello-client.js';
@@ -137,7 +137,7 @@ async function main() {
     printInfo('TEST_CARD_ID not set');
     console.log('');
     console.log('  Windows PowerShell:');
-    console.log('    $env:TEST_CARD_ID="CARD_ID"; node test/manual-test-checklist.js');
+    console.log('    $env:TEST_CARD_ID="CARD_ID"; bun test/manual-test-checklist.js');
     console.log('');
     process.exit(0);
   }

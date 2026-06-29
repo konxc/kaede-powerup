@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const SERVER_PATH = resolve(ROOT, 'src', 'mcp-server.js');
+const SERVER_PATH = resolve(ROOT, 'packages', 'kaede-trello', 'src', 'mcp-server.js');
 
 // ── Mock Data ──
 
@@ -324,12 +324,12 @@ describe('KAEDE MCP Server (44 Trello tools)', () => {
     delete process.env.TRELLO_API_KEY;
     delete process.env.TRELLO_TOKEN;
     delete process.env.TRELLO_DEFAULT_BOARD_ID;
-    mock.restoreAll();
+    if (typeof mock.restoreAll === 'function') mock.restoreAll();
   });
 
   it('0. initialize returns protocol version', async () => {
     const MOCK_PRELOAD = resolve(__dirname, 'mock-fetch.js');
-    proc = spawn('node', ['-r', MOCK_PRELOAD, SERVER_PATH], { stdio: ['pipe', 'pipe', 'pipe'] });
+    proc = spawn('bun', ['-r', MOCK_PRELOAD, SERVER_PATH], { stdio: ['pipe', 'pipe', 'pipe'] });
     const res = await rpc(proc, 'initialize', {
       protocolVersion: '2024-11-05',
       capabilities: {},

@@ -157,7 +157,7 @@ KAEDE mengimplementasikan **concern separation** yang jelas:
 
 | Feature | KAEDE MCP | TRELLO MCP | Notes |
 |---------|-----------|------------|-------|
-| **Core Tools** | 24 tools | 45+ tools | KAEDE focused on essentials |
+| **Core Tools** | 42 tools | 45+ tools | KAEDE focused on essentials |
 | **Attachments** | ⬜ In Progress | ✅ Complete | Phase 1 |
 | **Copy Card** | ⬜ In Progress | ✅ Complete | Phase 1 |
 | **Checklist** | ⚠️ Partial | ✅ Complete | Phase 2 |

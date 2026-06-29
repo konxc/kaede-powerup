@@ -1,6 +1,6 @@
 # Trello MCP Tools Reference (KAEDE)
 
-Complete list of tools provided by **KAEDE MCP Server** (`dist/mcp-server.js`). These tools can be called by AI Agents via OpenCode or any MCP client.
+Complete list of tools provided by **`packages/kaede-trello`**. These tools can be called by AI Agents via OpenCode or any MCP client.
 
 <div class="not-prose p-4 rounded-xl bg-kaede-primary/10 border border-kaede-primary/20 mb-6">
 
@@ -539,7 +539,7 @@ Attach image data to a card (screenshot convenience — accepts base64 or data U
 - **Date format:** Due date uses ISO 8601 (`2026-07-01T12:00:00Z`), start date uses `YYYY-MM-DD`
 - **Label IDs:** Get from Trello UI or via `get_board_labels`
 - **Member IDs:** Get via `get_board_members`
-- **Source code:** These tools are from `src/mcp-server.js` — custom KAEDE, not `@delorenj/mcp-server-trello`
+- **Source code:** These tools are from `packages/kaede-trello/src/mcp-server.js` — custom KAEDE, not `@delorenj/mcp-server-trello`
 
 ---
 
@@ -584,7 +584,7 @@ The following tools are in development (Phase 1-4):
 - `recurring_cards` — Power-Up feature
 
 **Timeline:** Week 1-10 (June-July 2026)  
-**Total Tools:** 24 → 44+ tools
+**Total Tools:** 42 tools
 
 **Related documentation:**
 - [`DEVELOPMENT-ROADMAP.md`](DEVELOPMENT-ROADMAP.html) — Master development plan

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 /**
  * KAEDE MCP - Attachments Manual Test Script
@@ -6,7 +6,7 @@
  * Script untuk manual testing attachment tools dengan test board.
  *
  * Usage:
- *   node test/manual-test-attachments.js
+ *   bun test/manual-test-attachments.js
  *
  * Prerequisites:
  * - secrets.env configured
@@ -184,10 +184,10 @@ async function main() {
     console.log('  To run tests, set TEST_CARD_ID environment variable:');
     console.log('');
     console.log('  Windows PowerShell:');
-    console.log('    $env:TEST_CARD_ID="YOUR_CARD_ID"; node test/manual-test-attachments.js');
+    console.log('    $env:TEST_CARD_ID="YOUR_CARD_ID"; bun test/manual-test-attachments.js');
     console.log('');
     console.log('  Linux/Mac:');
-    console.log('    TEST_CARD_ID="YOUR_CARD_ID" node test/manual-test-attachments.js');
+    console.log('    TEST_CARD_ID="YOUR_CARD_ID" bun test/manual-test-attachments.js');
     console.log('');
     console.log('  Get card ID from: https://trello.com/b/rAKmlRj3/lab-testing-kaede');
     console.log('');

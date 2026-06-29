@@ -16,7 +16,7 @@ Write-Host ""
 # Check if credentials are configured
 if (-not (Test-Path "secrets.env")) {
     Write-Host "  ✗ Trello credentials not found." -ForegroundColor Red
-    Write-Host "    Run 'node scripts/kaede.mjs setup' first." -ForegroundColor Yellow
+    Write-Host "    Run 'bun scripts/kaede.mjs setup' first." -ForegroundColor Yellow
     exit 1
 }
 

@@ -4,7 +4,7 @@
 
 1. **Trello Credentials** — Ensure `secrets.env` is configured:
    ```bash
-   node scripts/kaede.mjs setup
+   bun scripts/kaede.mjs setup
    ```
 
 2. **Build MCP Server**:
@@ -126,7 +126,7 @@ try {
 
 Run with:
 ```bash
-node test-attachments.js
+bun test-attachments.js
 ```
 
 ---
@@ -211,7 +211,7 @@ node test-attachments.js
 ## Troubleshooting
 
 ### Error: "TRELLO_API_KEY or TRELLO_TOKEN not configured"
-**Solution**: Run `node scripts/kaede.mjs setup`
+**Solution**: Run `bun scripts/kaede.mjs setup`
 
 ### Error: "Card not found"
 **Solution**: Verify card ID is correct (short ID like `FdhbArbK`)

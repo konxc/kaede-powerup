@@ -1081,7 +1081,7 @@ async function cmdInstall() {
     console.log('  \x1b[33m  ⚠  npm link failed, creating fallback script...\x1b[0m');
     // Fallback: create a wrapper script
     try {
-      const wrapper = `@echo off\r\nnode "${resolve(globalDir, 'scripts', 'kaede.mjs').replace(/\\/g, '\\\\')}" %*\r\n`;
+      const wrapper = `@echo off\r\nbun "${resolve(globalDir, 'scripts', 'kaede.mjs').replace(/\\/g, '\\\\')}" %*\r\n`;
       writeFileSync(resolve(globalDir, 'kaede.cmd'), wrapper, 'utf-8');
       console.log(`  \x1b[33m  ⚠  Created fallback at ${resolve(globalDir, 'kaede.cmd')}\x1b[0m`);
       console.log(

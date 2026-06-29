@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 /**
  * KAEDE MCP - Get Test Card ID
@@ -6,7 +6,7 @@
  * Helper script untuk mendapatkan card ID dari test board.
  *
  * Usage:
- *   node test/get-test-card.js
+ *   bun test/get-test-card.js
  */
 
 import { TrelloMCPClient } from '../src/trello-client.js';
@@ -134,10 +134,10 @@ async function main() {
     if (allCards.length > 0) {
       const firstCard = allCards[0];
       console.log(`  Windows PowerShell:`);
-      console.log(`    $env:TEST_CARD_ID="${firstCard.id}"; node test/manual-test-attachments.js`);
+      console.log(`    $env:TEST_CARD_ID="${firstCard.id}"; bun test/manual-test-attachments.js`);
       console.log('');
       console.log(`  Linux/Mac:`);
-      console.log(`    TEST_CARD_ID="${firstCard.id}" node test/manual-test-attachments.js`);
+      console.log(`    TEST_CARD_ID="${firstCard.id}" bun test/manual-test-attachments.js`);
       console.log('');
     } else {
       printInfo('No cards found. Create a card in the test board first.');

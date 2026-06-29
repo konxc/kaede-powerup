@@ -102,7 +102,7 @@ function Install-Deps {
 function Run-KaedeInstall {
   Write-Info "Running kaede install (global setup)..."
   Push-Location $InstallDir
-  node scripts/kaede.mjs install 2>&1
+  bun scripts/kaede.mjs install 2>&1
   Pop-Location
 }
 

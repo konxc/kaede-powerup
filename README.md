@@ -48,7 +48,7 @@
 │   ├── mcp-server-trello/   # Git submodule → delorenj/mcp-server-trello
 │   └── kaede-trello/
 │       └── src/
-│           ├── mcp-server.js    # MCP Trello server (42 tools, staging)
+│           ├── mcp-server.js    # Lib Trello (42 tools, fallback/penyangga)
 │           └── trello/
 │               └── attachments.js  # Attachment utilities
 ├── dist/                    # Build output (gitignored)
@@ -178,9 +178,9 @@ Dokumentasi di `docs/*.md` auto-build ke `gh-pages` branch via GitHub Actions.
 | Peran | Manfaat Utama |
 |---|---|
 | **Project Manager** | Sprint automation via intent — "Mulai Sprint Alpha" satu perintah |
-| **Developer** | 42 tools MCP, clipboard-to-card attachment, `kaede today` |
+| **Developer** | 42 tools lib via KAEDE, clipboard-to-card attachment, `kaede today` |
 | **QA / Tester** | Template checklist, histori card, sort by due date |
-| **Tech Lead** | Playbook-enforced governance, dual MCP architecture |
+| **Tech Lead** | Playbook-enforced governance, MCP + lib architecture |
 | **Stakeholder** | Badge environment langsung di card, zero config |
 | **AI Engineer** | Extensible MCP server, kontribusi upstream via PR |
 

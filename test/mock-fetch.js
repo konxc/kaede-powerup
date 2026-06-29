@@ -1,6 +1,6 @@
 /**
  * Fetch mock preload — set env vars + mock global.fetch
- * Load with: node -r ./test/mock-fetch.js
+ * Load with: bun -r ./test/mock-fetch.js
  *
  * Uses URL pathname-based matching to handle Trello API routes correctly
  * regardless of query string ordering or trailing slash variations.

@@ -2,6 +2,8 @@
 
 All notable changes to KAEDE MCP server implementation.
 
+_Note: Source files now reside under `packages/kaede-trello/` in the current monorepo architecture._
+
 ## [Unreleased] — 2026-06-27
 
 ### Added — Phase 4: Sort & Advanced List Management
@@ -17,7 +19,7 @@ All notable changes to KAEDE MCP server implementation.
 - `updateList(options)`
 
 **Files Modified:**
-- `src/mcp-server.js` — Added 3 tool handlers + 3 definitions
+- `packages/kaede-trello/src/mcp-server.js` — Added 3 tool handlers + 3 definitions
 - `src/trello-client.js` — Added 3 wrapper methods
 - `dist/mcp-server.js` — Built (20.63 KB)
 
@@ -40,7 +42,7 @@ All notable changes to KAEDE MCP server implementation.
 - `removeLabelFromCard(cardId, labelId)`
 
 **Files Modified:**
-- `src/mcp-server.js` — Added 5 tool handlers + 5 definitions
+- `packages/kaede-trello/src/mcp-server.js` — Added 5 tool handlers + 5 definitions
 - `src/trello-client.js` — Added 7 wrapper methods
 - `dist/mcp-server.js` — Built (19.82 KB)
 
@@ -61,7 +63,7 @@ All notable changes to KAEDE MCP server implementation.
 - `getCardChecklists(cardId)`
 
 **Files Modified:**
-- `src/mcp-server.js` — Added 4 tool handlers + 4 definitions
+- `packages/kaede-trello/src/mcp-server.js` — Added 4 tool handlers + 4 definitions
 - `src/trello-client.js` — Added 4 wrapper methods
 - `dist/mcp-server.js` — Built (18.58 KB)
 
@@ -91,9 +93,9 @@ All notable changes to KAEDE MCP server implementation.
 - `copyCard(options)`
 
 **Files Modified:**
-- `src/mcp-server.js` — Added 7 tool handlers + 7 definitions
+- `packages/kaede-trello/src/mcp-server.js` — Added 7 tool handlers + 7 definitions
 - `src/trello-client.js` — Added 7 wrapper methods
-- `src/trello/attachments.js` — NEW utility module (228 lines)
+- `packages/kaede-trello/src/trello/attachments.js` — NEW utility module (228 lines)
 - `dist/mcp-server.js` — Built (17.72 KB)
 
 **Documentation:**
@@ -114,7 +116,7 @@ All notable changes to KAEDE MCP server implementation.
 
 **Setup:**
 ```bash
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 ```
 
 **Files Modified:**
@@ -150,7 +152,7 @@ mv secrets.env ~/.config/kaede/
 ### Files Created
 
 **Source:**
-- `src/trello/attachments.js` (228 lines)
+- `packages/kaede-trello/src/trello/attachments.js` (228 lines)
 
 **Documentation:**
 - `IMPLEMENTATION-SUMMARY.md` — Complete overview

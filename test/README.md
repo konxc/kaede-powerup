@@ -1,15 +1,40 @@
 # Test Scripts — KAEDE MCP
 
-Kumpulan script untuk manual testing semua tools yang telah ditambahkan.
+Kumpulan script untuk testing semua tools KAEDE MCP, termasuk **automated tests** (via `bun test`) dan **manual test scripts** (via Trello API langsung).
 
 ---
 
-## 📋 Quick Start
+## 📋 Quick Start — Automated Tests
+
+Cara tercepat: jalankan automated test suite tanpa perlu credentials Trello asli.
+
+```bash
+# Seluruh suite (121+ tests, mock Trello API)
+bun run test
+
+# Atau langsung:
+bun test test/*.test.js
+
+# Per kategori:
+bun run test:mcp          # 44 Trello tools
+bun run test:orchestrator  # Playbook parser
+bun run test:trello        # Trello MCP client wrapper
+bun run test:e2e           # End-to-end orchestration
+```
+
+> Automated tests menggunakan `global.fetch` mock (`test/mock-fetch.js`),
+> tidak memerlukan koneksi Trello asli.
+
+---
+
+## 📋 Manual Testing
+
+Untuk testing dengan Trello API asli (memerlukan credentials):
 
 ### 1. Setup Credentials (GLOBAL)
 
 ```bash
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 ```
 
 Credentials akan disimpan di `~/.config/kaede/secrets.env` (global, bukan di project!)
@@ -23,7 +48,7 @@ bun run build:mcp
 ### 3. Get Card IDs
 
 ```bash
-node test/get-test-card.js
+bun test/get-test-card.js
 ```
 
 Output akan menampilkan semua kartu di test board dengan ID-nya.
@@ -32,10 +57,10 @@ Output akan menampilkan semua kartu di test board dengan ID-nya.
 
 ```bash
 # Windows PowerShell
-$env:TEST_CARD_ID="67xxx..."; node test/manual-test-attachments.js
+$env:TEST_CARD_ID="67xxx..."; bun test/manual-test-attachments.js
 
 # Linux/Mac  
-TEST_CARD_ID="67xxx..." node test/manual-test-attachments.js
+TEST_CARD_ID="67xxx..." bun test/manual-test-attachments.js
 ```
 
 ---
@@ -48,7 +73,7 @@ TEST_CARD_ID="67xxx..." node test/manual-test-attachments.js
 
 **Usage:**
 ```bash
-node test/get-test-card.js
+bun test/get-test-card.js
 ```
 
 **Output:**
@@ -61,7 +86,7 @@ node test/get-test-card.js
 
   Usage:
   Windows PowerShell:
-    $env:TEST_CARD_ID="678f9a0b1c2d3e4f5a6b7c8d"; node test/manual-test-attachments.js
+    $env:TEST_CARD_ID="678f9a0b1c2d3e4f5a6b7c8d"; bun test/manual-test-attachments.js
 ```
 
 ---
@@ -76,7 +101,7 @@ node test/get-test-card.js
 $env:TEST_CARD_ID="678f9a0b1c2d3e4f5a6b7c8d"
 
 # Run tests
-node test/manual-test-attachments.js
+bun test/manual-test-attachments.js
 ```
 
 **Tests:**
@@ -171,7 +196,7 @@ Baca dan ikuti langkah-langkah testing manual di dalamnya.
 
 **Solution:**
 ```bash
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 ```
 
 ### Error: "Connection failed"
@@ -185,7 +210,7 @@ bun run build:mcp
 
 **Solution:**
 ```bash
-node test/get-test-card.js
+bun test/get-test-card.js
 # Copy valid card ID dari output
 ```
 
@@ -194,7 +219,7 @@ node test/get-test-card.js
 **Solution:**
 1. Buka https://trello.com/app-key
 2. Regenerate token
-3. Update credentials: `node scripts/kaede.mjs setup`
+3. Update credentials: `bun scripts/kaede.mjs setup`
 
 ---
 
@@ -227,28 +252,33 @@ Gunakan template dari `test/TESTING-GUIDE.md`:
 
 ---
 
-## 🚀 Next Steps
+## 🚀 Status & Next Steps
 
-1. **Run All Tests**
-   - Setup credentials
-   - Build MCP server
-   - Get card IDs
-   - Run test scripts
+### ✅ Automated Testing: SELESAI
 
-2. **Document Results**
-   - Gunakan template di `test/TESTING-GUIDE.md`
-   - Screenshot successes/failures
-   - Catat edge cases
+Seluruh **44 Trello tools** sudah memiliki automated test (`test/mcp-server.test.js`)
+dengan mock `global.fetch`. Jumlah total: **121+ tests** (5 test files).
 
-3. **Report Issues**
-   - Buat file `test/ISSUES.md`
-   - Describe masalah dengan detail
-   - Sertakan steps to reproduce
+### ✅ Upstream Contribution: SUDAH DIKIRIM
 
-4. **Prepare Upstream PR**
-   - Pilih tools yang sudah tested dengan baik
-   - Port ke delorenj/mcp-server-trello
-   - Submit PR
+Tiga PR sudah dikirim ke [`delorenj/mcp-server-trello`](https://github.com/delorenj/mcp-server-trello):
+- **PR #98** — `get_card_attachments`, `get_card_checklists`
+- **PR #99** — `watch_card`, `watch_list`
+- **PR #100** — `search_labels`, `remove_label_from_card`
+
+PR di-port/dikembangkan di `packages/kaede-trello/` lalu di-PR ke upstream.
+
+### 📋 Manual Testing (Jika Diperlukan)
+
+Untuk pengujian end-to-end dengan Trello asli:
+1. Setup credentials
+2. Build MCP server
+3. Get card IDs
+4. Jalankan manual test scripts
+
+### 📝 Dokumentasi Hasil
+
+Gunakan template di `test/TESTING-GUIDE.md` jika perlu mencatat hasil manual testing.
 
 ---
 

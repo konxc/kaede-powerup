@@ -33,7 +33,6 @@ Terima kasih atas minat Anda untuk berkontribusi! Dokumen ini adalah panduan len
 ### Prerequisites
 
 - **Bun** v1.x (JavaScript runtime)
-- **Node.js** v18+ (fallback)
 - **Git** (version control)
 - **Trello Account** (for testing)
 
@@ -52,7 +51,7 @@ Terima kasih atas minat Anda untuk berkontribusi! Dokumen ini adalah panduan len
 
 3. **Setup Credentials (GLOBAL)**
    ```bash
-   node scripts/kaede.mjs setup
+   bun scripts/kaede.mjs setup
    ```
    
    Ini akan membuat file credentials di:
@@ -80,21 +79,26 @@ Terima kasih atas minat Anda untuk berkontribusi! Dokumen ini adalah panduan len
 
 ```
 kaede-powerup/
+├── packages/
+│   └── kaede-trello/
+│       └── src/
+│           ├── mcp-server.js          # Main MCP server
+│           └── trello/
+│               └── attachments.js     # Utility module
 ├── src/
-│   ├── mcp-server.js          # Main MCP server
-│   ├── trello-client.js       # Client wrapper
-│   └── trello/
-│       └── attachments.js     # Utility module
-├── dist/
-│   ├── mcp-server.js          # Compiled server
-│   └── kaede-mcp-server.js    # Orchestrator
+│   ├── trello-client.js               # Client wrapper
+│   ├── kaede-mcp-server.js            # Orchestrator
+│   ├── api-server.mjs                 # API server
+│   └── orchestrator.js                # Orchestrator logic
 ├── test/
-│   ├── manual-test-*.js       # Test scripts
-│   └── *-TESTING.md           # Test guides
+│   ├── manual-test-*.js               # Test scripts
+│   └── *-TESTING.md                   # Test guides
 ├── docs/
 │   └── DEVELOPMENT-ROADMAP.md
 ├── scripts/
-│   └── kaede.mjs              # CLI tool
+│   └── kaede.mjs                      # CLI tool
+├── public/                            # Static assets
+├── pr-submissions/                    # PR submissions
 └── README.md
 ```
 
@@ -144,7 +148,7 @@ bun run preview
 
 ### Step-by-Step Guide
 
-#### 1. Add Tool Handler (`src/mcp-server.js`)
+#### 1. Add Tool Handler (`packages/kaede-trello/src/mcp-server.js`)
 
 Find the appropriate section and add your handler:
 
@@ -206,16 +210,16 @@ Use test board: https://trello.com/b/rAKmlRj3/lab-testing-kaede
 
 1. **Get Test Card ID**
    ```bash
-   node test/get-test-card.js
+   bun test/get-test-card.js
    ```
 
 2. **Run Test Script**
    ```bash
    # Windows PowerShell
-   $env:TEST_CARD_ID="67xxx..."; node test/manual-test-attachments.js
+   $env:TEST_CARD_ID="67xxx..."; bun test/manual-test-attachments.js
    
    # Linux/Mac
-   TEST_CARD_ID="67xxx..." node test/manual-test-attachments.js
+   TEST_CARD_ID="67xxx..." bun test/manual-test-attachments.js
    ```
 
 3. **Verify in Trello UI**
@@ -325,7 +329,7 @@ docs/[lang]/    ← Other languages (created by contributors)
 ```
 feat(mcp-server): add get_card_attachments tool
 
-- Implement handler in src/mcp-server.js
+- Implement handler in packages/kaede-trello/src/mcp-server.js
 - Add wrapper method in trello-client.js
 - Add test script and documentation
 

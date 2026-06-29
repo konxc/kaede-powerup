@@ -61,10 +61,10 @@ TEST_BOARD_URL=https://trello.com/b/rAKmlRj3/lab-testing-kaede
 # Card ID format: 67xxxxxxxxxxxxxxxxxxxxx (24 karakter)
 
 # Windows PowerShell
-$env:TEST_CARD_ID="678f9a0b1c2d3e4f5a6b7c8d"; node test/manual-test-attachments.js
+$env:TEST_CARD_ID="678f9a0b1c2d3e4f5a6b7c8d"; bun test/manual-test-attachments.js
 
 # Linux/Mac
-TEST_CARD_ID="678f9a0b1c2d3e4f5a6b7c8d" node test/manual-test-attachments.js
+TEST_CARD_ID="678f9a0b1c2d3e4f5a6b7c8d" bun test/manual-test-attachments.js
 ```
 
 ### Option 2: PowerShell Test Script
@@ -105,7 +105,7 @@ test();
 
 Jalankan:
 ```powershell
-node test/test-direct.js
+bun test/test-direct.js
 ```
 
 ---
@@ -218,7 +218,7 @@ Test-Path dist/mcp-server.js
 
 **Solusi:**
 ```powershell
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 ```
 
 ### Error: "Invalid card ID"

@@ -14,7 +14,7 @@ KAEDE adalah **Trello Power-Up + MCP Server + CLI Orchestrator** yang menjembata
 - **Trello-based** — tim sudah pakai Trello, tinggal pasang Power-Up
 
 ### Untuk Ekosistem AI Agent
-- **44 tools MCP** — akses Trello paling lengkap dari AI Agent
+- **42 tools (kaede-trello) + 45+ tools (upstream delorenj)** — akses Trello paling lengkap dari AI Agent
 - **Intent-driven** — bilang "Mulai Sprint Alpha", AI Agent yang kerja
 - **Playbook enforcement** — SOP di Markdown, AI Agent yang jalankan
 

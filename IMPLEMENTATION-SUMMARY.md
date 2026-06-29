@@ -3,8 +3,8 @@
 > **Complete implementation of all phases** — Attachments, Checklist, Watch/Activity, and Sort/List Management tools.
 
 **Status:** ✅ All Phases Complete  
-**Total Tools Added:** 20 new tools + 2 enhancements  
-**Build Status:** ✅ MCP Server 20.63 KB  
+**Package:** `kaede-trello` — 42 tools as a standalone MCP library
+**Upstream:** `delorenj/mcp-server-trello` — 45+ tools  
 **Date:** June 27, 2026
 
 ---
@@ -29,7 +29,7 @@ KAEDE MCP telah berkembang menjadi **platform orkestrasi kolaboratif universal**
 ✅ Phase 3: Advanced Features (5 tools)
 ✅ Phase 4: Sort & List Management (3 tools)
 ✅ Phase 5: Documentation & Testing (This file)
-🔄 Phase 6: Upstream Contribution — Ready to prepare
+✅ Phase 6: Upstream Contribution — PRs submitted
 ```
 
 ---
@@ -84,17 +84,17 @@ KAEDE MCP telah berkembang menjadi **platform orkestrasi kolaboratif universal**
 
 | File | Changes | Size |
 |------|---------|------|
-| `src/mcp-server.js` | +20 tool handlers, +20 tool definitions | ~650 lines |
-| `src/trello-client.js` | +20 wrapper methods | ~250 lines |
-| `src/trello/attachments.js` | New utility module | 228 lines |
-| `dist/mcp-server.js` | Compiled MCP server | 20.63 KB |
+| `packages/kaede-trello/src/mcp-server.js` | 42 tool handlers & definitions | ~1100 lines |
+| `src/trello-client.js` | Legacy wrapper | ~250 lines |
+| `packages/kaede-trello/src/trello/attachments.js` | Utility module | 228 lines |
+| `dist/mcp-server.js` | Compiled output (Bun) | — |
 
 ### Documentation & Testing
 
 | File | Purpose |
 |------|---------|
 | `.env.example` | Reference for global credentials setup |
-| `test/manual-test-attachments.js` | Node.js test script for attachments |
+| `test/manual-test-attachments.js` | Bun test script for attachments |
 | `test/get-test-card.js` | Helper to get card IDs from board |
 | `test/MANUAL-TESTING.md` | Comprehensive testing guide |
 | `test/CHECKLIST-TESTING.md` | Checklist tools testing guide |
@@ -114,7 +114,7 @@ KAEDE menggunakan **global credentials** yang disimpan di:
 
 **Setup:**
 ```bash
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 ```
 
 **Manual:**
@@ -127,23 +127,28 @@ TRELLO_TOKEN=your-token
 
 ### Credential Loading Order
 
-Dari `scripts/kaede.mjs:30-40`:
+Dari `packages/kaede-trello/src/mcp-server.js:34-49`:
 
 ```javascript
-function getSecrets() {
-  const global = resolve(homedir(), '.config', 'kaede', 'secrets.env');
-  const local = resolve(process.cwd(), 'secrets.env');
-  const dev = resolve(KAEDE_DIR, 'secrets.env');
-
+function getAuth() {
+  const searchPaths = [
+    resolve(ROOT, 'secrets.env'),
+    resolve(ROOT, '..', 'secrets.env'),
+    resolve(homedir(), '.config', 'kaede', 'secrets.env'),
+    resolve(process.cwd(), 'secrets.env'),
+  ];
   let merged = {};
-  for (const p of [dev, local, global]) {
-    merged = { ...merged, ...loadEnv(p) };
-  }
-  return merged;
+  for (const p of searchPaths) merged = { ...merged, ...loadEnv(p) };
+  merged = { ...merged, ...process.env };
+
+  const key = merged.TRELLO_API_KEY;
+  const token = merged.TRELLO_TOKEN;
+  if (!key || !token) return null;
+  return { key, token, qs: `key=${key}&token=${token}` };
 }
 ```
 
-**Priority:** Global → Local → Dev (last one wins)
+**Priority:** ROOT/secrets.env → ../secrets.env → ~/.config/kaede/secrets.env → cwd/secrets.env → process.env (last wins)
 
 ---
 
@@ -153,7 +158,7 @@ function getSecrets() {
 
 ```bash
 # Interactive setup
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 
 # Or manual edit
 # Edit: ~/.config/kaede/secrets.env
@@ -169,10 +174,10 @@ bun run build:mcp
 
 ```bash
 # Get card IDs from test board
-node test/get-test-card.js
+bun test/get-test-card.js
 
 # Run attachment tests
-node test/manual-test-attachments.js
+bun test/manual-test-attachments.js
 ```
 
 ---
@@ -217,51 +222,52 @@ Use this board for all manual testing. Create cards, checklists, and attachments
 ### Preparation Steps
 
 1. ✅ Implement in KAEDE first (DONE)
-2. ✅ Test thoroughly (IN PROGRESS)
-3. ⏳ Prepare PRs to upstream
+2. ✅ Test thoroughly (DONE)
+3. ✅ Prepare PRs to upstream (DONE)
 4. ⏳ Sync KAEDE with upstream after merge
 
-### PR Strategy
+### PR Strategy (Executed)
 
-**PR #1:** `get_card_attachments`
-- Add tool handler
-- Add TypeScript types
-- Add tests
-- Update README
+**PR #98:** `get_card_attachments` + `get_card_checklists`
+- Tool handlers implemented in KAEDE
+- Ported to TypeScript for upstream
+- Tests included
+- Status: ✅ Open, review done
 
-**PR #2:** `get_card_checklists`
-- Add tool handler
-- Return checklists with items
-- Add tests
-
-**PR #3:** `watch_card` + `watch_list`
+**PR #99:** `watch_card` + `watch_list`
 - Unified watch/unwatch interface
 - Better error handling
-- Documentation
+- Documentation updated
+- Status: ✅ Open, review done
+
+**PR #100:** `search_labels` + `remove_label_from_card`
+- Additional tools discovered during development
+- Status: ✅ Open, fix pushed
 
 ---
 
 ## 📈 Progress Tracking
 
-### Phase Completion
+### Tool Count
 
-| Phase | Tools | Status | Build Size |
-|-------|-------|--------|------------|
-| Phase 1 | 8 + 2 enhancements | ✅ Complete | 17.72 KB |
-| Phase 2 | 4 | ✅ Complete | 18.58 KB |
-| Phase 3 | 5 | ✅ Complete | 19.82 KB |
-| Phase 4 | 3 | ✅ Complete | 20.63 KB |
-| **Total** | **20 + 2** | **✅ All Complete** | **20.63 KB** |
+| Package | Tools | Description |
+|---------|-------|-------------|
+| `kaede-trello` | **42** | Standalone MCP library (this repo) |
+| `delorenj/mcp-server-trello` | **45+** | Upstream provider |
 
-### Tool Count Growth
+### Tool Breakdown (kaede-trello)
 
 ```
-Original: 24 tools
-Phase 1:  +8 tools +2 enhancements = 32
-Phase 2:  +4 tools = 36
-Phase 3:  +5 tools = 41
-Phase 4:  +3 tools = 44
-Final:    44 tools (83% growth)
+Base/list/board:     9 tools  (list_boards, list_workspaces, create_board, get_lists, ...)
+Card operations:    10 tools  (add_card_to_list, update_card_details, move_card, ...)
+Attachments:         5 tools  (attach_file_to_card, attach_image_to_card, ...)
+Checklists:          6 tools  (create_checklist, add_checklist_item, ...)
+Labels:              4 tools  (create_label, update_label, delete_label, ...)
+Watch & Activity:    3 tools  (watch_card, watch_list, get_card_activity)
+Members:             3 tools  (get_board_members, assign_member_to_card, ...)
+Sort & Manage:       2 tools  (sort_list_cards, update_list)
+─────────────────────────────────────
+Total:              42 tools
 ```
 
 ---
@@ -300,22 +306,30 @@ bun run build:mcp
 bun run build
 
 # Test (manual)
-node test/get-test-card.js
-node test/manual-test-attachments.js
+bun test/get-test-card.js
+bun test/manual-test-attachments.js
 ```
 
 ### File Structure
 
 ```
 kaede-powerup/
-├── src/
-│   ├── mcp-server.js          # Main MCP server (20.63 KB)
-│   ├── trello-client.js       # Wrapper client
-│   └── trello/
-│       └── attachments.js     # Utility module (228 lines)
-├── dist/
-│   ├── mcp-server.js          # Compiled (Bun)
-│   └── kaede-mcp-server.js    # Orchestrator
+├── packages/
+│   ├── kaede-trello/
+│   │   ├── src/
+│   │   │   ├── mcp-server.js          # MCP server (42 tools)
+│   │   │   └── trello/
+│   │   │       └── attachments.js     # Utility module
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── mcp-server-trello/             # Upstream fork (45+ tools)
+│   └── README.md
+├── src/                               # Legacy wrappers
+│   ├── api-server.mjs
+│   ├── kaede-mcp-server.js
+│   ├── orchestrator.js
+│   ├── style.css
+│   └── trello-client.js
 ├── test/
 │   ├── manual-test-attachments.js
 │   ├── get-test-card.js
@@ -325,8 +339,11 @@ kaede-powerup/
 │   └── DEVELOPMENT-ROADMAP.md
 ├── scripts/
 │   └── kaede.mjs              # CLI tool
+├── dist/                       # Build output
 ├── .env.example               # Reference only
-└── README.md
+├── README.md
+├── package.json
+└── IMPLEMENTATION-SUMMARY.md
 ```
 
 ---
@@ -366,7 +383,7 @@ kaede-powerup/
 1. **Setup:**
    ```bash
    bun install
-   node scripts/kaede.mjs setup
+   bun scripts/kaede.mjs setup
    ```
 
 2. **Understand Architecture:**
@@ -375,7 +392,7 @@ kaede-powerup/
    - Review existing tool implementations
 
 3. **Add New Tool:**
-   - Add handler in `src/mcp-server.js`
+   - Add handler in `packages/kaede-trello/src/mcp-server.js`
    - Add tool definition (toolSchema)
    - Add wrapper in `src/trello-client.js`
    - Add tests in `test/`
@@ -432,4 +449,4 @@ KAEDE dapat digunakan dan dimodifikasi untuk project internal. Redistribusi kome
 
 **Last Updated:** June 27, 2026  
 **Version:** 1.0.0  
-**Build:** 20.63 KB
+**Build:** packages/kaede-trello (Bun)

@@ -46,7 +46,7 @@ async function main() {
   await client.connect();
 
   console.log('Creating checklist on card:', cardId);
-  
+
   // Create checklist
   const checklist = await client.createChecklist(cardId, 'Test Checklist');
   console.log('✓ Created checklist:', checklist.name, '(' + checklist.id + ')');
@@ -67,7 +67,7 @@ async function main() {
   console.log('Card ID:', cardId);
   console.log('');
   console.log('Now you can test:');
-  console.log('  node test/manual-test-checklist.js');
+  console.log('  bun test/manual-test-checklist.js');
 
   client.close();
 }

@@ -21,7 +21,7 @@ Panduan lengkap untuk testing semua tools yang telah ditambahkan ke KAEDE MCP.
 ### 1. Credentials
 
 ```bash
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 ```
 
 Atau manual edit: `~/.config/kaede/secrets.env`
@@ -41,10 +41,10 @@ bun run build:mcp
 
 ```bash
 # Get card IDs from test board
-node test/get-test-card.js
+bun test/get-test-card.js
 
 # Run attachment tests
-node test/manual-test-attachments.js
+bun test/manual-test-attachments.js
 ```
 
 ---
@@ -416,7 +416,7 @@ Copy template ini untuk dokumentasi hasil testing:
 **Solution:**
 ```bash
 bun run build:mcp
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 ```
 
 ### Issue: "Unauthorized"
@@ -435,7 +435,7 @@ node scripts/kaede.mjs setup
 **Solution:**
 ```bash
 # Get valid card IDs
-node test/get-test-card.js
+bun test/get-test-card.js
 ```
 
 ### Issue: "Rate limit exceeded"

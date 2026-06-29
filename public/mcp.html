@@ -1,195 +1,272 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="h-full">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KAEDE — MCP Control</title>
-  <link rel="stylesheet" href="css/style.css" />
-</head>
-<body class="h-full bg-kaede-surface p-4 font-sans antialiased flex flex-col">
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="text-base font-semibold text-kaede-text">KAEDE MCP</h2>
-    <span class="flex items-center justify-center size-6 rounded bg-kaede-primary text-white text-[9px] font-bold">K</span>
-  </div>
-
-  <div id="mcp-status" class="hidden">
-    <div class="flex items-center gap-2 px-3 py-2 bg-kaede-bg rounded-md mb-3">
-      <span class="size-2 rounded-full bg-kaede-success" id="status-dot"></span>
-      <span class="text-sm text-kaede-text" id="status-text">Connected</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KAEDE — MCP Control</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="h-full bg-kaede-surface p-4 font-sans antialiased flex flex-col">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-semibold text-kaede-text">KAEDE MCP</h2>
+      <span class="flex items-center justify-center size-6 rounded bg-kaede-primary text-white text-[9px] font-bold"
+        >K</span
+      >
     </div>
-  </div>
 
-  <div id="card-context" class="hidden mb-3">
-    <div class="flex items-center gap-2 px-3 py-2 bg-kaede-bg rounded-md border border-kaede-border/50">
-      <span class="size-2 rounded-full bg-kaede-primary shrink-0"></span>
-      <div class="min-w-0">
-        <div class="text-sm font-medium text-kaede-text truncate" id="context-name"></div>
-        <div class="text-[10px] text-kaede-muted font-mono truncate" id="context-id"></div>
+    <div id="mcp-status" class="hidden">
+      <div class="flex items-center gap-2 px-3 py-2 bg-kaede-bg rounded-md mb-3">
+        <span class="size-2 rounded-full bg-kaede-success" id="status-dot"></span>
+        <span class="text-sm text-kaede-text" id="status-text">Connected</span>
       </div>
     </div>
-  </div>
 
-  <div class="flex-1">
-    <div class="mb-3">
-      <label class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide">Intent</label>
-      <input type="text" id="intent-input" placeholder="e.g. buat card (create card)" class="w-full mt-1 px-3 py-2 rounded-md border border-kaede-border bg-kaede-bg text-sm text-kaede-text outline-none transition-colors focus:border-kaede-primary" />
+    <div id="card-context" class="hidden mb-3">
+      <div class="flex items-center gap-2 px-3 py-2 bg-kaede-bg rounded-md border border-kaede-border/50">
+        <span class="size-2 rounded-full bg-kaede-primary shrink-0"></span>
+        <div class="min-w-0">
+          <div class="text-sm font-medium text-kaede-text truncate" id="context-name"></div>
+          <div class="text-[10px] text-kaede-muted font-mono truncate" id="context-id"></div>
+        </div>
+      </div>
     </div>
-    <div class="mb-3">
-      <label class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide">Args (JSON)</label>
-      <textarea id="args-input" rows="3" placeholder='{"task":"New feature","list":"To Do"}' class="w-full mt-1 px-3 py-2 rounded-md border border-kaede-border bg-kaede-bg text-sm text-kaede-text outline-none transition-colors focus:border-kaede-primary resize-none font-mono"></textarea>
+
+    <div class="flex-1">
+      <div class="mb-3">
+        <label class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide">Intent</label>
+        <input
+          type="text"
+          id="intent-input"
+          placeholder="e.g. buat card (create card)"
+          class="w-full mt-1 px-3 py-2 rounded-md border border-kaede-border bg-kaede-bg text-sm text-kaede-text outline-none transition-colors focus:border-kaede-primary"
+        />
+      </div>
+      <div class="mb-3">
+        <label class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide">Args (JSON)</label>
+        <textarea
+          id="args-input"
+          rows="3"
+          placeholder='{"task":"New feature","list":"To Do"}'
+          class="w-full mt-1 px-3 py-2 rounded-md border border-kaede-border bg-kaede-bg text-sm text-kaede-text outline-none transition-colors focus:border-kaede-primary resize-none font-mono"
+        ></textarea>
+      </div>
+      <div class="flex gap-2">
+        <button
+          type="button"
+          id="execute-btn"
+          class="flex-1 px-4 py-2 rounded-lg bg-kaede-primary text-white text-sm font-medium cursor-pointer border-none transition-colors duration-200 hover:bg-kaede-primary-hover disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Execute
+        </button>
+        <button
+          type="button"
+          id="quick-card"
+          class="px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary"
+        >
+          Quick Card
+        </button>
+        <button
+          type="button"
+          id="quick-move"
+          class="px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary"
+        >
+          Quick Move
+        </button>
+      </div>
+      <div class="flex gap-2 mt-2">
+        <button
+          type="button"
+          id="quick-comment"
+          class="flex-1 px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary"
+        >
+          Quick Comment
+        </button>
+        <button
+          type="button"
+          id="quick-archive"
+          class="flex-1 px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary"
+        >
+          Quick Archive
+        </button>
+      </div>
+      <div id="result-area" class="mt-3 hidden">
+        <div class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide mb-1">Result</div>
+        <pre
+          id="result-text"
+          class="text-xs text-kaede-text bg-kaede-bg rounded-md p-3 overflow-x-auto max-h-40 leading-relaxed"
+        ></pre>
+      </div>
+      <div id="error-area" class="mt-3 hidden">
+        <div class="text-[11px] font-semibold text-kaede-danger uppercase tracking-wide mb-1">Error</div>
+        <pre
+          id="error-text"
+          class="text-xs text-kaede-danger bg-kaede-bg rounded-md p-3 overflow-x-auto leading-relaxed"
+        ></pre>
+      </div>
     </div>
-    <div class="flex gap-2">
-      <button type="button" id="execute-btn" class="flex-1 px-4 py-2 rounded-lg bg-kaede-primary text-white text-sm font-medium cursor-pointer border-none transition-colors duration-200 hover:bg-kaede-primary-hover disabled:opacity-40 disabled:cursor-not-allowed">Execute</button>
-      <button type="button" id="quick-card" class="px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary">Quick Card</button>
-      <button type="button" id="quick-move" class="px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary">Quick Move</button>
+
+    <div class="pt-3 border-t border-kaede-border/50 flex justify-between items-center">
+      <span class="text-[10px] text-kaede-muted"
+        >Try: buat card (create), pindah (move), komentar (comment), report</span
+      >
+      <a
+        href="/"
+        target="_blank"
+        rel="noopener"
+        class="text-[10px] text-kaede-muted hover:text-kaede-primary no-underline transition-colors"
+        >Info</a
+      >
     </div>
-    <div class="flex gap-2 mt-2">
-      <button type="button" id="quick-comment" class="flex-1 px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary">Quick Comment</button>
-      <button type="button" id="quick-archive" class="flex-1 px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary">Quick Archive</button>
-    </div>
-    <div id="result-area" class="mt-3 hidden">
-      <div class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide mb-1">Result</div>
-      <pre id="result-text" class="text-xs text-kaede-text bg-kaede-bg rounded-md p-3 overflow-x-auto max-h-40 leading-relaxed"></pre>
-    </div>
-    <div id="error-area" class="mt-3 hidden">
-      <div class="text-[11px] font-semibold text-kaede-danger uppercase tracking-wide mb-1">Error</div>
-      <pre id="error-text" class="text-xs text-kaede-danger bg-kaede-bg rounded-md p-3 overflow-x-auto leading-relaxed"></pre>
-    </div>
-  </div>
 
-  <div class="pt-3 border-t border-kaede-border/50 flex justify-between items-center">
-    <span class="text-[10px] text-kaede-muted">Try: buat card (create), pindah (move), komentar (comment), report</span>
-    <a href="/" target="_blank" rel="noopener" class="text-[10px] text-kaede-muted hover:text-kaede-primary no-underline transition-colors">Info</a>
-  </div>
+    <script src="https://p.trellocdn.net/power-up.min.js"></script>
+    <script>
+      (function () {
+        var API_BASE = 'http://localhost:3456';
+        var t = TrelloPowerUp.iframe();
+        var cardId = '';
+        var cardName = '';
 
-  <script src="https://p.trellocdn.net/power-up.min.js"></script>
-  <script>
-    (function () {
-      var API_BASE = 'http://localhost:3456';
-      var t = TrelloPowerUp.iframe();
-      var cardId = '';
-      var cardName = '';
+        var statusDot = document.getElementById('status-dot');
+        var statusText = document.getElementById('status-text');
+        var statusSection = document.getElementById('mcp-status');
+        var contextSection = document.getElementById('card-context');
+        var contextName = document.getElementById('context-name');
+        var contextId = document.getElementById('context-id');
+        var intentInput = document.getElementById('intent-input');
+        var argsInput = document.getElementById('args-input');
+        var executeBtn = document.getElementById('execute-btn');
+        var resultArea = document.getElementById('result-area');
+        var resultText = document.getElementById('result-text');
+        var errorArea = document.getElementById('error-area');
+        var errorText = document.getElementById('error-text');
+        var quickCard = document.getElementById('quick-card');
+        var quickMove = document.getElementById('quick-move');
+        var quickComment = document.getElementById('quick-comment');
+        var quickArchive = document.getElementById('quick-archive');
 
-      var statusDot = document.getElementById('status-dot');
-      var statusText = document.getElementById('status-text');
-      var statusSection = document.getElementById('mcp-status');
-      var contextSection = document.getElementById('card-context');
-      var contextName = document.getElementById('context-name');
-      var contextId = document.getElementById('context-id');
-      var intentInput = document.getElementById('intent-input');
-      var argsInput = document.getElementById('args-input');
-      var executeBtn = document.getElementById('execute-btn');
-      var resultArea = document.getElementById('result-area');
-      var resultText = document.getElementById('result-text');
-      var errorArea = document.getElementById('error-area');
-      var errorText = document.getElementById('error-text');
-      var quickCard = document.getElementById('quick-card');
-      var quickMove = document.getElementById('quick-move');
-      var quickComment = document.getElementById('quick-comment');
-      var quickArchive = document.getElementById('quick-archive');
-
-      t.card('id', 'name')
-        .then(function (card) {
-          if (card && card.id) {
-            cardId = card.id;
-            cardName = card.name || 'Untitled';
-            contextSection.classList.remove('hidden');
-            contextName.textContent = cardName;
-            contextId.textContent = cardId;
-          }
-        })
-        .catch(function () {});
-
-      function showResult(data) {
-        errorArea.classList.add('hidden');
-        resultArea.classList.remove('hidden');
-        resultText.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
-      }
-
-      function showError(msg) {
-        resultArea.classList.add('hidden');
-        errorArea.classList.remove('hidden');
-        errorText.textContent = msg;
-      }
-
-      function checkConnection() {
-        fetch(API_BASE + '/api/health', { method: 'POST' })
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            statusSection.classList.remove('hidden');
-            statusDot.className = 'size-2 rounded-full bg-kaede-success';
-            statusText.textContent = 'API Server connected (v' + data.version + ')';
-          })
-          .catch(function () {
-            statusSection.classList.remove('hidden');
-            statusDot.className = 'size-2 rounded-full bg-kaede-warning';
-            statusText.textContent = 'API Server not found. Run: node scripts/kaede.mjs start';
-          });
-      }
-
-      function executeMCP(intent, args) {
-        executeBtn.disabled = true;
-        executeBtn.textContent = 'Executing...';
-
-        fetch(API_BASE + '/api/mcp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ intent: intent, args: args, boardId: '' }),
-        })
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            if (data.success) {
-              showResult(data.results);
-            } else {
-              showError(data.error || 'Unknown error');
+        t.card('id', 'name')
+          .then(function (card) {
+            if (card && card.id) {
+              cardId = card.id;
+              cardName = card.name || 'Untitled';
+              contextSection.classList.remove('hidden');
+              contextName.textContent = cardName;
+              contextId.textContent = cardId;
             }
           })
-          .catch(function (err) {
-            showError('Connection failed: ' + err.message + '\n\nMake sure KAEDE API is running:\nnode scripts/kaede.mjs start');
-          })
-          .finally(function () {
-            executeBtn.disabled = false;
-            executeBtn.textContent = 'Execute';
-          });
-      }
+          .catch(function () {});
 
-      executeBtn.addEventListener('click', function () {
-        var intent = intentInput.value.trim();
-        if (!intent) { showError('Please enter an intent'); return; }
-        var args = {};
-        try {
-          if (argsInput.value.trim()) args = JSON.parse(argsInput.value.trim());
-        } catch (e) {
-          showError('Invalid JSON in args: ' + e.message);
-          return;
+        function showResult(data) {
+          errorArea.classList.add('hidden');
+          resultArea.classList.remove('hidden');
+          resultText.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
         }
-        executeMCP(intent, args);
-      });
 
-      quickCard.addEventListener('click', function () {
-        intentInput.value = 'buat card';
-        argsInput.value = JSON.stringify({ task: 'New Task', desc: 'Created from KAEDE Power-Up', list: 'To Do' }, null, 2);
-      });
+        function showError(msg) {
+          resultArea.classList.add('hidden');
+          errorArea.classList.remove('hidden');
+          errorText.textContent = msg;
+        }
 
-      quickMove.addEventListener('click', function () {
-        intentInput.value = 'pindah';
-        argsInput.value = JSON.stringify({ cardId: cardId || 'enter-card-id', listName: 'Done' }, null, 2);
-      });
+        function checkConnection() {
+          fetch(API_BASE + '/api/health', { method: 'POST' })
+            .then(function (r) {
+              return r.json();
+            })
+            .then(function (data) {
+              statusSection.classList.remove('hidden');
+              statusDot.className = 'size-2 rounded-full bg-kaede-success';
+              statusText.textContent = 'API Server connected (v' + data.version + ')';
+            })
+            .catch(function () {
+              statusSection.classList.remove('hidden');
+              statusDot.className = 'size-2 rounded-full bg-kaede-warning';
+              statusText.textContent = 'API Server not found. Run: bun scripts/kaede.mjs start';
+            });
+        }
 
-      quickComment.addEventListener('click', function () {
-        if (!cardId) { showError('No card context available. Open this from a card.'); return; }
-        intentInput.value = 'komentar';
-        argsInput.value = JSON.stringify({ cardId: cardId, text: 'Update from KAEDE Power-Up' }, null, 2);
-      });
+        function executeMCP(intent, args) {
+          executeBtn.disabled = true;
+          executeBtn.textContent = 'Executing...';
 
-      quickArchive.addEventListener('click', function () {
-        if (!cardId) { showError('No card context available. Open this from a card.'); return; }
-        intentInput.value = 'arsipkan';
-        argsInput.value = JSON.stringify({ cardId: cardId }, null, 2);
-      });
+          fetch(API_BASE + '/api/mcp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ intent: intent, args: args, boardId: '' }),
+          })
+            .then(function (r) {
+              return r.json();
+            })
+            .then(function (data) {
+              if (data.success) {
+                showResult(data.results);
+              } else {
+                showError(data.error || 'Unknown error');
+              }
+            })
+            .catch(function (err) {
+              showError(
+                'Connection failed: ' +
+                  err.message +
+                  '\n\nMake sure KAEDE API is running:\nbun scripts/kaede.mjs start',
+              );
+            })
+            .finally(function () {
+              executeBtn.disabled = false;
+              executeBtn.textContent = 'Execute';
+            });
+        }
 
-      checkConnection();
-    })();
-  </script>
-</body>
+        executeBtn.addEventListener('click', function () {
+          var intent = intentInput.value.trim();
+          if (!intent) {
+            showError('Please enter an intent');
+            return;
+          }
+          var args = {};
+          try {
+            if (argsInput.value.trim()) args = JSON.parse(argsInput.value.trim());
+          } catch (e) {
+            showError('Invalid JSON in args: ' + e.message);
+            return;
+          }
+          executeMCP(intent, args);
+        });
+
+        quickCard.addEventListener('click', function () {
+          intentInput.value = 'buat card';
+          argsInput.value = JSON.stringify(
+            { task: 'New Task', desc: 'Created from KAEDE Power-Up', list: 'To Do' },
+            null,
+            2,
+          );
+        });
+
+        quickMove.addEventListener('click', function () {
+          intentInput.value = 'pindah';
+          argsInput.value = JSON.stringify({ cardId: cardId || 'enter-card-id', listName: 'Done' }, null, 2);
+        });
+
+        quickComment.addEventListener('click', function () {
+          if (!cardId) {
+            showError('No card context available. Open this from a card.');
+            return;
+          }
+          intentInput.value = 'komentar';
+          argsInput.value = JSON.stringify({ cardId: cardId, text: 'Update from KAEDE Power-Up' }, null, 2);
+        });
+
+        quickArchive.addEventListener('click', function () {
+          if (!cardId) {
+            showError('No card context available. Open this from a card.');
+            return;
+          }
+          intentInput.value = 'arsipkan';
+          argsInput.value = JSON.stringify({ cardId: cardId }, null, 2);
+        });
+
+        checkConnection();
+      })();
+    </script>
+  </body>
 </html>

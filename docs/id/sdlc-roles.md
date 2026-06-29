@@ -35,7 +35,7 @@ pasang label benar, assign anggota sesuai aturan playbook
 Copy screenshot dari clipboard → AI Agent lampirkan ke Trello card
 via base64, tanpa perlu upload file
 ```
-- 44 tools MCP — akses Trello komprehensif dari AI Agent
+- 42 tools — akses Trello komprehensif dari AI Agent (via packages/kaede-trello)
 - Lampiran clipboard-to-card (screenshot base64)
 - Checklist CRUD lengkap: buat, update, hapus, copy antar card
 - `kaede init` — setup MCP satu perintah di project mana pun
@@ -103,7 +103,7 @@ Playbook → OpenKB → OpenCode → mcp.kaede (orchestrasi) → mcp.trello (eks
 - Belum ada cara standar untuk berkontribusi kembali ke ekosistem
 
 **Solusi KAEDE:**
-- 44 tools siap pakai — protokol JSON-RPC standar
+- 42 tools siap pakai dari packages/kaede-trello + 45+ tools dari upstream @delorenj/mcp-server-trello
 - `CONTRIBUTING.md` — panduan langkah-demi-langkah nambah tools baru
 - Auto-built MCP server via `bun run build:mcp`
 - 3 upstream PR dikontribusikan ke `delorenj/mcp-server-trello`
@@ -115,7 +115,7 @@ Playbook → OpenKB → OpenCode → mcp.kaede (orchestrasi) → mcp.trello (eks
 | Peran | Manfaat Utama | Entry Point |
 |---|---|---|
 | PM/PO | Otomatisasi sprint berbasis intent | `kaede run --intent` |
-| Developer | 44 tools MCP dari AI Agent | `kaede init` |
+| Developer | 42+45 tools dari kaede-trello + upstream | `kaede init` |
 | QA/Tester | Template checklist + histori card | `get_card_activity` |
 | Tech Lead | Governance via playbook | Playbook parser |
 | Stakeholder | Visibilitas tanpa konfigurasi | Badge Trello |

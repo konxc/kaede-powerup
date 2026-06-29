@@ -9,15 +9,16 @@
 | **Phase 3** | Watch & Activity (5) | ✅ Complete | 19.82 KB |
 | **Phase 4** | Sort & List Management (3) | ✅ Complete | 20.63 KB |
 | **Phase 5** | Documentation & Cleanup | ✅ Complete | - |
-| **TOTAL** | **20 tools + 2 enhancements** | **✅ ALL DONE** | **20.63 KB** |
+| **Phase 6** | Upstream Contribution (3 PRs) | ✅ Submitted | - |
+| **TOTAL** | **42 tools** | **✅ ALL DONE** | **25.42 KB** |
 
 ## 📊 Quick Stats
 
-- **Tool Growth:** 24 → 44 tools (**83% increase**)
-- **Build Size:** 15.18 KB → 20.63 KB (**+36%**)
+- **Tool Growth:** 24 → 42 tools (**75% increase**)
+- **Build Size:** 15.18 KB → 24.82 KB (**+63%**)
 - **New Files:** 15 files created
 - **Modified Files:** 6 files updated
-- **New Contributions:** 3 tools ready for upstream
+- **New Contributions:** 3 PRs submitted to delorenj/mcp-server-trello
 
 ## 📁 New Files Created
 
@@ -43,33 +44,29 @@
 
 `ash
 # 1. Setup credentials (GLOBAL)
-node scripts/kaede.mjs setup
+bun scripts/kaede.mjs setup
 
 # 2. Build MCP server
 bun run build:mcp
 
 # 3. Get card IDs
-node test/get-test-card.js
+bun test/get-test-card.js
 
 # 4. Run tests
-\="67xxx..."; node test/manual-test-attachments.js
+\="67xxx..."; bun test/manual-test-attachments.js
 `
 
 ## 🎯 Next Steps
 
-### Phase 6: Upstream Contribution
+### ✅ Phase 6: Upstream Contribution — SELESAI
 
-**Priority 1:**
-1. get_card_attachments — Missing in upstream
-2. get_card_checklists — Missing in upstream  
-3. watch_card + watch_list — Enhanced implementation
+Tiga PR sudah dikirim ke [`delorenj/mcp-server-trello`](https://github.com/delorenj/mcp-server-trello):
 
-**Action Items:**
-- [ ] Prepare PR #1: get_card_attachments
-- [ ] Prepare PR #2: get_card_checklists
-- [ ] Prepare PR #3: watch tools
-- [ ] Submit to delorenj/mcp-server-trello
-- [ ] Track PR status
+| PR | Tools | Status |
+|----|-------|--------|
+| [#98](https://github.com/delorenj/mcp-server-trello/pull/98) | `get_card_attachments`, `get_card_checklists` | ✅ Open, review done |
+| [#99](https://github.com/delorenj/mcp-server-trello/pull/99) | `watch_card`, `watch_list` | ✅ Open, review done |
+| [#100](https://github.com/delorenj/mcp-server-trello/pull/100) | `search_labels`, `remove_label_from_card` | ✅ Open, fix pushed |
 
 ### Manual Testing (Optional)
 
@@ -97,20 +94,19 @@ node test/get-test-card.js
 - Location: ~/.config/kaede/secrets.env
 - JANGAN buat secrets.env di project folder
 - File sudah ada di .gitignore
-- Use 
-ode scripts/kaede.mjs setup to configure
+- Use `bun scripts/kaede.mjs setup` to configure
 
 ## 🎉 Achievement Unlocked!
 
-✅ **20 new tools implemented**  
-✅ **3 new contributions ready**  
+✅ **42 tools implemented**
+✅ **3 PRs submitted to upstream**  
 ✅ **Complete documentation**  
-✅ **Testing infrastructure**  
-✅ **Ready for upstream PRs**
+✅ **Testing infrastructure (121+ automated tests)**  
+✅ **Packages restructured (submodule + lib staging)**
 
 ---
 
 **Status:** ✅ All Phases Complete  
 **Date:** June 27, 2026  
 **Build:** 20.63 KB  
-**Next:** Upstream Contribution (Phase 6)
+**Next:** Sync upstream after PR merges

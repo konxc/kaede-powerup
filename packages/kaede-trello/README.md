@@ -1,47 +1,80 @@
-# @kaede/trello — KAEDE Trello MCP (Staging Area)
+# @kaede/trello — KAEDE Custom Trello Library
 
-Package ini adalah **staging area** untuk fitur Trello MCP yang belum tersedia di upstream
-[delorenj/mcp-server-trello](https://github.com/delorenj/mcp-server-trello).
+**Wadah permanen** untuk tools Trello yang belum atau tidak akan tersedia
+di upstream [`delorenj/mcp-server-trello`](https://github.com/delorenj/mcp-server-trello).
 
-## Strategi
+Package ini adalah **lib** (bukan MCP server) yang digunakan langsung oleh
+kode KAEDE (`src/trello-client.js`) sebagai penyangga/fallback. Kode tetap
+kompatibel dengan struktur upstream agar mudah di-port ke TypeScript dan
+di-PR-kan ke delorenj.
+
+## Filosofi
 
 ```
-Upstream (delorenj/mcp-server-trello)  ──PR──►  @kaede/trello (staging)
-                                                    │
-                                            setelah PR di-merge,
-                                            fitur pindah ke upstream
-                                                    │
-                                            @kaede/trello → fallback only
+delorenj/mcp-server-trello (upstream, MCP server)
+  → Tools resmi, stabil, dikelola komunitas
+  → 45+ tools Trello standar
+
+@kaede/trello (package ini, lib)
+  → Tools custom KAEDE, fitur tambahan
+  → 42 tools yang belum/tidak akan tersedia di upstream
+  → BUKAN MCP server — digunakan langsung oleh kode KAEDE
 ```
 
-1. **Kontribusi ke Upstream** — Setiap fitur baru yang kita buat di sini,
-   kita usahakan untuk di-PR-kan ke `delorenj/mcp-server-trello`.
-2. **Staging Area** — Sembari menunggu PR di-merge, fitur tetap tersedia
-   di sini untuk digunakan langsung.
-3. **Fallback** — Jika upstream sudah mendukung fitur tersebut, maka
-   `@kaede/trello` akan otomatis menjadi fallback (tidak dipakai lagi).
+## Hubungan dengan Upstream
 
-## Cara Kerja
+```
+┌───────────────────────────────────────────────┐
+│  1. Fitur baru muncul                          │
+│     ↓                                         │
+│  2. Implementasi di sini (JavaScript)          │
+│     (kompatibel dgn struktur delorenj)          │
+│     ↓                                         │
+│  3. Uji & stabilkan                           │
+│     ↓                                         │
+│  4. Port ke TypeScript                         │
+│     ↓                                         │
+│  5. Ajukan proposal PR ke delorenj             │
+│     (via packages/mcp-server-trello submodule) │
+│     ↓                              ↓          │
+│  6a. PR di-merge             6b. PR ditolak    │
+│      → sync submodule           → tetap di     │
+│      → (opsional) hapus           sini         │
+│        dari sini                 (permanen)     │
+└───────────────────────────────────────────────┘
+```
 
-MCP Trello yang aktif akan dipilih secara otomatis oleh
-`src/trello-client.js` dengan urutan prioritas:
+Tidak semua proposal akan di-merge oleh delorenj. Package ini adalah
+wadah permanen untuk fitur yang tetap kita butuhkan.
 
-1. Global `opencode.json` (jika terdaftar)
-2. `packages/kaede-trello/src/mcp-server.js` (staging)
-3. `dist/mcp-server.js` (built fallback)
-4. `packages/mcp-server-trello/src/index.js` (upstream langsung)
+## Tools
 
-## Tools yang Tersedia
+Menyediakan **42 tools**, termasuk fitur yang belum ada di upstream:
 
-Saat ini `@kaede/trello` memiliki **42 tools** Trello MCP:
+| Kategori | Tools |
+|---|---|
+| **Attachments** | attach file (URL), attach image (URL/base64/data URL), get attachments |
+| **Copy Card** | copy dengan opsi keepFromSource (all, partial, custom) |
+| **Sort** | sort list cards by pos, dueDate, startDate, dateLastActivity |
+| **Watch** | watch/unwatch card, watch/unwatch list |
+| **Activity** | get card activity dengan filter & limit |
+| **Checklists** | delete checklist, delete item, update item, copy checklist |
 
-- Boards: list, create
-- Lists: get, add, archive, update, sort
-- Cards: get, create, update, move, archive, copy
-- Members: get board members, assign, remove
-- Labels: get, create, update, delete, search, add/remove from card
-- Checklists: create, add item, delete, update item, get, copy
-- Comments: add, get
-- Attachments: attach file (URL), attach image (URL/base64), get attachments
-- Watch: watch/unwatch card, watch/unwatch list
-- Activity: get card activity
+## Build
+
+```bash
+# Dari root project
+cd packages/kaede-trello
+bun run build
+
+# Atau dari root
+bun run build:mcp
+```
+
+Output: `dist/mcp-server.js`
+
+## Penggunaan
+
+`packages/kaede-trello` digunakan langsung oleh `src/trello-client.js` sebagai
+fallback. Tidak perlu registrasi MCP terpisah — cukup `mcp.trello` (upstream)
+dan `mcp.kaede` (orchestrator) di `.opencode/opencode.json`.

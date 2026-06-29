@@ -49,7 +49,7 @@ Sistem kolaboratif di dalam ekosistem PT Koneksi Jaringan Indonesia diatur dalam
                                ▼
         ┌────────────────────────────────────────────────────────┐
         │                  MCP.TRELLO (Executor)                 │
-        │            (mcp-server.js — 24 Trello tools)           │
+        │            (@delorenj/mcp-server-trello — 45+ tools)       │
         └──────────────────────┬─────────────────────────────────┘
                               │ stdio JSON-RPC
                               ▼
@@ -96,7 +96,7 @@ powerup-konxc/
 │   ├── api-key.md               # Panduan mendapatkan kredensial Trello
 │   ├── mcp-server.md            # Konfigurasi Trello MCP Server
 │   ├── opencode.md              # Dokumentasi integrasi Opencode
-│   ├── tools.md                 # Deskripsi 24 tools Trello MCP yang tersedia
+│   ├── tools.md                 # Deskripsi tools Trello MCP yang tersedia
 │   ├── role-management.md       # Detail integrasi role AI Agent & Trello
 │   └── kaede-architecture.md    # [DOKUMEN INI] Arsitektur mendalam & roadmap
 ├── public/                      # Static Assets (Deploy Netlify)
@@ -106,16 +106,27 @@ powerup-konxc/
 │   ├── auth.html                # Mock Authorization page
 │   ├── privacy.html             # Kebijakan privasi multibahasa
 │   └── js/kaede.js              # Implementasi 7 Capabilities Trello Power-Up
+├── packages/
+│   ├── README.md                # Dokumentasi arsitektur packages
+│   ├── mcp-server-trello/       # Git submodule → delorenj/mcp-server-trello (upstream)
+│   └── kaede-trello/
+│       └── src/
+│           ├── mcp-server.js    # Lib Trello (42 tools, fallback/penyangga)
+│           └── trello/
+│               └── attachments.js  # Attachment utilities
 ├── scripts/
-│   ├── kaede.mjs                # CLI Tool utama (15+ commands: playbook, orchestrate, run, start, build, install, dll.)
-│   └── build-docs.mjs           # Script kompilasi Markdown → HTML
-└── src/
-    ├── mcp-server.js            # Sumber kode Trello MCP Server (24 tools)
-    ├── api-server.mjs           # HTTP API server (port 3456)
-    ├── orchestrator.js          # Orchestrator — parsePlaybook, executeIntent, bundleContext, generatePlan
-    ├── trello-client.js         # MCP Client — 24 tool wrappers + timeout + reconnect
-    ├── style.css                # CSS Source (Tailwind v4 + custom utility)
-    └── index.html               # Landing page (deployed to Netlify)
+│   ├── kaede.mjs                # CLI Tool utama (15+ commands)
+│   ├── build-docs.mjs           # Script kompilasi Markdown → HTML
+│   └── build-mcp.mjs            # Build MCP server via bun build
+├── src/
+│   ├── kaede-mcp-server.js      # KAEDE Orchestrator MCP (4 tools)
+│   ├── trello-client.js         # MCP Client — 42+ tool wrappers
+│   ├── orchestrator.js          # Orchestrator — parsePlaybook, executeIntent, bundleContext, generatePlan
+│   ├── api-server.mjs           # HTTP API server (port 3456)
+│   ├── style.css                # CSS Source (Tailwind v4 + custom utility)
+│   └── index.html               # Landing page (deployed to Netlify)
+├── .gitmodules                  # Konfigurasi submodule mcp-server-trello
+├── package.json                 # Build scripts + CLI entry
 ```
 
 ### 3.2 Analisis File-by-File & Penilaian Gaps
@@ -131,8 +142,8 @@ powerup-konxc/
 * 15+ commands: `playbook parse/show`, `orchestrate`, `run` (+dry-run), `build`, `start`, `install`, `init`, `setup`, `today`, `status` (+--mcp), `test-tools`, `env`, `push`.
 * *Gap*: Belum ada integrasi langsung dengan Google Calendar / jadwal akademik untuk auto-sync sprint timeline.
 
-#### C.1. MCP Trello Server (`src/mcp-server.js`) — Executor
-* Menyediakan implementasi protokol MCP mandiri dengan 24 Trello tools esensial (22 original + 2 checklist). Fungsinya murni sebagai executor — menerima perintah dengan ID Trello dan mengeksekusinya.
+C.1. MCP Trello Server (`packages/kaede-trello/src/mcp-server.js`) — Executor
+* Menyediakan implementasi protokol MCP mandiri dengan 42 tools. Fungsinya murni sebagai executor — menerima perintah dengan ID Trello dan mengeksekusinya.
   * *Gap*: Belum ada fitur multi-tool chaining. Untuk itu, gunakan layer context di atasnya (`mcp.kaede`).
 
 #### C.2. KAEDE Orchestrator MCP (`src/kaede-mcp-server.js`) — Pure Context
@@ -148,9 +159,9 @@ powerup-konxc/
 
 | Fitur / Dimensi | Kondisi Sekarang (As-Is) | Target Visi (To-Be) | Gaps | Prioritas |
 |---|---|---|---|---|
-| **Eksekusi Trello** | Plan via `mcp.kaede.generate_plan` (16 intent → ActionStep[]), eksekusi via `mcp.trello.*` (24 tools) | Orkestrasi otomatis multi-langkah (Cukup 1 intent, eksekusi berantai) | Plan → execute masih manual (AI agent chain), belum auto-chaining di server | **🟡 Sedang** |
+| **Eksekusi Trello** | Plan via `mcp.kaede.generate_plan` (16 intent → ActionStep[]), eksekusi via `mcp.trello.*` (45+ tools) | Orkestrasi otomatis multi-langkah (Cukup 1 intent, eksekusi berantai) | Plan → execute masih manual (AI agent chain), belum auto-chaining di server | **🟡 Sedang** |
 | **Playbook Integration** | Parse aktif (Markdown → section map → bundle context) | Di-parse + ditegakkan secara real-time oleh AI Agent | Output parse masih dictionary, belum fully structured untuk auto-enforcement | **🟡 Sedang** |
-| **Trello State Sync** | MCP langsung (via trello-client.js wrapper, 24 tools) | Real-time Label & Metadata Sync via Trello API langsung | Power-Up frontend masih pakai Shared Storage, belum via MCP | **🟡 Sedang** |
+| **Trello State Sync** | MCP langsung (via trello-client.js wrapper, 45+ tools) | Real-time Label & Metadata Sync via Trello API langsung | Power-Up frontend masih pakai Shared Storage, belum via MCP | **🟡 Sedang** |
 | **API Server** | HTTP bridge aktif (port 3456, endpoint /api/mcp & /api/health) | Dashboard visual dengan metrik sprint real-time | Hanya REST proxy, belum ada UI dashboard | **🟡 Sedang** |
 
 ---

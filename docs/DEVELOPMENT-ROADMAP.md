@@ -29,12 +29,13 @@ KAEDE evolves into a **Universal Collaborative Orchestration Platform** with cle
 
 ### Timeline
 
-**8 Weeks Total:**
+**10 Weeks Total:**
 - **Phase 1 (Week 1-2):** Quick Wins — Attachments, Copy Card
 - **Phase 2 (Week 3):** Checklist Enhancements
 - **Phase 3 (Week 4-5):** Advanced Features
-- **Phase 4 (Week 6-7):** Upstream Contribution
-- **Phase 5 (Week 8):** Sync & Documentation
+- **Phase 4 (Week 6-7):** Additional Enhancements
+- **Phase 5 (Week 8-9):** Upstream Contribution
+- **Phase 6 (Week 10):** Sync & Documentation
 
 ---
 
@@ -169,7 +170,7 @@ Impact ↑
 #### Files to Create/Modify
 
 - `src/trello/attachments.js` — Ported from TypeScript
-- `src/mcp-server.js` — Add 5-6 new tool registrations
+- `packages/kaede-trello/src/mcp-server.js` — Add 5-6 new tool registrations
 - `src/trello-client.js` — Add wrapper methods
 - `test/attachments.test.js` — Test suite
 
@@ -282,7 +283,7 @@ Impact ↑
 
 ### Phase 4: Additional Enhancements (Optional) -- PARTIAL (copy_checklist, sort_list_cards done)
 
-**Timeline:** Week 9-10 (if needed)
+**Timeline:** Week 6-7 (if needed)
 
 **Goal:** Implement remaining enhancements useful for KAEDE workflows.
 
@@ -333,7 +334,7 @@ Impact ↑
 
 ---
 
-### Phase 5: Upstream Contribution (Week 6-7) -- IN PROGRESS (3 PRs submitted, awaiting review)
+### Phase 5: Upstream Contribution (Week 8-9) -- IN PROGRESS (3 PRs submitted, awaiting review)
 
 **Goal:** Prepare and submit 3 PRs to `delorenj/mcp-server-trello`.
 
@@ -475,7 +476,7 @@ Closes #XXX (if applicable)
 
 ---
 
-### Phase 6: Sync & Documentation (Week 8) -- PENDING (blocked on PR review)
+### Phase 6: Sync & Documentation (Week 10) -- PENDING (blocked on PR review)
 
 **Goal:** Sync KAEDE with upstream changes and finalize documentation.
 

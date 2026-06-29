@@ -103,7 +103,7 @@ Playbook → OpenKB → OpenCode → mcp.kaede (orchestration) → mcp.trello (e
 - No standardized way to contribute back to the ecosystem
 
 **How KAEDE helps:**
-- 44 tools ready out of the box — standard JSON-RPC protocol
+- 42 tools from packages/kaede-trello + 45+ tools from upstream @delorenj/mcp-server-trello
 - `CONTRIBUTING.md` — step-by-step guide to add new tools
 - Auto-built MCP server via `bun run build:mcp`
 - 3 upstream PRs contributed to `delorenj/mcp-server-trello`

@@ -2,8 +2,8 @@
 
 ## Tujuan
 
-Direktori `packages/` adalah rumah bagi komponen Trello MCP dalam ekosistem KAEDE.
-Memisahkan concerns antara **upstream** dan **staging area** agar codebase punya arah yang jelas.
+`packages/` adalah direktori yang menampung komponen Trello MCP dalam ekosistem KAEDE,
+dengan pemisahan jelas antara **upstream** dan **custom features**.
 
 ## Struktur
 
@@ -12,8 +12,8 @@ packages/
 ├── mcp-server-trello/     ← Git submodule dari delorenj/mcp-server-trello
 │                            (via fork sandikodev untuk kontribusi PR)
 │
-└── kaede-trello/           ← Staging area untuk fitur custom KAEDE
-                             (sebelum di-PR ke upstream)
+└── kaede-trello/           ← Custom Trello MCP KAEDE (first-class citizen)
+                             Fitur yang belum / tidak akan ada di upstream
 ```
 
 ## Aliran Data (Runtime)
@@ -21,110 +21,80 @@ packages/
 ```
 OpenCode (AI Agent)
     │
-    ├── mcp.kaede (dist/kaede-mcp-server.js)
-    │   → Orchestrator: parse_playbook, bundle_context, generate_plan, status
+    ├── mcp.kaede → dist/kaede-mcp-server.js
+    │   → Orchestrator: generate_plan, parse_playbook, bundle_context, status
     │   → Output: ActionStep[] (nama action saja, tanpa ID Trello)
     │
-    └── mcp.trello (@delorenj/mcp-server-trello via bunx)
-        → Eksekutor: menjalankan ActionStep ke Trello API
-        → 45+ tools resmi dari upstream
+    └── mcp.trello → bunx @delorenj/mcp-server-trello
+        → Eksekutor utama: 45+ tools Trello resmi dari upstream
 ```
 
-> **Catatan Penting:** `mcp.trello` di runtime mengarah ke **upstream**
-> `@delorenj/mcp-server-trello` (via npm/bunx), BUKAN ke `packages/kaede-trello/`.
-> `packages/kaede-trello/` adalah staging ground untuk pengembangan.
+`packages/kaede-trello` adalah **lib**, bukan MCP server. Digunakan langsung oleh
+kode KAEDE (`src/trello-client.js`) sebagai fallback/penyangga untuk fitur yang
+belum/tidak akan tersedia di upstream.
 
-## Strategi Kontribusi
+### Alur Kontribusi ke Upstream
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  1. Ide fitur baru                                       │
-│     ↓                                                    │
-│  2. Implementasi di packages/kaede-trello/ (JavaScript)  │
-│     ↓                                                    │
-│  3. Uji & stabilkan                                      │
-│     ↓                                                    │
-│  4. Port ke TypeScript                                   │
-│     ↓                                                    │
-│  5. PR ke packages/mcp-server-trello/ (fork → upstream)  │
-│     ↓                                                    │
-│  6. PR di-merge oleh delorenj                            │
-│     ↓                                                    │
-│  7. Sync submodule ke versi terbaru                      │
-│     ↓                                                    │
-│  8. Hapus fitur dari packages/kaede-trello/              │
-│     (sudah ada di upstream)                              │
-└─────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────┐
+│  1. Fitur baru muncul                         │
+│     ↓                                         │
+│  2. Implementasi di packages/kaede-trello/    │
+│     (JavaScript, kompatibel dgn delorenj)     │
+│     ↓                                         │
+│  3. Uji & stabilkan                           │
+│     ↓                                         │
+│  4. Ajukan proposal PR ke delorenj            │
+│     (via packages/mcp-server-trello submodule)│
+│     ↓                              ↓          │
+│  5a. PR di-merge              5b. PR ditolak  │
+│      → sync submodule          → tetap di     │
+│      → (opsional) hapus          kaede-trello │
+│        dari kaede-trello         (permanen)   │
+└───────────────────────────────────────────────┘
 ```
 
-## Kenapa Submodule?
-
-- **Landasan kontribusi** — source upstream bisa dimodifikasi dan di-PR langsung
-- **Riwayat terpisah** — tidak campur aduk dengan KAEDE
-- **Update** cukup `git submodule update --remote`
+> **Catatan:** Tidak semua proposal akan di-merge oleh delorenj.
+> `packages/kaede-trello` adalah wadah permanen untuk fitur-fitur yang
+> tetap kita butuhkan meskipun tidak di-approve upstream.
 
 ## packages/mcp-server-trello
 
 **Git submodule** ke `github.com/sandikodev/mcp-server-trello` (fork dari
 `delorenj/mcp-server-trello`). Berisi source TypeScript upstream.
 
-Untuk berkontribusi:
+Kegunaan:
+- Landasan untuk kontribusi PR ke delorenj
+- Source code upstream bisa dipelajari, dimodifikasi, di-PR langsung
+- Update: `git submodule update --remote`
+
 ```bash
 cd packages/mcp-server-trello
 git checkout main
-# buat branch, implementasi, commit, push ke origin, PR ke upstream
+# buat branch, implementasi di TypeScript, commit, push ke origin, PR ke upstream
 ```
 
-## packages/kaede-trello
+## packages/kaede-trello (Lib, Bukan MCP)
 
-**Staging area** — tempat pengembangan fitur Trello MCP yang belum tersedia
-di upstream. Setelah fitur di-PR dan di-merge, staging area bisa dikosongkan.
+**Wadah permanen** untuk tools Trello yang belum atau tidak akan tersedia
+di upstream `delorenj/mcp-server-trello`.
 
-Berisi `mcp-server.js` (42 tools) dengan fitur tambahan seperti:
-- Attachments via base64/data URL
-- Copy card dengan keepFromSource
-- Sort list cards
-- Watch/unwatch card & list
-- Activity history
-- Checklist management lengkap
+Fitur tambahan yang belum ada di upstream:
+- **Attachments**: via base64/data URL, file URL, image data
+- **Copy Card**: dengan opsi keepFromSource (all, partial, custom)
+- **Sort List Cards**: sort by pos, dueDate, startDate, dateLastActivity
+- **Watch/Unwatch**: card dan list
+- **Activity History**: filterable card activity
+- **Checklist Management**: create, delete, update item, copy checklist
 
 Lihat `packages/kaede-trello/README.md` untuk detail lebih lanjut.
 
-## Registrasi di OpenCode
-
-Konfigurasi runtime di `.opencode/opencode.json`:
-
-```json
-{
-  "mcp": {
-    "kaede": {
-      "type": "local",
-      "command": ["bun", "dist/kaede-mcp-server.js"],
-      "description": "Orchestrator — generate_plan, parse_playbook, bundle_context, status",
-      "enabled": true,
-      "timeout": 60000
-    },
-    "trello": {
-      "type": "local",
-      "command": ["bunx", "@delorenj/mcp-server-trello"],
-      "description": "Eksekutor upstream — 45+ tools Trello resmi",
-      "enabled": true,
-      "timeout": 30000
-    }
-  }
-}
-```
-
-> **Untuk pengembangan:** Jika ingin menguji fitur staging, arahkan sementara
-> `mcp.trello` ke `packages/kaede-trello/src/mcp-server.js`.
-> Jangan commit perubahan ini ke production.
-
 ## Prioritas Pemilihan MCP Server (Client)
 
-`src/trello-client.js` menggunakan urutan fallback ini:
+`src/trello-client.js` menggunakan urutan fallback:
 
 1. **Global opencode.json** — command dari `~/.config/opencode/opencode.json`
-2. **packages/kaede-trello** — `packages/kaede-trello/src/mcp-server.js`
+2. **packages/kaede-trello** — `packages/kaede-trello/src/mcp-server.js` (lib)
 3. **packages/mcp-server-trello** — `packages/mcp-server-trello/src/index.js`
 4. **dist/** — `dist/mcp-server.js` (built fallback)
 5. **~/.kaede/** — `~/.kaede/dist/mcp-server.js` (global install fallback)
