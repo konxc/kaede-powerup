@@ -213,7 +213,7 @@ Use this board for all manual testing. Create cards, checklists, and attachments
 
 ### Target: delorenj/mcp-server-trello
 
-**New Contributions (3 tools):**
+**New Contributions (6 tools in 3 PRs):**
 
 1. `get_card_attachments` — Missing in upstream
 2. `get_card_checklists` — Missing in upstream

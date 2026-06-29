@@ -68,7 +68,7 @@ Terima kasih atas minat Anda untuk berkontribusi! Dokumen ini adalah panduan len
 5. **Verify Build**
    ```bash
    ls -lh dist/mcp-server.js
-   # Should show ~20 KB
+   # Should show ~25 KB
    ```
 
 ---

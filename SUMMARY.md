@@ -27,22 +27,22 @@
 - CHANGELOG.md — Version history
 - CONTRIBUTING.md — Guide for contributors
 - docs/CONTRIBUTION-GUIDE.md — Upstream contribution guide
-- 	est/README.md — Test scripts overview
-- 	est/TESTING-GUIDE.md — Comprehensive testing guide
+- test/README.md — Test scripts overview
+- test/TESTING-GUIDE.md — Comprehensive testing guide
 - .env.example — Global config reference
 
 ### Testing (4 files)
-- 	est/manual-test-attachments.js — Node.js test script
-- 	est/get-test-card.js — Card ID helper
-- 	est/MANUAL-TESTING.md — Attachments testing guide
-- 	est/CHECKLIST-TESTING.md — Checklist testing guide
+- test/manual-test-attachments.js — Bun test script
+- test/get-test-card.js — Card ID helper
+- test/MANUAL-TESTING.md — Attachments testing guide
+- test/CHECKLIST-TESTING.md — Checklist testing guide
 
 ### Source Code (1 file)
 - src/trello/attachments.js — Utility module (228 lines)
 
 ## 🚀 Quick Start
 
-`ash
+```bash
 # 1. Setup credentials (GLOBAL)
 bun scripts/kaede.mjs setup
 
@@ -53,8 +53,8 @@ bun run build:mcp
 bun test/get-test-card.js
 
 # 4. Run tests
-\="67xxx..."; bun test/manual-test-attachments.js
-`
+TEST_CARD_ID="67xxx..."; bun test/manual-test-attachments.js
+```
 
 ## 🎯 Next Steps
 
@@ -83,9 +83,9 @@ Tiga PR sudah dikirim ke [`delorenj/mcp-server-trello`](https://github.com/delor
 | README.md | User quick start |
 | IMPLEMENTATION-SUMMARY.md | Complete technical overview |
 | CONTRIBUTING.md | Guide for new contributors |
-| CHANGELOG.md — | Version history |
-| 	est/README.md | Testing scripts guide |
-| 	est/TESTING-GUIDE.md | Comprehensive testing procedures |
+| CHANGELOG.md | Version history |
+| test/README.md | Testing scripts guide |
+| test/TESTING-GUIDE.md | Comprehensive testing procedures |
 
 ## 🔐 Security Reminder
 
@@ -108,5 +108,5 @@ Tiga PR sudah dikirim ke [`delorenj/mcp-server-trello`](https://github.com/delor
 
 **Status:** ✅ All Phases Complete  
 **Date:** June 27, 2026  
-**Build:** 20.63 KB  
+**Build:** 25.42 KB  
 **Next:** Sync upstream after PR merges
