@@ -47,15 +47,15 @@ const idToEn = [
   ],
   [
     '<strong class="text-kaede-text">Power-Up Trello</strong> — Kelola environment, badge, dan autorisasi langsung dari kartu Trello.',
-    '<strong class="text-kaede-text font-semibold text-kaede-text">Trello Power-Up</strong> — Manage environments, badges, and authorization directly from Trello cards.',
+    '<strong class="font-semibold text-kaede-text">Trello Power-Up</strong> — Manage environments, badges, and authorization directly from Trello cards.',
   ],
   [
     '<strong class="text-kaede-text">MCP Bridge</strong> — Membuka data Trello untuk dibaca dan ditulis oleh AI Agent melalui MCP OpenCode.',
-    '<strong class="text-kaede-text font-semibold text-kaede-text">MCP Bridge</strong> — Exposes Trello data for reading and writing by AI Agents via OpenCode MCP.',
+    '<strong class="font-semibold text-kaede-text">MCP Bridge</strong> — Exposes Trello data for reading and writing by AI Agents via OpenCode MCP.',
   ],
   [
     '<strong class="text-kaede-text">Knowledge Hub</strong> — Pusat informasi ekosistem Koneksi untuk seluruh anggota tim.',
-    '<strong class="text-kaede-text font-semibold text-kaede-text">Knowledge Hub</strong> — The central information hub of the Koneksi ecosystem for all team members.',
+    '<strong class="font-semibold text-kaede-text">Knowledge Hub</strong> — The central information hub of the Koneksi ecosystem for all team members.',
   ],
   ['Terakhir diperbarui Juni 2026', 'Last updated June 2026'],
 
