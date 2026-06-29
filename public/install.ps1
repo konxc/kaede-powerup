@@ -37,19 +37,10 @@ function Check-Prereqs {
   Write-Info "Checking prerequisites..."
 
   try {
-    $nodeVer = node --version
-    Write-Ok "Node.js $nodeVer"
-  } catch {
-    Write-Fail "Node.js not found. Install from https://nodejs.org (v18+)"
-  }
-
-  try {
     $bunVer = bun --version
-    $script:HasBun = $true
     Write-Ok "Bun $bunVer"
   } catch {
-    $script:HasBun = $false
-    Write-Warn "Bun not found — MCP build will need manual step"
+    Write-Fail "Bun not found. Install from https://bun.sh (v1.0+)"
   }
 
   try {
@@ -59,10 +50,10 @@ function Check-Prereqs {
     Write-Fail "Git not found. Install from https://git-scm.com"
   }
 
-  # Check elevated (for npm link -g)
+  # Check elevated (for bun link -g)
   $script:IsElevated = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
   if (-not $script:IsElevated) {
-    Write-Warn "Not running as Administrator — npm link may fail"
+    Write-Warn "Not running as Administrator — bun link may fail"
     Write-Warn "Run PowerShell as Admin for full install, or use KAEDE_DIR manually"
   }
 }
@@ -91,10 +82,10 @@ function CloneOrUpdate {
 }
 
 function Install-Deps {
-  Write-Info "Installing npm dependencies..."
+  Write-Info "Installing dependencies..."
   Push-Location $InstallDir
-  npm install --silent 2>&1 | Out-Null
-  if (-not $?) { Write-Fail "npm install failed" }
+  bun install 2>&1 | Out-Null
+  if (-not $?) { Write-Fail "bun install failed" }
   Pop-Location
   Write-Ok "Dependencies installed"
 }
@@ -128,7 +119,7 @@ function Uninstall-KAEDE {
   if ($kaedeBin) {
     Write-Info "Unlinking global binary..."
     Push-Location $InstallDir 2>$null
-    npm unlink 2>$null
+    bun unlink 2>$null
     Pop-Location
   }
   if (Test-Path $InstallDir) {

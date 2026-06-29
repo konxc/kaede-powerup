@@ -29,22 +29,10 @@ fail()  { echo -e "  ${YELLOW}  ✗ ${1}${NC}"; exit 1; }
 check_prereqs() {
   info "Checking prerequisites..."
 
-  if ! command -v node &>/dev/null; then
-    fail "Node.js not found. Install from https://nodejs.org (v18+)"
+  if ! command -v bun &>/dev/null; then
+    fail "Bun not found. Install from https://bun.sh (v1.0+)"
   fi
-  local node_ver=$(node -v | sed 's/v//' | cut -d. -f1)
-  if [ "$node_ver" -lt 18 ] 2>/dev/null; then
-    fail "Node.js v18+ required (found v$(node -v))"
-  fi
-  ok "Node.js $(node -v)"
-
-  if command -v bun &>/dev/null; then
-    HAS_BUN=true
-    ok "Bun $(bun --version)"
-  else
-    HAS_BUN=false
-    warn "Bun not found — MCP build will use Node.js fallback"
-  fi
+  ok "Bun $(bun --version)"
 
   if ! command -v git &>/dev/null; then
     fail "Git not found. Install from https://git-scm.com"
@@ -73,9 +61,9 @@ clone_or_update() {
 }
 
 install_deps() {
-  info "Installing npm dependencies..."
+  info "Installing dependencies..."
   cd "$INSTALL_DIR"
-  npm install --silent
+  bun install
   ok "Dependencies installed"
 }
 
@@ -107,7 +95,7 @@ uninstall() {
   kaede_bin=$(command -v kaede || true)
   if [ -n "$kaede_bin" ]; then
     info "Unlinking global binary..."
-    cd "$INSTALL_DIR" 2>/dev/null && npm unlink 2>/dev/null || true
+    cd "$INSTALL_DIR" 2>/dev/null && bun unlink 2>/dev/null || true
     rm -f "$kaede_bin" 2>/dev/null || true
   fi
   if [ -d "$INSTALL_DIR" ]; then

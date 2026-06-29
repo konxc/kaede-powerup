@@ -1,4 +1,5 @@
-﻿import { TrelloMCPClient } from '../src/trello-client.js';
+﻿#!/usr/bin/env bun
+import { TrelloMCPClient } from '../src/trello-client.js';
 import { homedir } from 'os';
 import { resolve } from 'path';
 import { existsSync, readFileSync } from 'fs';
@@ -46,7 +47,7 @@ async function main() {
     const result = await client.getCardChecklists(cardId);
     console.log('✓ SUCCESS!');
     console.log('Found', result.checklists.length, 'checklist(s)');
-    
+
     if (result.checklists.length > 0) {
       result.checklists.forEach((cl, i) => {
         console.log(\\n  [\] \ (ID: \)\);

@@ -1,4 +1,5 @@
-﻿import { TrelloMCPClient } from '../src/trello-client.js';
+﻿#!/usr/bin/env bun
+import { TrelloMCPClient } from '../src/trello-client.js';
 import { homedir } from 'os';
 import { resolve } from 'path';
 import { existsSync, readFileSync } from 'fs';
