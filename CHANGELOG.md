@@ -4,6 +4,40 @@ All notable changes to KAEDE MCP server implementation.
 
 _Note: Source files now reside under `packages/kaede-trello/` in the current monorepo architecture._
 
+## [1.0.1] — 2026-06-30
+
+### Changed — TypeScript Migration
+
+**Seluruh source code** dimigrasikan dari JavaScript ke TypeScript tanpa mengubah fitur atau fungsionalitas:
+
+| File | Dari | Ke |
+|------|------|----|
+| `packages/kaede-trello/src/mcp-server.*` | `.js` | `.ts` (dengan `@ts-nocheck`) |
+| `packages/kaede-trello/src/trello/attachments.*` | `.js` | `.ts` (dengan `@ts-nocheck`) |
+| `src/trello-client.*` | `.js` | `.ts` |
+| `src/kaede-mcp-server.*` | `.js` | `.ts` |
+| `src/orchestrator.*` | `.js` | `.ts` |
+| `src/api-server.*` | `.mjs` | `.ts` |
+| `scripts/kaede.*` | `.mjs` | `.ts` |
+| `scripts/build-docs.*` | `.mjs` | `.ts` |
+| `scripts/build-mcp.*` | `.mjs` | `.ts` |
+| `scripts/deploy-gh-pages.*` | `.mjs` | `.ts` |
+| `scripts/translate-landing.*` | `.mjs` | `.ts` |
+
+**Infrastruktur:**
+- `tsconfig.json` — strict mode, `noEmit: true`, `allowImportingTsExtensions: true`
+- `@types/bun` + `typescript` sebagai devDependencies
+- Bun native — tanpa tsc/esbuild/tsup untuk build
+
+**Bug yang ditemukan & diperbaiki selama migrasi:**
+- Duplicate key `orange` di `orchestrator.ts` colorMap
+- Duplicate method `removeLabelFromCard` di `trello-client.ts`
+- SVG path rusak di `build-docs.ts` (copy-paste corruption)
+- `TRELLO_API_KEY`/`TRELLO_TOKEN` undefined di `kaede.ts` (referensi variabel global vs properti objek)
+- `spawn('node', ...)` harus `spawn('bun', ...)` di `kaede-mcp-server.test.js`
+
+**Testing: 121 tests pass, 0 fail** — build MCP sukses
+
 ## [1.0.0] — 2026-06-29
 
 ### Changed — Restrukturasi Arsitektur
