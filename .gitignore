@@ -1,16 +1,32 @@
+# Dependencies
 node_modules/
-.playwright-mcp/
-.netlify
+packages/mcp-server-trello/node_modules/
+
+# Build artifacts
+dist/
 dist-docs/
+public/css/style.css
+
 # Environment variables (API keys, tokens)
 .env
 secrets.env
+
 # Personal knowledge base
 .openkb/PERSONAL/
-# Build artifacts
-dist/
+
 # AI agent session cache
 .sisyphus/
 
 # Upstream PR submission drafts
 pr-submissions/
+
+# Netlify
+.netlify
+.playwright-mcp/
+
+# Deploy temp files
+.tmp-gh-pages/
+.worktree-gh-pages/
+
+# Windows artifacts
+nul
