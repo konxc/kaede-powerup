@@ -1,5 +1,3 @@
-// @ts-nocheck — file ini adalah port langsung dari JS, akan diperbaiki tipenya bertahap
-
 /**
  * KAEDE Attachments Utility
  *
@@ -148,11 +146,8 @@ export function filenameFromUrl(url: string): string {
 export function createAttachmentFormData(file: Buffer | Blob, filename: string, mimeType: string): FormData {
   const formData = new FormData();
   // Wrap Buffer in Blob for Node.js compatibility (Node 18+ FormData requires Blob)
-  const blob = Buffer.isBuffer(file) ? new Blob([file]) : file;
-  formData.append('file', blob, {
-    filename,
-    contentType: mimeType,
-  });
+  const blob = Buffer.isBuffer(file) ? new Blob([file as BlobPart]) : file;
+  formData.append('file', blob, filename);
   formData.append('name', filename);
   formData.append('mimeType', mimeType);
   return formData;
