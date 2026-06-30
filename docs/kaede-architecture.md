@@ -111,18 +111,18 @@ powerup-konxc/
 │   ├── mcp-server-trello/       # Git submodule → delorenj/mcp-server-trello (upstream)
 │   └── kaede-trello/
 │       └── src/
-│           ├── mcp-server.js    # Lib Trello (42 tools, fallback/penyangga)
+│           ├── mcp-server.ts    # Lib Trello (42 tools, fallback/penyangga)
 │           └── trello/
-│               └── attachments.js  # Attachment utilities
+│               └── attachments.ts  # Attachment utilities
 ├── scripts/
-│   ├── kaede.mjs                # Main CLI Tool (15+ commands)
-│   ├── build-docs.mjs           # Markdown → HTML compilation script
-│   └── build-mcp.mjs            # Build MCP servers via bun build
+│   ├── kaede.ts                # Main CLI Tool (15+ commands)
+│   ├── build-docs.ts           # Markdown → HTML compilation script
+│   └── build-mcp.ts            # Build MCP servers via bun build
 ├── src/
-│   ├── kaede-mcp-server.js      # KAEDE Orchestrator MCP (4 tools)
-│   ├── trello-client.js         # Trello MCP Client wrapper — 42+ tool wrappers
-│   ├── orchestrator.js          # Orchestrator — parsePlaybook, executeIntent, bundleContext, generatePlan
-│   ├── api-server.mjs           # HTTP API server (port 3456)
+│   ├── kaede-mcp-server.ts      # KAEDE Orchestrator MCP (4 tools)
+│   ├── trello-client.ts         # Trello MCP Client wrapper — 42+ tool wrappers
+│   ├── orchestrator.ts          # Orchestrator — parsePlaybook, executeIntent, bundleContext, generatePlan
+│   ├── api-server.ts            # HTTP API server (port 3456)
 │   ├── style.css                # CSS Source (Tailwind v4 + custom utility)
 │   └── index.html               # Landing page (deployed to Netlify)
 ├── .gitmodules                  # Submodule config untuk mcp-server-trello
@@ -138,19 +138,19 @@ powerup-konxc/
 * **`card.html` & `board.html`**: Successfully provide minimal UI for environment management (PROD, STAG, DEV).
   * *Gap*: Static state. Environment selection on cards does not yet trigger actual Label addition on Trello dynamically. Board popup environment status calculations are buggy because they only increment without tracking previous state.
 
-#### B. CLI Tool (`scripts/kaede.mjs`)
+#### B. CLI Tool (`scripts/kaede.ts`)
 * 15+ commands: `playbook parse/show`, `orchestrate`, `run` (+dry-run), `build`, `start`, `install`, `init`, `setup`, `today`, `status` (+--mcp), `test-tools`, `env`, `push`.
 * *Gap*: No direct integration with Google Calendar / academic schedule for auto-syncing sprint timelines yet.
 
-C.1. Trello MCP Server (`packages/kaede-trello/src/mcp-server.js`) — Executor
+C.1. Trello MCP Server (`packages/kaede-trello/src/mcp-server.ts`) — Executor
 * Provides a standalone MCP protocol implementation with 42 tools. Functions purely as an executor — receives commands with Trello IDs and executes them.
   * *Gap*: No multi-tool chaining feature yet. Use the context layer above it (`mcp.kaede`) for that.
 
-#### C.2. KAEDE Orchestrator MCP (`src/kaede-mcp-server.js`) — Pure Context
+#### C.2. KAEDE Orchestrator MCP (`src/kaede-mcp-server.ts`) — Pure Context
 * The second MCP server that stands alone as a pure context provider. Has no access to Trello.
 * **4 tools**: `parse_playbook` (parse playbook → structured), `bundle_context` (merge playbook + openkb + opencode), `generate_plan` (intent → ActionStep[] with names), `status` (check playbook & openkb paths).
 * Designed to be called by the AI Agent as the first step: `mcp.kaede.generate_plan` → receive plan → resolve IDs via `mcp.trello.*` → execute.
-* Does not import `trello-client.js`, no Trello dependencies whatsoever.
+Does not import `trello-client.ts`, no Trello dependencies whatsoever.
 * *Gap*: No automatic validation that resolved Trello IDs are correct before execution.
 
 ---
@@ -170,8 +170,8 @@ C.1. Trello MCP Server (`packages/kaede-trello/src/mcp-server.js`) — Executor
 
 ### ✅ Phase 1 — Cleanup & Context Strengthening (COMPLETE)
 1. **✅ Reference Cleanup**: All project-specific references (smauii/laravel) removed from KAEDE OpenKB. KAEDE is now purely universal.
-2. **✅ Auto-Compilation**: `scripts/build-mcp.mjs` + `kaede build` command for building the MCP server.
-3. **✅ Playbook Parser**: `parsePlaybook` in `src/orchestrator.js` — shared between CLI and orchestrator.
+2. **✅ Auto-Compilation**: `scripts/build-mcp.ts` + `kaede build` command for building the MCP server.
+3. **✅ Playbook Parser**: `parsePlaybook` in `src/orchestrator.ts` — shared between CLI and orchestrator.
 4. **✅ Intent-Driven Orchestrator**: `executeIntent` with 16 handlers (7 original + 9 additional: create label, archive, move all, create board, remove member, add label, archive list, update card, create checklist).
 5. **✅ generatePlan()**: 16 intent pattern handlers → returns ActionStep[] with names (without Trello IDs).
 6. **✅ Pure Context Refactor**: `mcp.kaede` separated from Trello — 4 tools, zero Trello dependencies.
@@ -190,7 +190,7 @@ C.1. Trello MCP Server (`packages/kaede-trello/src/mcp-server.js`) — Executor
 - [`FEATURE-SPECIFICATION.md`](FEATURE-SPECIFICATION.html) — Detailed feature specs
 
 ### 🟡 Phase 3 — Frontend Power-Up Integration (PHASED)
-1. **✅ API Server**: `src/api-server.mjs` — HTTP bridge port 3456, endpoints `/api/health` & `/api/mcp`.
+1. **✅ API Server**: `src/api-server.ts` — HTTP bridge port 3456, endpoints `/api/health` & `/api/mcp`.
 2. **✅ Power-Up MCP Panel**: `public/mcp.html` — intent control panel directly from Trello popup.
 3. **⬜ Sync Label Environment**: Connect environment buttons in `card.html` to the MCP API for auto-adding labels.
 4. **⬜ Dynamic Dashboard**: `board.html` real-time stats via MCP API.

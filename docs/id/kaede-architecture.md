@@ -111,18 +111,18 @@ powerup-konxc/
 │   ├── mcp-server-trello/       # Git submodule → delorenj/mcp-server-trello (upstream)
 │   └── kaede-trello/
 │       └── src/
-│           ├── mcp-server.js    # Lib Trello (42 tools, fallback/penyangga)
+│           ├── mcp-server.ts    # Lib Trello (42 tools, fallback/penyangga)
 │           └── trello/
-│               └── attachments.js  # Attachment utilities
+│               └── attachments.ts  # Attachment utilities
 ├── scripts/
-│   ├── kaede.mjs                # CLI Tool utama (15+ commands)
-│   ├── build-docs.mjs           # Script kompilasi Markdown → HTML
-│   └── build-mcp.mjs            # Build MCP server via bun build
+│   ├── kaede.ts                # CLI Tool utama (15+ commands)
+│   ├── build-docs.ts           # Script kompilasi Markdown → HTML
+│   └── build-mcp.ts            # Build MCP server via bun build
 ├── src/
-│   ├── kaede-mcp-server.js      # KAEDE Orchestrator MCP (4 tools)
-│   ├── trello-client.js         # MCP Client — 42+ tool wrappers
-│   ├── orchestrator.js          # Orchestrator — parsePlaybook, executeIntent, bundleContext, generatePlan
-│   ├── api-server.mjs           # HTTP API server (port 3456)
+│   ├── kaede-mcp-server.ts      # KAEDE Orchestrator MCP (4 tools)
+│   ├── trello-client.ts         # MCP Client — 42+ tool wrappers
+│   ├── orchestrator.ts          # Orchestrator — parsePlaybook, executeIntent, bundleContext, generatePlan
+│   ├── api-server.ts            # HTTP API server (port 3456)
 │   ├── style.css                # CSS Source (Tailwind v4 + custom utility)
 │   └── index.html               # Landing page (deployed to Netlify)
 ├── .gitmodules                  # Konfigurasi submodule mcp-server-trello
@@ -138,19 +138,19 @@ powerup-konxc/
 * **`card.html` & `board.html`**: Berhasil membuat UI minimalis untuk manajemen environment (PROD, STAG, DEV).
   * *Gap*: Status statis. Pilihan environment di kartu belum memicu penambahan Label asli di Trello secara dinamis. Perhitungan status lingkungan di board popup rawan bug karena hanya increment-only tanpa melacak state lama.
 
-#### B. CLI Tool (`scripts/kaede.mjs`)
+#### B. CLI Tool (`scripts/kaede.ts`)
 * 15+ commands: `playbook parse/show`, `orchestrate`, `run` (+dry-run), `build`, `start`, `install`, `init`, `setup`, `today`, `status` (+--mcp), `test-tools`, `env`, `push`.
 * *Gap*: Belum ada integrasi langsung dengan Google Calendar / jadwal akademik untuk auto-sync sprint timeline.
 
-C.1. MCP Trello Server (`packages/kaede-trello/src/mcp-server.js`) — Executor
+C.1. MCP Trello Server (`packages/kaede-trello/src/mcp-server.ts`) — Executor
 * Menyediakan implementasi protokol MCP mandiri dengan 42 tools. Fungsinya murni sebagai executor — menerima perintah dengan ID Trello dan mengeksekusinya.
   * *Gap*: Belum ada fitur multi-tool chaining. Untuk itu, gunakan layer context di atasnya (`mcp.kaede`).
 
-#### C.2. KAEDE Orchestrator MCP (`src/kaede-mcp-server.js`) — Pure Context
+#### C.2. KAEDE Orchestrator MCP (`src/kaede-mcp-server.ts`) — Pure Context
 * Server MCP kedua yang berdiri sendiri sebagai penyedia konteks murni. Tidak memiliki akses ke Trello.
 * **4 tools**: `parse_playbook` (parse playbook → structured), `bundle_context` (gabung playbook + openkb + opencode), `generate_plan` (intent → ActionStep[] dengan nama), `status` (cek path playbook & openkb).
 * Dirancang untuk dipanggil AI Agent sebagai langkah pertama: `mcp.kaede.generate_plan` → terima plan → resolve ID via `mcp.trello.*` → eksekusi.
-* Tidak mengimpor `trello-client.js`, tidak ada dependency Trello sama sekali.
+Tidak mengimpor `trello-client.ts`, tidak ada dependency Trello sama sekali.
 * *Gap*: Belum ada validasi otomatis bahwa ID Trello yang di-resolve benar sebelum eksekusi.
 
 ---
@@ -170,8 +170,8 @@ C.1. MCP Trello Server (`packages/kaede-trello/src/mcp-server.js`) — Executor
 
 ### ✅ Fase 1 — Pembersihan & Penguatan Konteks (SELESAI)
 1. **✅ Pembersihan Referensi**: Semua referensi project-specific (smauii/laravel) dihapus dari OpenKB KAEDE. KAEDE sekarang murni universal.
-2. **✅ Kompilasi Otomatis**: `scripts/build-mcp.mjs` + `kaede build` command untuk build MCP server.
-3. **✅ Playbook Parser**: `parsePlaybook` di `src/orchestrator.js` — shared antara CLI dan orchestrator.
+2. **✅ Kompilasi Otomatis**: `scripts/build-mcp.ts` + `kaede build` command untuk build MCP server.
+3. **✅ Playbook Parser**: `parsePlaybook` di `src/orchestrator.ts` — shared antara CLI dan orchestrator.
 4. **✅ Intent-Driven Orchestrator**: `executeIntent` dengan 16 handler (7 original + 9 tambahan: buat label, arsipkan, pindah semua, buat board, hapus anggota, tambah label, arsip list, update card, buat checklist).
 5. **✅ generatePlan()**: 16 intent pattern handlers → mengembalikan ActionStep[] dengan nama (tanpa ID Trello).
 6. **✅ Pure Context Refactor**: `mcp.kaede` dipisah dari Trello — 4 tools, zero dependency Trello.
@@ -190,7 +190,7 @@ C.1. MCP Trello Server (`packages/kaede-trello/src/mcp-server.js`) — Executor
 - [`FEATURE-SPECIFICATION.md`](FEATURE-SPECIFICATION.html) — Detailed feature specs
 
 ### 🟡 Fase 3 — Integrasi Frontend Power-Up (BERTAHAP)
-1. **✅ API Server**: `src/api-server.mjs` — HTTP bridge port 3456, endpoints `/api/health` & `/api/mcp`.
+1. **✅ API Server**: `src/api-server.ts` — HTTP bridge port 3456, endpoints `/api/health` & `/api/mcp`.
 2. **✅ Power-Up MCP Panel**: `public/mcp.html` — kontrol panel intent langsung dari Trello popup.
 3. **⬜ Sync Label Environment**: Hubungkan tombol environment di `card.html` ke MCP API untuk auto-add label.
 4. **⬜ Dynamic Dashboard**: `board.html` real-time stats via MCP API.

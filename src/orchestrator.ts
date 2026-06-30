@@ -8,16 +8,17 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { TrelloMCPClient } from './trello-client';
+import { getErrorMessage } from './types';
 
 // ── Type Definitions ──
 
-interface PlaybookConventions {
+export interface PlaybookConventions {
   titlePrefixes: string[];
   descriptionTemplate: string;
   labels: Array<{ color: string; meaning: string }>;
 }
 
-interface PlaybookResult {
+export interface PlaybookResult {
   title: string;
   roles: Array<{
     name: string;
@@ -44,7 +45,7 @@ interface PlanHandler {
   fn: (pb: PlaybookResult, args: Record<string, unknown>) => Array<Record<string, unknown>>;
 }
 
-interface IntentResult {
+export interface IntentResult {
   success: boolean;
   type: string;
   name: string;
@@ -53,13 +54,13 @@ interface IntentResult {
   detail?: unknown;
 }
 
-interface BundlePaths {
+export interface BundlePaths {
   playbook?: string;
   openkb?: string;
   opencode?: string;
 }
 
-interface BundleContextResult {
+export interface BundleContextResult {
   playbook: PlaybookResult | null;
   openkb: { glossary: string[]; decisions: string[] };
   opencode: Record<string, unknown> | null;
@@ -185,7 +186,7 @@ onIntent(['mulai sprint', 'setup sprint'], async (client, pb, boardId) => {
       const r = await client.createList(boardId, listName);
       results.push({ success: true, type: 'create_list', name: listName, result: r });
     } catch (err) {
-      results.push({ success: false, type: 'create_list', name: listName, error: (err as Error).message });
+      results.push({ success: false, type: 'create_list', name: listName, error: getErrorMessage(err) });
     }
   }
   return results;
@@ -202,7 +203,7 @@ onIntent(['buat card', 'buat kartu', 'create card', 'tambah task', 'new task'], 
       const r = await client.createCard(listId, name, desc);
       return [{ success: true, type: 'create_card', name: (r as Record<string, unknown>).name as string }];
     } catch (err) {
-      return [{ success: false, type: 'create_card', name, error: (err as Error).message }];
+      return [{ success: false, type: 'create_card', name, error: getErrorMessage(err) }];
     }
   }
 
@@ -215,7 +216,7 @@ onIntent(['buat card', 'buat kartu', 'create card', 'tambah task', 'new task'], 
     const r = await client.createCard(target.id as string, name, desc);
     return [{ success: true, type: 'create_card', name: (r as Record<string, unknown>).name as string }];
   } catch (err) {
-    return [{ success: false, type: 'create_card', name, error: (err as Error).message }];
+    return [{ success: false, type: 'create_card', name, error: getErrorMessage(err) }];
   }
 });
 
@@ -230,7 +231,7 @@ onIntent(['assign', 'tugaskan', 'tambahkan anggota'], async (client, _pb, _board
     await client.assignMember(cardId, memberId);
     return [{ success: true, type: 'assign_member', name: `Member ${memberId} → Card ${cardId}` }];
   } catch (err) {
-    return [{ success: false, type: 'assign_member', name: `${memberId} → ${cardId}`, error: (err as Error).message }];
+    return [{ success: false, type: 'assign_member', name: `${memberId} → ${cardId}`, error: getErrorMessage(err) }];
   }
 });
 
@@ -256,12 +257,12 @@ onIntent(['tutup sprint', 'close sprint', 'archive sprint'], async (client, _pb,
             success: false,
             type: 'archive_card',
             name: card.name as string,
-            error: (err as Error).message,
+            error: getErrorMessage(err),
           });
         }
       }
     } catch (err) {
-      results.push({ success: false, type: 'get_cards', name: list.name as string, error: (err as Error).message });
+      results.push({ success: false, type: 'get_cards', name: list.name as string, error: getErrorMessage(err) });
     }
   }
   return results;
@@ -293,12 +294,12 @@ onIntent(['pindah semua', 'move all', 'pindahkan semua'], async (client, _pb, bo
         await client.callTool('move_card', { cardId: card.id, listId: toList.id });
         results.push({ success: true, type: 'move_card', name: card.name as string });
       } catch (err) {
-        results.push({ success: false, type: 'move_card', name: card.name as string, error: (err as Error).message });
+        results.push({ success: false, type: 'move_card', name: card.name as string, error: getErrorMessage(err) });
       }
     }
     return results;
   } catch (err) {
-    return [{ success: false, type: 'move_all_cards', name: fromListName, error: (err as Error).message }];
+    return [{ success: false, type: 'move_all_cards', name: fromListName, error: getErrorMessage(err) }];
   }
 });
 
@@ -323,7 +324,7 @@ onIntent(['pindah', 'move card', 'pindahkan'], async (client, _pb, boardId, args
     await client.callTool('move_card', { cardId, listId: targetListId });
     return [{ success: true, type: 'move_card', name: `Card ${cardId} → List ${targetListId}` }];
   } catch (err) {
-    return [{ success: false, type: 'move_card', name: cardId, error: (err as Error).message }];
+    return [{ success: false, type: 'move_card', name: cardId, error: getErrorMessage(err) }];
   }
 });
 
@@ -338,7 +339,7 @@ onIntent(['komentar', 'comment', 'tambah komentar'], async (client, _pb, _boardI
     await client.callTool('add_comment', { cardId, text });
     return [{ success: true, type: 'add_comment', name: `Comment on ${cardId}` }];
   } catch (err) {
-    return [{ success: false, type: 'add_comment', name: cardId, error: (err as Error).message }];
+    return [{ success: false, type: 'add_comment', name: cardId, error: getErrorMessage(err) }];
   }
 });
 
@@ -382,7 +383,7 @@ onIntent(['buat label', 'create label', 'tambah label baru'], async (client, _pb
     const r = await client.createLabel(boardId, displayName, targetColor);
     return [{ success: true, type: 'create_label', name: displayName, result: r }];
   } catch (err) {
-    return [{ success: false, type: 'create_label', name: displayName, error: (err as Error).message }];
+    return [{ success: false, type: 'create_label', name: displayName, error: getErrorMessage(err) }];
   }
 });
 
@@ -407,7 +408,7 @@ onIntent(['arsip list', 'archive list', 'hapus list'], async (client, _pb, board
     await client.archiveList(targetListId);
     return [{ success: true, type: 'archive_list', name: `List ${listName || targetListId} archived` }];
   } catch (err) {
-    return [{ success: false, type: 'archive_list', name: listName, error: (err as Error).message }];
+    return [{ success: false, type: 'archive_list', name: listName, error: getErrorMessage(err) }];
   }
 });
 
@@ -420,7 +421,7 @@ onIntent(['arsipkan', 'archive card', 'hapus card', 'delete card'], async (clien
     await client.archiveCard(cardId);
     return [{ success: true, type: 'archive_card', name: `Archived ${cardId}` }];
   } catch (err) {
-    return [{ success: false, type: 'archive_card', name: cardId, error: (err as Error).message }];
+    return [{ success: false, type: 'archive_card', name: cardId, error: getErrorMessage(err) }];
   }
 });
 
@@ -442,7 +443,7 @@ onIntent(['update card', 'ubah kartu', 'edit card', 'update kartu'], async (clie
     await client.updateCard(cardId, updates);
     return [{ success: true, type: 'update_card', name: `Card ${cardId} updated` }];
   } catch (err) {
-    return [{ success: false, type: 'update_card', name: cardId, error: (err as Error).message }];
+    return [{ success: false, type: 'update_card', name: cardId, error: getErrorMessage(err) }];
   }
 });
 
@@ -463,12 +464,12 @@ onIntent(['buat checklist', 'add checklist', 'tambah checklist'], async (client,
         const ir = await client.addChecklistItem(r.id as string, item);
         results.push({ success: true, type: 'add_checklist_item', name: item, result: ir });
       } catch (err) {
-        results.push({ success: false, type: 'add_checklist_item', name: item, error: (err as Error).message });
+        results.push({ success: false, type: 'add_checklist_item', name: item, error: getErrorMessage(err) });
       }
     }
     return results;
   } catch (err) {
-    return [{ success: false, type: 'create_checklist', name, error: (err as Error).message }];
+    return [{ success: false, type: 'create_checklist', name, error: getErrorMessage(err) }];
   }
 });
 
@@ -478,7 +479,7 @@ onIntent(['buat board', 'create board', 'new board'], async (client, _pb, _board
     const r = await client.createBoard(name, {});
     return [{ success: true, type: 'create_board', name, result: r }];
   } catch (err) {
-    return [{ success: false, type: 'create_board', name, error: (err as Error).message }];
+    return [{ success: false, type: 'create_board', name, error: getErrorMessage(err) }];
   }
 });
 
@@ -492,7 +493,7 @@ onIntent(['hapus anggota', 'remove member', 'keluarkan anggota'], async (client,
     await client.removeMember(cardId, memberId);
     return [{ success: true, type: 'remove_member', name: `${memberId} removed from ${cardId}` }];
   } catch (err) {
-    return [{ success: false, type: 'remove_member', name: cardId, error: (err as Error).message }];
+    return [{ success: false, type: 'remove_member', name: cardId, error: getErrorMessage(err) }];
   }
 });
 
@@ -506,7 +507,7 @@ onIntent(['tambah label ke card', 'add label to card', 'pasang label'], async (c
     await client.addLabelToCard(cardId, labelId);
     return [{ success: true, type: 'add_label_to_card', name: `Label ${labelId} → Card ${cardId}` }];
   } catch (err) {
-    return [{ success: false, type: 'add_label_to_card', name: cardId, error: (err as Error).message }];
+    return [{ success: false, type: 'add_label_to_card', name: cardId, error: getErrorMessage(err) }];
   }
 });
 
@@ -522,7 +523,7 @@ onIntent(['report', 'progress', 'my cards', 'kartu saya'], async (client, _pb, _
     }
     return [{ success: true, type: 'report', name: `Found ${cards.length} cards assigned to you`, detail: grouped }];
   } catch (err) {
-    return [{ success: false, type: 'report', name: 'failed', error: (err as Error).message }];
+    return [{ success: false, type: 'report', name: 'failed', error: getErrorMessage(err) }];
   }
 });
 

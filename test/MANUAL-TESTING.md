@@ -218,7 +218,7 @@ Test-Path dist/mcp-server.js
 
 **Solusi:**
 ```powershell
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 ```
 
 ### Error: "Invalid card ID"

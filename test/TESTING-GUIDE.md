@@ -20,8 +20,7 @@ Panduan lengkap untuk testing semua tools yang telah ditambahkan ke KAEDE MCP.
 
 ### 1. Credentials
 
-```bash
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 ```
 
 Atau manual edit: `~/.config/kaede/secrets.env`
@@ -416,7 +415,7 @@ Copy template ini untuk dokumentasi hasil testing:
 **Solution:**
 ```bash
 bun run build:mcp
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 ```
 
 ### Issue: "Unauthorized"

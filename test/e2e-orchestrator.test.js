@@ -1,6 +1,6 @@
 import { describe, it, mock } from 'node:test';
 import assert from 'node:assert/strict';
-import { parsePlaybook, executeIntent } from '../src/orchestrator.js';
+import { parsePlaybook, executeIntent } from '../src/orchestrator';
 
 class MockClient {
   constructor() {
@@ -19,14 +19,14 @@ class MockClient {
       case 'list_boards':
         return { boards: [{ id: 'b1', name: 'Test Board' }] };
       case 'get_lists':
-        return { lists: this.lists.filter(l => l.boardId === args.boardId) };
+        return { lists: this.lists.filter((l) => l.boardId === args.boardId) };
       case 'get_cards_by_list_id':
-        return { cards: this.cards.filter(c => c.listId === args.listId) };
+        return { cards: this.cards.filter((c) => c.listId === args.listId) };
       case 'archive_card':
-        this.cards = this.cards.filter(c => c.id !== args.cardId);
+        this.cards = this.cards.filter((c) => c.id !== args.cardId);
         return { success: true };
       case 'move_card':
-        const card = this.cards.find(c => c.id === args.cardId);
+        const card = this.cards.find((c) => c.id === args.cardId);
         if (card) card.listId = args.listId;
         return { success: true };
       case 'add_comment':
@@ -39,7 +39,7 @@ class MockClient {
       case 'get_my_cards':
         return { cards: this.cards };
       case 'get_cards_by_list_id':
-        return { cards: this.cards.filter(c => c.listId === args.listId) };
+        return { cards: this.cards.filter((c) => c.listId === args.listId) };
       default:
         return {};
     }
@@ -52,7 +52,7 @@ class MockClient {
   }
 
   async getLists(boardId) {
-    return this.lists.filter(l => l.boardId === boardId);
+    return this.lists.filter((l) => l.boardId === boardId);
   }
 
   async getBoardMembers(boardId) {
@@ -79,7 +79,7 @@ class MockClient {
   }
 
   async getCardsByListId(listId, boardId) {
-    return this.cards.filter(c => c.listId === listId);
+    return this.cards.filter((c) => c.listId === listId);
   }
 
   // ── New handlers support ──
@@ -95,7 +95,7 @@ class MockClient {
   }
 
   async archiveCard(cardId) {
-    this.cards = this.cards.filter(c => c.id !== cardId);
+    this.cards = this.cards.filter((c) => c.id !== cardId);
     return { success: true };
   }
 
@@ -108,7 +108,7 @@ class MockClient {
   }
 
   async archiveList(listId) {
-    const list = this.lists.find(l => l.id === listId);
+    const list = this.lists.find((l) => l.id === listId);
     if (list) list.closed = true;
     return { success: true };
   }
@@ -128,7 +128,7 @@ class MockClient {
   }
 
   async updateCard(cardId, updates) {
-    const card = this.cards.find(c => c.id === cardId);
+    const card = this.cards.find((c) => c.id === cardId);
     if (card) Object.assign(card, updates);
     return { success: true };
   }
@@ -182,7 +182,10 @@ describe('E2E: parsePlaybook → executeIntent (Mocked MCP)', () => {
       assert.equal(r.type, 'create_list');
     }
     assert.equal(client.lists.length, 4);
-    assert.deepEqual(client.lists.map(l => l.name), ['Backlog', 'To Do', 'In Progress', 'Done']);
+    assert.deepEqual(
+      client.lists.map((l) => l.name),
+      ['Backlog', 'To Do', 'In Progress', 'Done'],
+    );
   });
 
   it('3. executeIntent "buat card" creates a card', async () => {
@@ -218,7 +221,7 @@ describe('E2E: parsePlaybook → executeIntent (Mocked MCP)', () => {
     await executeIntent(client, 'Mulai Sprint Alpha', pb, 'b1');
     await executeIntent(client, 'buat card', pb, 'b1', { task: 'Feature X' });
     const cardId = client.cards[0].id;
-    const doneList = client.lists.find(l => l.name === 'Done');
+    const doneList = client.lists.find((l) => l.name === 'Done');
     const results = await executeIntent(client, 'pindahkan card', pb, 'b1', {
       cardId,
       listId: doneList.id,
@@ -260,11 +263,11 @@ describe('E2E: parsePlaybook → executeIntent (Mocked MCP)', () => {
     await executeIntent(client, 'buat card', pb, 'b1', { task: 'Card B', list: 'Done' });
     await executeIntent(client, 'buat card', pb, 'b1', { task: 'Card C', list: 'In Progress' });
     const results = await executeIntent(client, 'close sprint', pb, 'b1');
-    const archiveResults = results.filter(r => r.type === 'archive_card');
+    const archiveResults = results.filter((r) => r.type === 'archive_card');
     assert.equal(archiveResults.length, 2);
     assert.equal(archiveResults[0].success, true);
     // Cards in Done list should be archived
-    const remaining = client.cards.filter(c => !c.archived).length || client.cards.length;
+    const remaining = client.cards.filter((c) => !c.archived).length || client.cards.length;
     assert.equal(remaining, 1); // Only the In Progress card remains
   });
 
@@ -279,7 +282,10 @@ describe('E2E: parsePlaybook → executeIntent (Mocked MCP)', () => {
     const client = new MockClient();
     let getListsCalled = false;
     const origGetLists = client.getLists;
-    client.getLists = async () => { getListsCalled = true; return origGetLists.call(client); };
+    client.getLists = async () => {
+      getListsCalled = true;
+      return origGetLists.call(client);
+    };
     const results = await executeIntent(client, 'buat card', pb, 'b1', {
       task: 'Direct',
       listId: 'l123',
@@ -351,8 +357,8 @@ describe('E2E: parsePlaybook → executeIntent (Mocked MCP)', () => {
       assert.equal(r.success, true);
       assert.equal(r.type, 'move_card');
     }
-    const toDoList = client.lists.find(l => l.name === 'To Do');
-    const doneCards = client.cards.filter(c => c.listId === toDoList.id);
+    const toDoList = client.lists.find((l) => l.name === 'To Do');
+    const doneCards = client.cards.filter((c) => c.listId === toDoList.id);
     assert.equal(doneCards.length, 0);
   });
 
@@ -390,12 +396,12 @@ describe('E2E: parsePlaybook → executeIntent (Mocked MCP)', () => {
   it('20. executeIntent "arsip list" archives a list', async () => {
     const client = new MockClient();
     await executeIntent(client, 'Mulai Sprint Alpha', pb, 'b1');
-    const backlog = client.lists.find(l => l.name === 'Backlog');
+    const backlog = client.lists.find((l) => l.name === 'Backlog');
     assert.ok(backlog);
     const results = await executeIntent(client, 'arsip list', pb, 'b1', { name: 'Backlog' });
     assert.equal(results[0].success, true);
     assert.equal(results[0].type, 'archive_list');
-    assert.equal(client.lists.find(l => l.id === backlog.id).closed, true);
+    assert.equal(client.lists.find((l) => l.id === backlog.id).closed, true);
   });
 
   it('21. executeIntent "arsip list" without name returns error', async () => {
@@ -434,11 +440,11 @@ describe('E2E: parsePlaybook → executeIntent (Mocked MCP)', () => {
       name: 'QA Steps',
       items: ['Test login', 'Test logout'],
     });
-    const createResult = results.find(r => r.type === 'create_checklist');
+    const createResult = results.find((r) => r.type === 'create_checklist');
     assert.ok(createResult);
     assert.equal(createResult.success, true);
     assert.equal(createResult.name, 'QA Steps');
-    const itemResults = results.filter(r => r.type === 'add_checklist_item');
+    const itemResults = results.filter((r) => r.type === 'add_checklist_item');
     assert.equal(itemResults.length, 2);
     assert.equal(itemResults[0].name, 'Test login');
     assert.equal(itemResults[1].name, 'Test logout');

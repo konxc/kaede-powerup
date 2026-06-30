@@ -692,9 +692,6 @@ Thanks again for maintaining this project! 🙏
 **Step 1: Update Dependencies**
 ```bash
 # Update package.json
-npm update @delorenj/mcp-server-trello
-
-# Or with Bun
 bun update @delorenj/mcp-server-trello
 ```
 
@@ -716,7 +713,9 @@ rm src/trello/attachments.js  # If upstream has it now
 
 **Step 4: Version Bump**
 ```bash
-npm version minor
+bun run build && bun run build:mcp
+git add -A
+git commit -m "chore: bump version"
 git push origin main
 git push origin --tags
 ```
@@ -736,8 +735,8 @@ git push origin --tags
 
 **Step 2: Publish Fork**
 ```bash
-# Publish to npm
-npm publish --scope @kaede/mcp-server-trello
+# Publish as a Bun package
+bun publish
 
 # Update documentation
 # Provide installation instructions for fork

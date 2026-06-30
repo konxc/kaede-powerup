@@ -41,8 +41,9 @@ const run = (cmd: string, cwd = ROOT) => {
   log(`$ ${cmd}`);
   try {
     return execSync(cmd, { cwd, encoding: 'utf-8' as BufferEncoding, stdio: 'pipe' });
-  } catch (e: any) {
-    console.error(`  \u2717 ${e.message}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error(`  \u2717 ${message}`);
     process.exit(1);
   }
 };

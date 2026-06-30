@@ -1,4 +1,5 @@
 import http from 'http';
+import type { PlaybookResult } from './orchestrator';
 
 export async function startApiServer(port: number = 3456): Promise<http.Server> {
   const { TrelloMCPClient } = await import('./trello-client');
@@ -60,17 +61,16 @@ export async function startApiServer(port: number = 3456): Promise<http.Server> 
         const client = new TrelloMCPClient();
         await client.connect();
 
-        let context: Record<string, unknown> = {
-          title: '',
-          roles: [],
-          workflow: { lists: [] },
-          conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
-        };
-        if (playbook) {
-          context = parsePlaybook(playbook) as unknown as Record<string, unknown>;
-        }
+        const context: PlaybookResult = playbook
+          ? parsePlaybook(playbook)
+          : {
+              title: '',
+              roles: [],
+              workflow: { lists: [] },
+              conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
+            };
 
-        const results = await executeIntent(client, intent, context as never, boardId || '', args);
+        const results = await executeIntent(client, intent, context, boardId || '', args);
         client.close();
 
         res.writeHead(200, { 'Content-Type': 'application/json' });

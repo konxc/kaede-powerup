@@ -2,7 +2,7 @@
 .SYNOPSIS
   KAEDE — Windows installer. Run via: iwr -Uri https://kaede.sh/install.ps1 | iex
 .DESCRIPTION
-  Installs KAEDE globally: clones repo, builds MCP server, links npm binary.
+  Installs KAEDE globally: clones repo, builds MCP server, links bun binary.
   Supports -Update and -Uninstall switches.
 .PARAMETER Update
   Pull latest changes and rebuild.
@@ -93,7 +93,7 @@ function Install-Deps {
 function Run-KaedeInstall {
   Write-Info "Running kaede install (global setup)..."
   Push-Location $InstallDir
-  bun scripts/kaede.mjs install 2>&1
+  bun scripts/kaede.ts install 2>&1
   Pop-Location
 }
 

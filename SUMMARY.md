@@ -44,13 +44,13 @@
 
 ```bash
 # 1. Setup credentials (GLOBAL)
-bun scripts/kaede.mjs setup
+bun scripts/kaede.ts setup
 
 # 2. Build MCP server
 bun run build:mcp
 
 # 3. Get card IDs
-bun test/get-test-card.js
+bun test/get-test-card.ts
 
 # 4. Run tests
 TEST_CARD_ID="67xxx..."; bun test/manual-test-attachments.js
@@ -94,7 +94,7 @@ Tiga PR sudah dikirim ke [`delorenj/mcp-server-trello`](https://github.com/delor
 - Location: ~/.config/kaede/secrets.env
 - JANGAN buat secrets.env di project folder
 - File sudah ada di .gitignore
-- Use `bun scripts/kaede.mjs setup` to configure
+- Use `bun scripts/kaede.ts setup` to configure
 
 ## 🎉 Achievement Unlocked!
 

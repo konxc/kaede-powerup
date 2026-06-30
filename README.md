@@ -39,18 +39,18 @@
 ```
 ├── public/                  # Static site (deploy ke Netlify)
 ├── src/
-│   ├── kaede-mcp-server.js  # KAEDE Orchestrator MCP (4 tools)
-│   ├── trello-client.js     # Trello MCP Client wrapper
-│   ├── orchestrator.js      # Intent engine & playbook parser
+│   ├── kaede-mcp-server.ts  # KAEDE Orchestrator MCP (4 tools)
+│   ├── trello-client.ts     # Trello MCP Client wrapper
+│   ├── orchestrator.ts      # Intent engine & playbook parser
 │   └── style.css            # Source CSS (Tailwind v4)
 ├── packages/
 │   ├── README.md            # Dokumentasi arsitektur packages
 │   ├── mcp-server-trello/   # Git submodule → delorenj/mcp-server-trello
 │   └── kaede-trello/
 │       └── src/
-│           ├── mcp-server.js    # Lib Trello (42 tools, fallback/penyangga)
+│           ├── mcp-server.ts    # Lib Trello (42 tools, fallback/penyangga)
 │           └── trello/
-│               └── attachments.js  # Attachment utilities
+│               └── attachments.ts  # Attachment utilities
 ├── dist/                    # Build output (gitignored)
 ├── scripts/
 │   ├── kaede.ts            # CLI tool (setup, today, init, push, env, status)

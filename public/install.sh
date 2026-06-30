@@ -70,7 +70,7 @@ install_deps() {
 run_kaede_install() {
   info "Running kaede install (global setup)..."
   cd "$INSTALL_DIR"
-  bun scripts/kaede.mjs install
+  bun scripts/kaede.ts install
 }
 
 print_next() {

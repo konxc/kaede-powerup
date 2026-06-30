@@ -96,7 +96,7 @@ kaede-powerup/
 ├── docs/
 │   └── DEVELOPMENT-ROADMAP.md
 ├── scripts/
-│   └── kaede.mjs                      # CLI tool
+│   └── kaede.ts                      # CLI tool
 ├── public/                            # Static assets
 ├── pr-submissions/                    # PR submissions
 └── README.md

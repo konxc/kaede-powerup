@@ -485,7 +485,7 @@ Closes #XXX (if applicable)
 1. **Update Dependencies**
    ```bash
    # Update package.json
-   npm update @delorenj/mcp-server-trello
+   bun update @delorenj/mcp-server-trello
    ```
 
 2. **Remove Duplicate Implementations**
@@ -500,7 +500,9 @@ Closes #XXX (if applicable)
 
 4. **Version Bump**
    ```bash
-   npm version minor
+   bun run build && bun run build:mcp
+   git add -A
+   git commit -m "chore: bump version"
    ```
 
 #### If PRs Not Merged
@@ -713,7 +715,7 @@ Phase 1 (Attachments) â†’ Phase 2 (Checklists) â†’ Phase 3 (Advanced) 
 
 - **Test Board:** `https://trello.com/b/rAKmlRj3/lab-testing-kaede`
 - **Test Scripts:** `test/attachments.test.js`, `test/checklist-enhancements.test.js`
-- **Test Data:** Generated via `scripts/generate-test-data.mjs`
+- **Test Data:** Generated via test scripts in `test/` directory
 
 ---
 

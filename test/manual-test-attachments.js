@@ -171,7 +171,7 @@ async function main() {
   const env = getSecrets();
   if (!env.TRELLO_API_KEY || !env.TRELLO_TOKEN) {
     printError('TRELLO_API_KEY or TRELLO_TOKEN not configured');
-    console.error('    Run: bun scripts/kaede.mjs setup');
+    console.error('    Run: bun scripts/kaede.ts setup');
     process.exit(1);
   }
   printSuccess('Credentials loaded from global config');
