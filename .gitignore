@@ -24,9 +24,10 @@ pr-submissions/
 .netlify
 .playwright-mcp/
 
-# Deploy temp files
+# Temp files & deploy artifacts
 .tmp-gh-pages/
 .worktree-gh-pages/
-
-# Windows artifacts
 nul
+
+# Release build output (binaries besar, pengguna download dari GitHub Releases)
+dist/release/
