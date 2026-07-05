@@ -13,6 +13,8 @@
       <span class="flex items-center justify-center size-5 rounded bg-kaede-primary text-white text-[8px] font-bold">K</span>
     </div>
 
+    <div id="enforcement-alert" class="hidden mb-3 px-3 py-2 rounded-md border text-xs leading-relaxed"></div>
+
     <button type="button" class="env-option w-full text-left px-3.5 py-2.5 mb-1.5 rounded-md border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-[border-color,background] duration-200 hover:border-kaede-primary hover:bg-[rgba(108,92,231,0.08)]" data-env="production">
       <span class="font-medium">Production</span>
       <span class="block text-[11px] text-kaede-muted mt-0.5">Live / customer-facing</span>
@@ -32,6 +34,7 @@
   </div>
 
   <script src="https://p.trellocdn.net/power-up.min.js"></script>
+  <script src="js/mcp-client.js"></script>
   <script>
     TrelloPowerUp.initialize({'card-buttons': function(t) { return []; }});
 
@@ -41,92 +44,133 @@
       development: { name: 'Development', color: 'green' },
     };
 
+    var alertEl = document.getElementById('enforcement-alert');
+
+    function showEnforcement(warnings) {
+      if (!warnings || warnings.length === 0) {
+        alertEl.classList.add('hidden');
+        return;
+      }
+      alertEl.classList.remove('hidden');
+      alertEl.style.borderColor = warnings.some(function (w) { return w.severity === 'error'; })
+        ? 'rgba(225,112,85,0.3)' : 'rgba(253,203,110,0.3)';
+      alertEl.style.background = warnings.some(function (w) { return w.severity === 'error'; })
+        ? 'rgba(225,112,85,0.08)' : 'rgba(253,203,110,0.08)';
+      alertEl.innerHTML = '<div class="font-semibold text-kaede-text mb-1">Enforcement</div>' +
+        warnings.map(function (w) {
+          return '<div class="flex items-start gap-1.5 mt-1"><span class="shrink-0 ' +
+            (w.severity === 'error' ? 'text-kaede-danger' : 'text-kaede-warning') +
+            '">' + (w.severity === 'error' ? '!' : '\u26A0') + '</span>' +
+            '<span class="text-kaede-muted">' + w.message + '</span></div>';
+        }).join('');
+    }
+
+    function runEnforcement(env, cardId, t) {
+      KAEDEMCP.init(t).then(function () {
+        return Promise.all([
+          KAEDEMCP.getAuth(t),
+          t.get('board', 'shared', 'playbook', null),
+        ]);
+      }).then(function (results) {
+        var auth = results[0];
+        var playbook = results[1];
+        if (!playbook) return;
+
+        var plan = [{
+          action: 'update_card',
+          params: { cardId: cardId, name: env },
+          description: 'Set environment to ' + env,
+        }];
+        return KAEDEMCP.enforcePlaybook(playbook, plan, []).then(function (result) {
+          if (result && result.warnings && result.warnings.length > 0) {
+            showEnforcement(result.warnings);
+          }
+          if (auth) syncLabelViaTrelloApi(cardId, env, auth);
+        });
+      }).catch(function () {
+        /* enforcement skipped */
+      });
+    }
+
     function getTrelloAuth(t) {
       return t.get('board', 'shared', 'trelloAuth', null);
     }
 
-    function syncLabelViaMCP(cardId, env, t) {
-      return getTrelloAuth(t).then(function(auth) {
-        if (!auth || !auth.key || !auth.token) return;
+    function syncLabelViaTrelloApi(cardId, env, auth) {
+      if (!auth || !auth.key || !auth.token) return;
 
-        var qs = 'key=' + encodeURIComponent(auth.key) + '&token=' + encodeURIComponent(auth.token);
-        var base = 'https://api.trello.com/1';
+      var qs = 'key=' + encodeURIComponent(auth.key) + '&token=' + encodeURIComponent(auth.token);
+      var base = 'https://api.trello.com/1';
 
-        function trelloApi(path, opts) {
-          var url = base + path + (path.indexOf('?') > -1 ? '&' : '?') + qs;
-          return fetch(url, {
-            method: opts.method || 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            body: opts.body ? JSON.stringify(opts.body) : undefined,
-          }).then(function(r) {
-            if (!r.ok) return r.text().then(function(txt) { throw new Error(txt.slice(0, 200)); });
-            return r.json();
+      function trelloApi(path, opts) {
+        var url = base + path + (path.indexOf('?') > -1 ? '&' : '?') + qs;
+        return fetch(url, {
+          method: opts.method || 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          body: opts.body ? JSON.stringify(opts.body) : undefined,
+        }).then(function (r) {
+          if (!r.ok) return r.text().then(function (txt) { throw new Error(txt.slice(0, 200)); });
+          return r.json();
+        });
+      }
+
+      return trelloApi('/cards/' + cardId + '?fields=idBoard').then(function (card) {
+        return trelloApi('/boards/' + card.idBoard + '/labels?fields=id,name,color').then(function (labels) {
+          var targetLabel = labels.find(function (l) {
+            return l.name === env || l.color === ENV_LABEL_MAP[env].color;
           });
-        }
 
-        // First get card details to see current labels
-        return trelloApi('/cards/' + cardId + '?fields=idBoard').then(function(card) {
-          // Get board labels to find/create env labels
-          return trelloApi('/boards/' + card.idBoard + '/labels?fields=id,name,color').then(function(labels) {
-            var targetLabel = labels.find(function(l) {
-              return l.name === env || l.color === ENV_LABEL_MAP[env].color;
+          function ensureLabel() {
+            if (targetLabel) return Promise.resolve(targetLabel);
+            var lbl = ENV_LABEL_MAP[env];
+            return trelloApi('/boards/' + card.idBoard + '/labels', {
+              method: 'POST',
+              body: { name: lbl.name, color: lbl.color },
+            }).then(function (newLabel) {
+              targetLabel = newLabel;
+              return newLabel;
+            });
+          }
+
+          return ensureLabel().then(function (label) {
+            var otherEnvs = Object.keys(ENV_LABEL_MAP).filter(function (e) { return e !== env; });
+            var labelNameToRemove = {};
+            otherEnvs.forEach(function (e) {
+              var lbl = labels.find(function (l) { return l.name === ENV_LABEL_MAP[e].name; });
+              if (lbl) labelNameToRemove[lbl.id] = true;
             });
 
-            function ensureLabel() {
-              if (targetLabel) return Promise.resolve(targetLabel);
-              var lbl = ENV_LABEL_MAP[env];
-              return trelloApi('/boards/' + card.idBoard + '/labels', {
+            var removePromises = Object.keys(labelNameToRemove).map(function (labelId) {
+              return trelloApi('/cards/' + cardId + '/idLabels/' + labelId, { method: 'DELETE' })
+                .catch(function () {});
+            });
+
+            return Promise.all(removePromises).then(function () {
+              return trelloApi('/cards/' + cardId + '/idLabels', {
                 method: 'POST',
-                body: { name: lbl.name, color: lbl.color },
-              }).then(function(newLabel) {
-                targetLabel = newLabel;
-                return newLabel;
-              });
-            }
-
-            return ensureLabel().then(function(label) {
-              // Remove other env labels
-              var otherEnvs = Object.keys(ENV_LABEL_MAP).filter(function(e) { return e !== env; });
-              var labelNameToRemove = {};
-              otherEnvs.forEach(function(e) {
-                var lbl = labels.find(function(l) { return l.name === ENV_LABEL_MAP[e].name; });
-                if (lbl) labelNameToRemove[lbl.id] = true;
-              });
-
-              var removePromises = Object.keys(labelNameToRemove).map(function(labelId) {
-                return trelloApi('/cards/' + cardId + '/idLabels/' + labelId, { method: 'DELETE' })
-                  .catch(function() { /* ignore if label not on card */ });
-              });
-
-              return Promise.all(removePromises).then(function() {
-                // Add target label
-                return trelloApi('/cards/' + cardId + '/idLabels', {
-                  method: 'POST',
-                  body: { value: label.id },
-                }).catch(function() { /* label may already exist */ });
-              });
+                body: { value: label.id },
+              }).catch(function () {});
             });
           });
         });
       });
     }
 
-    document.querySelectorAll('.env-option').forEach(function(btn) {
-      btn.addEventListener('click', function() {
+    document.querySelectorAll('.env-option').forEach(function (btn) {
+      btn.addEventListener('click', function () {
         var env = this.getAttribute('data-env');
         var t = TrelloPowerUp.iframe();
         var cardId = '';
 
         t.card('id')
-          .then(function(card) {
+          .then(function (card) {
             cardId = card.id;
-            // Read old env and board stats in parallel
             return Promise.all([
               t.get('card', 'shared', 'environment', null),
               t.get('board', 'shared', 'envStats', {}),
             ]);
           })
-          .then(function(results) {
+          .then(function (results) {
             var oldEnv = results[0];
             var stats = results[1];
 
@@ -135,26 +179,23 @@
               return;
             }
 
-            // Decrement old env count
             if (oldEnv && stats[oldEnv] !== undefined) {
               stats[oldEnv] = Math.max(0, stats[oldEnv] - 1);
               if (stats[oldEnv] === 0) delete stats[oldEnv];
             }
 
-            // Increment new env count
             stats[env] = (stats[env] || 0) + 1;
 
-            // Save card env + board stats + sync label in parallel
             return Promise.all([
               t.set('card', 'shared', 'environment', env),
               t.set('board', 'shared', 'envStats', stats),
-              syncLabelViaMCP(cardId, env, t),
+              runEnforcement(env, cardId, t),
             ]);
           })
-          .then(function() {
+          .then(function () {
             t.closePopup();
           })
-          .catch(function(err) {
+          .catch(function (err) {
             console.error('[KAEDE] Failed to set environment:', err);
             t.closePopup();
           });

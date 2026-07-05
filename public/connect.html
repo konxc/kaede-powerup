@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAEDE — Connect</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="h-full bg-kaede-surface p-4 font-sans antialiased flex flex-col">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-base font-semibold text-kaede-text">KAEDE Connect</h2>
+    <span class="flex items-center justify-center size-6 rounded bg-kaede-primary text-white text-[9px] font-bold">K</span>
+  </div>
+
+  <div class="flex-1">
+    <div id="connection-status" class="flex items-center gap-2 px-3 py-2 bg-kaede-bg rounded-md mb-3 hidden">
+      <span class="size-2 rounded-full" id="conn-dot"></span>
+      <span class="text-sm text-kaede-text" id="conn-text"></span>
+    </div>
+
+    <div class="mb-3">
+      <label class="text-[11px] font-semibold text-kaede-muted uppercase tracking-wide">API Server URL</label>
+      <div class="flex gap-2 mt-1">
+        <input type="text" id="api-base-input" placeholder="http://localhost:3456"
+          class="flex-1 px-3 py-2 rounded-md border border-kaede-border bg-kaede-bg text-sm text-kaede-text outline-none transition-colors focus:border-kaede-primary" />
+        <button type="button" id="test-conn-btn"
+          class="px-3 py-2 rounded-lg border border-kaede-border bg-kaede-bg text-kaede-text text-sm cursor-pointer transition-colors hover:border-kaede-primary whitespace-nowrap">
+          Test
+        </button>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button type="button" id="save-conn-btn"
+        class="flex-1 px-4 py-2 rounded-lg bg-kaede-primary text-white text-sm font-medium cursor-pointer border-none transition-colors hover:bg-kaede-primary-hover disabled:opacity-40 disabled:cursor-not-allowed">
+        Save Connection
+      </button>
+      <button type="button" id="disconnect-btn"
+        class="px-3 py-2 rounded-lg border border-kaede-danger/50 text-kaede-danger text-sm cursor-pointer bg-transparent transition-colors hover:bg-kaede-danger/10">
+        Disconnect
+      </button>
+    </div>
+
+    <div class="mt-4 p-3 bg-kaede-bg rounded-md border border-kaede-border/50">
+      <p class="text-[11px] text-kaede-muted leading-relaxed">
+        Enter the URL of your KAEDE API server. For local development, run <code class="text-[10px]">bun scripts/kaede.mjs start</code> and use <code class="text-[10px]">http://localhost:3456</code>.
+      </p>
+    </div>
+  </div>
+
+  <div class="pt-3 border-t border-kaede-border/50 text-center">
+    <a href="/" target="_blank" rel="noopener" class="text-[10px] text-kaede-muted hover:text-kaede-primary no-underline transition-colors">About KAEDE Ecosystem</a>
+  </div>
+
+  <script src="https://p.trellocdn.net/power-up.min.js"></script>
+  <script src="js/mcp-client.js"></script>
+  <script>
+    (function () {
+      var t = TrelloPowerUp.iframe();
+      var apiInput = document.getElementById('api-base-input');
+      var testBtn = document.getElementById('test-conn-btn');
+      var saveBtn = document.getElementById('save-conn-btn');
+      var disconnectBtn = document.getElementById('disconnect-btn');
+      var connStatus = document.getElementById('connection-status');
+      var connDot = document.getElementById('conn-dot');
+      var connText = document.getElementById('conn-text');
+
+      function showConn(ok, msg) {
+        connStatus.classList.remove('hidden');
+        connDot.className = 'size-2 rounded-full ' + (ok ? 'bg-kaede-success' : 'bg-kaede-warning');
+        connText.textContent = msg;
+      }
+
+      function loadConfig() {
+        return Promise.all([
+          t.get('board', 'shared', 'apiBase', null),
+          t.get('board', 'shared', 'auth', null),
+        ]).then(function (results) {
+          var base = results[0];
+          var auth = results[1];
+          if (base) apiInput.value = base;
+          if (auth && base) {
+            showConn(true, 'Connected to ' + base);
+            saveBtn.textContent = 'Update Connection';
+          }
+        });
+      }
+
+      function testConnection(url) {
+        testBtn.disabled = true;
+        testBtn.textContent = 'Testing...';
+        var testUrl = url + '/api/health';
+        fetch(testUrl, { method: 'POST' })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.status === 'ok') {
+              showConn(true, 'Connected — KAEDE v' + (data.version || '?'));
+            } else {
+              showConn(false, 'Unexpected response');
+            }
+          })
+          .catch(function () {
+            showConn(false, 'Cannot reach server at ' + url);
+          })
+          .finally(function () {
+            testBtn.disabled = false;
+            testBtn.textContent = 'Test';
+          });
+      }
+
+      function saveConnection(url) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        t.set('board', 'shared', 'apiBase', url)
+          .then(function () {
+            showConn(true, 'Saved. Connecting to ' + url + '...');
+            testConnection(url);
+          })
+          .catch(function (err) {
+            showConn(false, 'Failed to save: ' + err.message);
+          })
+          .finally(function () {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Connection';
+          });
+      }
+
+      loadConfig();
+
+      testBtn.addEventListener('click', function () {
+        var url = apiInput.value.trim();
+        if (!url) { showConn(false, 'Enter a server URL'); return; }
+        testConnection(url.replace(/\/+$/, ''));
+      });
+
+      saveBtn.addEventListener('click', function () {
+        var url = apiInput.value.trim();
+        if (!url) { showConn(false, 'Enter a server URL'); return; }
+        saveConnection(url.replace(/\/+$/, ''));
+      });
+
+      disconnectBtn.addEventListener('click', function () {
+        Promise.all([
+          t.set('board', 'shared', 'apiBase', null),
+          t.set('board', 'shared', 'trelloAuth', null),
+          t.set('board', 'shared', 'auth', null),
+        ]).then(function () {
+          apiInput.value = '';
+          connStatus.classList.add('hidden');
+          saveBtn.textContent = 'Save Connection';
+        }).catch(function (err) {
+          showConn(false, 'Disconnect failed: ' + err.message);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

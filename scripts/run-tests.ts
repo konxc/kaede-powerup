@@ -7,6 +7,7 @@ const testFiles = [
   'test/mcp-server.test.js',
   'test/kaede-mcp-server.test.js',
   'test/auto-chainer.test.js',
+  'test/enforcer.test.js',
 ];
 
 let exitCode = 0;

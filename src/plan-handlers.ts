@@ -6,6 +6,7 @@ import type { BatchCard, TemplateVars, PlaybookResult, BoardSnapshot, PlanStep }
 import { generateCardFromTemplate, getTemplate } from './templates';
 import { inferFromGoal } from './prompter';
 import { validateContext } from './duplicate-detector';
+import { enforcePlaybook } from './enforcer';
 
 interface PlanHandler {
   patterns: string[];
@@ -410,6 +411,7 @@ onPlan(['setup labels batch', 'batch labels', 'create labels batch'], (_pb, args
 function runPreFlight(
   plan: Array<Record<string, unknown>>,
   boards: BoardSnapshot[],
+  playbook?: PlaybookResult,
 ): Array<Record<string, unknown>> {
   const steps: Array<Record<string, unknown>> = [];
 
@@ -432,6 +434,30 @@ function runPreFlight(
             ? `BLOCKER: ${result.blockers.join('; ')}`
             : `Warning: ${result.warnings.map((w) => w.message).join('; ')}`,
           preFlight: { safe: result.safe, warnings: result.warnings, blockers: result.blockers },
+        });
+      }
+    }
+  }
+
+  if (playbook) {
+    const typedPlan = plan as PlanStep[];
+    const enforceResult = enforcePlaybook(typedPlan, playbook, boards);
+
+    if (enforceResult.warnings.length > 0) {
+      for (const w of enforceResult.warnings) {
+        steps.push({
+          action: 'enforcement_check',
+          params: {
+            rule: w.rule,
+            severity: w.severity,
+            message: w.message,
+            actual: w.actual,
+            expected: w.expected,
+          },
+          description: w.severity === 'blocker'
+            ? `BLOCKER: ${w.message}`
+            : `Enforcement: ${w.message}`,
+          enforcement: w,
         });
       }
     }

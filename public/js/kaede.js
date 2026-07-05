@@ -66,7 +66,7 @@ async function set(t, scope, key, value) {
 
 const capabilities = {
   // ---------------------------------------------------------------
-  //  Board Button — opens the KAEDE dashboard
+  //  Board Buttons — Dashboard & t-connect
   // ---------------------------------------------------------------
   'board-buttons': function (t) {
     return [
@@ -77,7 +77,19 @@ const capabilities = {
           return t.popup({
             title: 'KAEDE Dashboard',
             url: 'board.html',
-            height: 400,
+            height: 520,
+          });
+        },
+        condition: 'edit',
+      },
+      {
+        icon: KAEDE.iconFallback.light,
+        text: 'KAEDE: Connect',
+        callback: async function (t) {
+          return t.popup({
+            title: 'KAEDE Connect',
+            url: 'connect.html',
+            height: 360,
           });
         },
         condition: 'edit',
@@ -201,12 +213,17 @@ const capabilities = {
   },
 
   // ---------------------------------------------------------------
-  //  Authorization — attach OAuth / API key flow here
+  //  Authorization — MCP + Trello API key flow
   // ---------------------------------------------------------------
   'authorization-status': function (t) {
-    return get(t, 'board', 'auth', null).then(function (auth) {
+    return Promise.all([
+      get(t, 'board', 'auth', null),
+      get(t, 'board', 'apiBase', null),
+    ]).then(function (results) {
+      var auth = results[0];
+      var apiBase = results[1];
       return {
-        authorized: auth !== null,
+        authorized: auth !== null && apiBase !== null,
       };
     });
   },
@@ -215,7 +232,7 @@ const capabilities = {
     return t.popup({
       title: 'KAEDE: Authorize',
       url: 'auth.html',
-      height: 280,
+      height: 360,
     });
   },
 

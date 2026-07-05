@@ -55,6 +55,21 @@ export type ValidationWarning = {
   existing?: CardItem;
 };
 
+export type EnforcementWarning = {
+  rule: 'title_prefix' | 'allowed_label' | 'workflow_list' | 'role_access';
+  severity: 'info' | 'warning' | 'blocker';
+  message: string;
+  actual?: string;
+  expected?: string;
+};
+
+export type EnforceResult = {
+  safe: boolean;
+  warnings: EnforcementWarning[];
+  blockers: string[];
+  summary: string;
+};
+
 export type ValidateContextResult = {
   safe: boolean;
   warnings: ValidationWarning[];

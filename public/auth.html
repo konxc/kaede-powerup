@@ -14,8 +14,7 @@
       <div id="auth-unauthorized">
         <h2 class="text-base font-semibold text-kaede-text mb-2">Authorize KAEDE</h2>
         <p class="text-sm text-kaede-muted leading-relaxed mb-4">
-          Enter your Trello API credentials to enable environment → label sync and MCP orchestration.
-          Credentials are stored in this board's shared storage (same access level as the board itself).
+          Enter your Trello API credentials and MCP server URL to enable environment &rarr; label sync and MCP orchestration.
         </p>
         <div class="text-left bg-kaede-bg rounded-md p-3 mb-4 border border-kaede-border/50 text-[11px]">
           <div class="mb-3">
@@ -28,8 +27,13 @@
             <input type="password" id="auth-token" placeholder="Your Trello Token"
               class="w-full mt-1 px-2 py-1.5 rounded border border-kaede-border bg-kaede-surface text-kaede-text text-xs outline-none focus:border-kaede-primary" />
           </div>
+          <div class="mb-3">
+            <label class="text-kaede-text font-medium text-xs">MCP Server URL</label>
+            <input type="text" id="auth-api-base" placeholder="http://localhost:3456"
+              class="w-full mt-1 px-2 py-1.5 rounded border border-kaede-border bg-kaede-surface text-kaede-text text-xs outline-none focus:border-kaede-primary" />
+          </div>
           <p class="text-kaede-muted leading-relaxed">
-            Don't have credentials?
+            Don't have Trello credentials?
             <a href="https://trello.com/power-ups/admin" target="_blank" rel="noopener"
               class="text-kaede-primary no-underline hover:underline">Get them here</a>.
           </p>
@@ -76,32 +80,46 @@
         var unauthSection = document.getElementById('auth-unauthorized');
         var authSection = document.getElementById('auth-authorized');
 
-        t.get('board', 'shared', 'auth', null)
-          .then(function (auth) {
-            if (auth && auth.connected) {
-              unauthSection.classList.add('hidden');
-              authSection.classList.remove('hidden');
-            }
-          })
-          .catch(function () {});
+        function checkAuth() {
+          t.get('board', 'shared', 'auth', null)
+            .then(function (auth) {
+              if (auth && auth.connected) {
+                unauthSection.classList.add('hidden');
+                authSection.classList.remove('hidden');
+              }
+            })
+            .catch(function () {});
+        }
+
+        checkAuth();
+
+        document.getElementById('auth-api-base').value = 'http://localhost:3456';
 
         document.getElementById('kaede-auth-btn').addEventListener('click', function () {
           var apiKey = document.getElementById('auth-api-key').value.trim();
           var token = document.getElementById('auth-token').value.trim();
+          var apiBase = document.getElementById('auth-api-base').value.trim();
           var errEl = document.getElementById('auth-error');
 
           if (!apiKey || !token) {
-            errEl.textContent = 'Both API Key and Token are required.';
+            errEl.textContent = 'API Key and Token are required.';
+            errEl.classList.remove('hidden');
+            return;
+          }
+
+          if (!apiBase) {
+            errEl.textContent = 'MCP Server URL is required.';
             errEl.classList.remove('hidden');
             return;
           }
 
           errEl.classList.add('hidden');
 
-          t.set('board', 'shared', 'auth', { connected: true, provider: 'kaede-mcp', version: '1.0.0' })
-            .then(function () {
-              return t.set('board', 'shared', 'trelloAuth', { key: apiKey, token: token });
-            })
+          Promise.all([
+            t.set('board', 'shared', 'auth', { connected: true, provider: 'kaede-mcp', version: '1.0.0' }),
+            t.set('board', 'shared', 'trelloAuth', { key: apiKey, token: token }),
+            t.set('board', 'shared', 'apiBase', apiBase.replace(/\/+$/, '')),
+          ])
             .then(function () {
               unauthSection.classList.add('hidden');
               authSection.classList.remove('hidden');
@@ -117,10 +135,12 @@
           Promise.all([
             t.set('board', 'shared', 'auth', null),
             t.set('board', 'shared', 'trelloAuth', null),
+            t.set('board', 'shared', 'apiBase', null),
           ])
             .then(function () {
               document.getElementById('auth-api-key').value = '';
               document.getElementById('auth-token').value = '';
+              document.getElementById('auth-api-base').value = 'http://localhost:3456';
               authSection.classList.add('hidden');
               unauthSection.classList.remove('hidden');
             })

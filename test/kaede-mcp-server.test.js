@@ -93,6 +93,7 @@ describe('kaede-mcp-server (via stdio RPC)', () => {
       'bundle_context',
       'clear_execution_history',
       'detect_duplicates',
+      'enforce_playbook',
       'execute_plan',
       'find_card',
       'generate_plan',

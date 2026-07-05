@@ -20,6 +20,7 @@ export { batchUpdateCards } from './batch-updater';
 export { executeIntent } from './intent-handlers';
 export { executePlan, undoLastPlan } from './plan-executor';
 export { splitCompoundGoal, injectAutoRefs, resolveCrossPlanRefs } from './auto-chainer';
+export { enforcePlaybook, enforceSingleAction, validateCardPrefix, validateCardLabel, validateWorkflowList, validateRoleAccess } from './enforcer';
 export type { PlaybookResult } from './types';
 
 function matchHandler(
@@ -49,7 +50,7 @@ export function generatePlan(
   if (direct) {
     const expanded = expandArgsChain(direct, extraArgs);
     if (boards && boards.length > 0) {
-      const preFlight = runPreFlight(expanded, boards);
+      const preFlight = runPreFlight(expanded, boards, playbook);
       if (preFlight.length > 0) {
         return [...preFlight, ...expanded];
       }
@@ -69,7 +70,7 @@ export function generatePlan(
     if (subPlans.length > 0) {
       const chained = resolveCrossPlanRefs(subPlans);
       if (boards && boards.length > 0) {
-        const preFlight = runPreFlight(chained, boards);
+        const preFlight = runPreFlight(chained, boards, playbook);
         if (preFlight.length > 0) {
           return [...preFlight, ...chained];
         }

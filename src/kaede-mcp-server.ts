@@ -24,6 +24,7 @@ import {
 } from './tool-handlers/duplicate';
 import { handleGenerateTemplate, handleLoadTemplates } from './tool-handlers/template';
 import { handleGenerateSprintReport, handleBatchUpdateCards } from './tool-handlers/report';
+import { handleEnforcePlaybook } from './tool-handlers/enforcer';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -491,6 +492,64 @@ const TOOLS: ToolSchema[] = [
     'clear_execution_history',
     'Clear all stored execution history. Use with caution — undo_last_plan will not work after clearing.',
   ),
+
+  toolSchema(
+    'enforce_playbook',
+    'Validate a plan or board snapshot against playbook conventions. Checks title prefixes, allowed labels, workflow list compliance, and role-based access. Returns structured enforcement warnings.',
+    {
+      plan: {
+        type: 'array',
+        description: 'Array of PlanStep to validate (action, params)',
+        items: {
+          type: 'object',
+          properties: {
+            action: { type: 'string' },
+            params: { type: 'object' },
+            description: { type: 'string' },
+          },
+          required: ['action'],
+        },
+      },
+      playbook: { type: 'string', description: 'Playbook markdown content to validate against' },
+      boards: {
+        type: 'array',
+        description: 'Optional board snapshots for board-level validation (existing cards)',
+        items: {
+          type: 'object',
+          properties: {
+            boardId: { type: 'string' },
+            boardName: { type: 'string' },
+            lists: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  listId: { type: 'string' },
+                  listName: { type: 'string' },
+                  cards: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        name: { type: 'string' },
+                        listName: { type: 'string' },
+                        boardName: { type: 'string' },
+                      },
+                      required: ['id', 'name'],
+                    },
+                  },
+                },
+                required: ['listId', 'listName', 'cards'],
+              },
+            },
+          },
+          required: ['boardId', 'boardName', 'lists'],
+        },
+      },
+    },
+    ['playbook'],
+  ),
 ];
 
 type ToolHandler = (args: Record<string, unknown>) => Promise<Record<string, unknown>> | Record<string, unknown>;
@@ -518,6 +577,8 @@ const TOOL_HANDLERS: Record<string, ToolHandler> = {
 
   generate_sprint_report: handleGenerateSprintReport,
   batch_update_cards: handleBatchUpdateCards,
+
+  enforce_playbook: handleEnforcePlaybook,
 };
 
 async function handleToolsCall(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
