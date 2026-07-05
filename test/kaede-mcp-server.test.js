@@ -83,11 +83,24 @@ describe('kaede-mcp-server (via stdio RPC)', () => {
     assert.equal(res.result.serverInfo.name, 'KAEDE Orchestrator MCP');
   });
 
-  it('2. tools/list returns 4 tools', async () => {
+  it('2. tools/list returns all tools', async () => {
     const res = await rpc(proc, 'tools/list', {});
     const tools = res.result.tools;
     const names = tools.map((t) => t.name).sort();
-    assert.deepEqual(names, ['bundle_context', 'generate_plan', 'parse_playbook', 'status']);
+    assert.deepEqual(names, [
+      'archive_duplicates',
+      'bundle_context',
+      'detect_duplicates',
+      'execute_plan',
+      'find_card',
+      'generate_plan',
+      'generate_template',
+      'parse_playbook',
+      'resolve_board',
+      'resolve_context',
+      'status',
+      'validate_context',
+    ]);
   });
 
   it('3. parse_playbook tool works', async () => {

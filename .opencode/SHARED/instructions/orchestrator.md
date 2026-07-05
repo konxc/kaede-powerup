@@ -19,7 +19,7 @@ KAEDE menyediakan **dua MCP server** yang saling melengkapi:
 
 | MCP | Server | Peran |
 |---|---|---|
-| `mcp.kaede` | `dist/kaede-mcp-server.js` | **Orchestrator** — generate plan, parse playbook, bundle context |
+| `mcp.kaede` | `dist/kaede-mcp-server.js` | **Orchestrator** — generate plan, parse playbook, bundle context, resolve board, dedup & pre-flight |
 | `mcp.trello` | `@delorenj/mcp-server-trello` (bunx) | **Eksekutor utama** — 45+ tools Trello resmi dari upstream |
 
 `packages/kaede-trello/src/mcp-server.ts` adalah **lib** (bukan MCP server) yang
@@ -39,7 +39,8 @@ User: "Mulai Sprint Alpha"
 
 | Kebutuhan | MCP / Lib |
 |---|---|
-| Generate plan, parse playbook, bundle context | `mcp.kaede` |
+| Generate plan, parse playbook, bundle context, resolve board | `mcp.kaede` |
+| **Find/detect duplicate cards, validate context, archive plan** | `mcp.kaede` (dedup tools) |
 | Boards: list, create | `mcp.trello` (utama) |
 | Lists: get, add, archive | `mcp.trello` (utama) |
 | Cards: get, create, update, move, archive | `mcp.trello` (utama) |
@@ -70,21 +71,37 @@ Setiap kali Anda diminta untuk melakukan tugas manajemen project (seperti membua
 - Baca `.openkb/SHARED/glossary.md` untuk istilah-istilah spesifik.
 - Baca `.openkb/SHARED/decision-log.md` untuk memastikan tindakan Anda tidak melanggar keputusan arsitektur sebelumnya.
 
-### Langkah 3: Generate Plan via mcp.kaede
+### Langkah 3: Pre-Flight Duplicate Check (WAJIB untuk create_card/create_label)
+**Jika rencana melibatkan pembuatan card atau label**, WAJIB lakukan pre-flight:
+
+a. Snapshot board via `mcp.trello`:
+   - `get_board_lists(boardId)` → semua list
+   - `get_cards_by_list_id(listId, boardId)` untuk setiap list → semua card
+
+b. Susun `boards` array dan sertakan ke `mcp.kaede.generate_plan`:
+   - `generatePlan` akan auto-return `pre_flight_check` step jika ada duplikat
+   - Jika ada `blockers` (safe: false) → **WAJIB tanya user** sebelum lanjut
+   - Jika hanya `warnings` (safe: true) → informasikan user, lanjut jika disetujui
+   - Alternatif: `mcp.kaede.validate_context` atau `mcp.kaede.detect_duplicates` langsung
+
+### Langkah 4: Generate Plan via mcp.kaede
 Sebelum menyentuh Trello, gunakan `mcp.kaede` untuk menghasilkan rencana eksekusi:
 - Panggil tool `mcp.kaede.generate_plan` dengan goal & playbook.
+- **Wajib sertakan `boards`** jika ada potensi duplikat (lihat Langkah 3).
 - Output: array of `ActionStep` dengan action + params (nama saja, tanpa ID Trello).
 - Tool `mcp.kaede.parse_playbook` untuk parse playbook jika belum ada.
 - Gunakan `mcp.kaede.bundle_context` untuk menggabungkan playbook + openkb + opencode config.
 
-### Langkah 4: Eksekusi via mcp.trello
+### Langkah 5: Eksekusi via mcp.trello
 Setelah dapat plan dari `mcp.kaede`, eksekusi setiap step ke Trello:
-- **Gunakan `mcp.trello`** (upstream `@delorenj/mcp-server-trello`) untuk tools standar.
-- **Fallback ke `packages/kaede-trello`** (lib) jika tool yang dibutuhkan tidak tersedia di upstream.
-- Resolve nama member/list/board via tools yang tersedia (`search_members`, `get_board_lists`, dll).
-- Jika plan gagal di satu step, lanjutkan ke step berikutnya.
-- Untuk eksekusi cepat bisa juga via CLI: `bun scripts/kaede.ts run --playbook <path> --board <id> "Mulai Sprint Alpha"`
-- Intent yang didukung CLI: mulai sprint, buat card, assign, pindah, komentar, report, tutup sprint
+- **Periksa `pre_flight_check` step**: Jika ada blocker, tanya user dulu. Jika aman, lanjut.
+- **Eksekusi step lain** ke `mcp.trello`:
+  - **Gunakan `mcp.trello`** (upstream `@delorenj/mcp-server-trello`) untuk tools standar.
+  - **Fallback ke `packages/kaede-trello`** (lib) jika tool yang dibutuhkan tidak tersedia di upstream.
+  - Resolve nama member/list/board via tools yang tersedia (`search_members`, `get_board_lists`, dll).
+  - Jika plan gagal di satu step, lanjutkan ke step berikutnya.
+  - Untuk eksekusi cepat bisa juga via CLI: `bun scripts/kaede.ts run --playbook <path> --board <id> "Mulai Sprint Alpha"`
+  - Intent yang didukung CLI: mulai sprint, buat card, assign, pindah, komentar, report, tutup sprint
 
 Pastikan:
 - Label yang dipasang sesuai dengan warna dan nama di Playbook.

@@ -5,6 +5,12 @@
 [build.environment]
   BUN_VERSION = "1"
 
+[functions]
+  directory = "netlify/functions"
+
+[functions.trello-proxy]
+  external_node_modules = []
+
 [[redirects]]
   from = "/docs/*"
   to = "/404"

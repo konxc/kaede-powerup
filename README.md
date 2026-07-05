@@ -39,9 +39,20 @@
 ```
 ├── public/                  # Static site (deploy ke Netlify)
 ├── src/
-│   ├── kaede-mcp-server.ts  # KAEDE Orchestrator MCP (4 tools)
-│   ├── trello-client.ts     # Trello MCP Client wrapper
-│   ├── orchestrator.ts      # Intent engine & playbook parser
+│   ├── kaede-mcp-server.ts  # KAEDE Orchestrator MCP (entry point)
+│   ├── trello-client.ts     # Trello MCP Client facade
+│   ├── orchestrator.ts      # Intent engine barrel
+│   ├── plan-handlers.ts     # Plan handler logic (19 patterns)
+│   ├── plan-executor.ts     # Plan execution facade
+│   ├── intent-handlers.ts   # Intent handlers barrel
+│   ├── prompter.ts          # Prompt builder & smart defaults
+│   ├── mcp-helpers.ts       # MCP helper utilities
+│   ├── types.ts             # Type exports barrel
+│   ├── intent-handlers/     # 10 domain intent files
+│   ├── plan-executors/      # 6 domain executor files + types
+│   ├── tool-handlers/       # 5 domain tool handler files
+│   ├── services/            # 10 domain service classes
+│   ├── types/               # 4 domain type files
 │   └── style.css            # Source CSS (Tailwind v4)
 ├── packages/
 │   ├── README.md            # Dokumentasi arsitektur packages

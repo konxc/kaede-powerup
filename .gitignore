@@ -28,6 +28,8 @@ pr-submissions/
 .tmp-gh-pages/
 .worktree-gh-pages/
 nul
+netlify/
+_test_*
 
 # Release build output (binaries besar, pengguna download dari GitHub Releases)
 dist/release/

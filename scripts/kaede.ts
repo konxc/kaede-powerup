@@ -270,8 +270,8 @@ async function cmdInit(): Promise<void> {
     '',
     '| Server | Description |',
     '|--------|-------------|',
-    '| `mcp.trello` | 42 Trello API tools (cards, boards, lists, labels, checklists, etc.)',
-    '| `mcp.kaede` | 4 orchestration tools (playbook parse, context bundle, plan generation, status)',
+    '| `mcp.trello` | 44 Trello API tools (cards, boards, lists, labels, checklists, search, etc.)',
+    '| `mcp.kaede` | 18 orchestration tools (playbook, context, plan, templates, report, undo, batch)',
     '',
     '## Workflow',
     '',
@@ -786,7 +786,7 @@ async function cmdRun(): Promise<void> {
       console.log('');
       console.log('  \x1b[36m  Would execute:\x1b[0m \x1b[90m"' + intent + '"\x1b[0m');
       console.log(
-        `  \x1b[36m  Intents available:\x1b[0m \x1b[90mmulai sprint, buat card, assign, buat label, arsipkan, pindah semua, buat board, komentar, report, tutup sprint\x1b[0m`,
+        `  \x1b[36m  Intents available:\x1b[0m \x1b[90mmulai sprint, buat card, assign, buat label, arsipkan, pindah semua, buat board, komentar, report, tutup sprint, undo, batch update, sprint report\x1b[0m`,
       );
       console.log(`  \x1b[36m  Workflow lists:\x1b[0m \x1b[90m${playbook.workflow.lists.join(', ')}\x1b[0m`);
       console.log('');
@@ -840,6 +840,264 @@ async function cmdRun(): Promise<void> {
     }
   } else {
     console.log('  \x1b[33m  \u26a0  Playbook not provided. Execute with generic defaults.\x1b[0m');
+  }
+  console.log('');
+}
+
+// ── Template ──
+
+async function cmdTemplate(): Promise<void> {
+  const args = process.argv.slice(3);
+  const subcmd = args[0];
+  if (!subcmd) {
+    console.error('  \x1b[31m  \u2717 Subcommand required.\x1b[0m');
+    console.log('  \x1b[37m  Usage: kaede template \x1b[36mlist|show|apply\x1b[0m');
+    return;
+  }
+
+  const { listTemplates, getTemplate, applyTemplate, loadTemplatesFromDir } = await import(
+    resolve(KAEDE_DIR, 'src/templates')
+  );
+
+  if (subcmd === 'list') {
+    const templates = listTemplates();
+    console.log('');
+    console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+    console.log('  \x1b[35m║     KAEDE — Card Templates          \x1b[0m');
+    console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+    console.log('');
+    console.log(`  \x1b[36m  ${templates.length} templates available\x1b[0m`);
+    console.log('');
+    for (const t of templates) {
+      const checklistCount = t.checklistTemplates?.length || 0;
+      const hasComment = t.commentTemplate ? '\x1b[32m\u2713\x1b[0m' : '\x1b[90m-\x1b[0m';
+      const labels = (t.defaultLabels as string[] | undefined)?.join(', ') || '\x1b[90m(none)\x1b[0m';
+      console.log(`  \x1b[36m  \u2022 ${t.name}\x1b[0m`);
+      console.log(`      Checklist: ${checklistCount} items | Comment: ${hasComment} | Labels: ${labels}`);
+    }
+    console.log('');
+  } else if (subcmd === 'show') {
+    const name = args[1];
+    if (!name) {
+      console.error('  \x1b[31m  \u2717 Template name required.\x1b[0m');
+      console.log('  \x1b[37m  Usage: kaede template show \x1b[36m<name>\x1b[0m');
+      return;
+    }
+    const template = getTemplate(name);
+    if (!template) {
+      console.error('  \x1b[31m  \u2717 Template not found: ' + name + '\x1b[0m');
+      return;
+    }
+    console.log('');
+    console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+    console.log('  \x1b[35m║     KAEDE — Template Detail         \x1b[0m');
+    console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+    console.log('');
+    console.log(`  \x1b[36m  Name:\x1b[0m ${template.name}`);
+    console.log(`  \x1b[36m  Description template:\x1b[0m`);
+    console.log(`  \x1b[90m  ${template.descriptionTemplate.split('\n').join('\n  ')}\x1b[0m`);
+    console.log('');
+    if (template.checklistTemplates?.length) {
+      console.log(`  \x1b[36m  Checklist items (${template.checklistTemplates.length}):\x1b[0m`);
+      for (const item of template.checklistTemplates) {
+        console.log(`    \x1b[90m\u2022 ${item}\x1b[0m`);
+      }
+    }
+    if (template.commentTemplate) {
+      console.log(`  \x1b[36m  Comment template:\x1b[0m`);
+      console.log(`  \x1b[90m  ${template.commentTemplate.split('\n').join('\n  ')}\x1b[0m`);
+    }
+    console.log('');
+  } else if (subcmd === 'apply') {
+    const name = args[1];
+    if (!name) {
+      console.error('  \x1b[31m  \u2717 Template name required.\x1b[0m');
+      console.log('  \x1b[37m  Usage: kaede template apply \x1b[36m<name>\x1b[0m [--task "Title"] [--want "..."] [--role "..."] [--benefit "..."]');
+      return;
+    }
+    const getOpt = (f: string) => {
+      const i = args.indexOf(f);
+      return i !== -1 ? args[i + 1] : undefined;
+    };
+    const vars: Record<string, string> = {
+      task: getOpt('--task') || getOpt('-t') || name,
+      role: getOpt('--role') || getOpt('-r') || '',
+      want: getOpt('--want') || getOpt('-w') || '',
+      benefit: getOpt('--benefit') || getOpt('-b') || '',
+      feature: getOpt('--feature') || getOpt('-f') || '',
+      techStack: getOpt('--tech') || '',
+      convention: getOpt('--convention') || getOpt('-c') || '',
+      reference: getOpt('--reference') || getOpt('--ref') || '',
+      priority: getOpt('--priority') || getOpt('-p') || '',
+      assignee: getOpt('--assignee') || getOpt('-a') || '',
+      sprint: getOpt('--sprint') || getOpt('-s') || '',
+      technologies: getOpt('--technologies') || '',
+      description: getOpt('--desc') || getOpt('-d') || '',
+    };
+
+    const result = applyTemplate(name, vars);
+    console.log('');
+    console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+    console.log('  \x1b[35m║     KAEDE — Applied Template        \x1b[0m');
+    console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+    console.log('');
+    console.log(`  \x1b[36m  Template: \x1b[0m${name}`);
+    console.log(`  \x1b[36m  Task: \x1b[0m${vars.task}`);
+    console.log('');
+    console.log('  \x1b[36m  Description:\x1b[0m');
+    console.log(`  \x1b[90m  ${result.description.split('\n').join('\n  ')}\x1b[0m`);
+    console.log('');
+    if (result.checklist.length) {
+      console.log('  \x1b[36m  Checklist:\x1b[0m');
+      for (const item of result.checklist) {
+        console.log(`    \x1b[90m\u2022 ${item}\x1b[0m`);
+      }
+      console.log('');
+    }
+    if (result.comment) {
+      console.log('  \x1b[36m  Comment:\x1b[0m');
+      console.log(`  \x1b[90m  ${result.comment}\x1b[0m`);
+      console.log('');
+    }
+    if (result.labels?.length) {
+      console.log(`  \x1b[36m  Labels: \x1b[0m\x1b[90m${result.labels.join(', ')}\x1b[0m`);
+      console.log('');
+    }
+  } else {
+    console.error('  \x1b[31m  \u2717 Unknown subcommand: ' + subcmd + '\x1b[0m');
+    console.log('  \x1b[37m  Available: list, show, apply\x1b[0m');
+  }
+}
+
+// ── Report ──
+
+async function cmdReport(): Promise<void> {
+  const args = process.argv.slice(3);
+  const subcmd = args[0] || 'sprint';
+
+  if (subcmd !== 'sprint') {
+    console.error('  \x1b[31m  \u2717 Unknown subcommand: ' + subcmd + '\x1b[0m');
+    console.log('  \x1b[37m  Usage: kaede report sprint \x1b[36m--board <id>\x1b[0m [--name "Sprint Name"] [--list "List1,List2"]');
+    return;
+  }
+
+  const getOpt = (f: string) => {
+    const i = args.indexOf(f);
+    return i !== -1 ? args[i + 1] : undefined;
+  };
+  const boardId = getOpt('--board') || '';
+  const sprintName = getOpt('--name') || getOpt('-n') || 'Sprint Report';
+  const listStr = getOpt('--list') || getOpt('-l') || '';
+  const listNames = listStr ? listStr.split(',').map((s) => s.trim()) : [];
+
+  if (!boardId) {
+    console.error('  \x1b[31m  \u2717 --board <id> required.\x1b[0m');
+    return;
+  }
+
+  const secrets = getSecrets();
+  if (!secrets.TRELLO_API_KEY || !secrets.TRELLO_TOKEN) {
+    console.error('  \x1b[31m  \u2717 Trello credentials not found. Run `kaede setup` first.\x1b[0m');
+    return;
+  }
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║     KAEDE — Sprint Report           \x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('');
+
+  const { TrelloMCPClient } = await import(resolve(KAEDE_DIR, 'src/trello-client'));
+  const { generateSprintReport } = await import(resolve(KAEDE_DIR, 'src/orchestrator'));
+
+  const client = new TrelloMCPClient();
+  try {
+    await client.connect();
+    console.log(`  \x1b[36m  Generating report for "${sprintName}"...\x1b[0m`);
+    const report = await generateSprintReport(client, boardId, listNames, sprintName);
+    console.log('');
+    console.log(report);
+  } catch (err) {
+    console.error('  \x1b[31m  \u2717 Failed:\x1b[0m', (err as Error).message);
+  } finally {
+    client.close();
+  }
+}
+
+// ── Archive Sprint ──
+
+async function cmdArchiveSprint(): Promise<void> {
+  const args = process.argv.slice(3);
+  const getOpt = (f: string) => {
+    const i = args.indexOf(f);
+    return i !== -1 ? args[i + 1] : undefined;
+  };
+  const boardId = getOpt('--board');
+  const listName = getOpt('--list') || getOpt('-l') || 'Done';
+  const archiveAction = getOpt('--action') || getOpt('-a') || 'all';
+
+  if (!boardId) {
+    console.error('  \x1b[31m  \u2717 --board <id> required.\x1b[0m');
+    console.log('  \x1b[37m  Usage: kaede archive sprint --board <id> [--list "Done"|"Review"] [--action all|closed]\x1b[0m');
+    return;
+  }
+
+  const secrets = getSecrets();
+  if (!secrets.TRELLO_API_KEY || !secrets.TRELLO_TOKEN) {
+    console.error('  \x1b[31m  \u2717 Trello credentials not found.\x1b[0m');
+    return;
+  }
+
+  const api = 'https://api.trello.com/1';
+  const auth = `key=${secrets.TRELLO_API_KEY}&token=${secrets.TRELLO_TOKEN}`;
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║     KAEDE — Archive Sprint          \x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('');
+
+  try {
+    // Find the list
+    const listsRes = await fetch(`${api}/boards/${boardId}/lists?${auth}&fields=name,id`);
+    const lists = await listsRes.json() as Array<{ name: string; id: string }>;
+
+    // Resolve target lists
+    const targetLists = listName === 'all'
+      ? lists.filter((l) => l.name.toLowerCase() !== 'backlog')
+      : lists.filter((l) => l.name.toLowerCase() === listName.toLowerCase());
+
+    if (targetLists.length === 0) {
+      console.error(`  \x1b[31m  \u2717 No lists found matching "${listName}".\x1b[0m`);
+      return;
+    }
+
+    console.log(`  \x1b[36m  Archiving cards from ${targetLists.length} list(s)...\x1b[0m`);
+
+    let archived = 0;
+    for (const list of targetLists) {
+      const cardsRes = await fetch(`${api}/lists/${list.id}/cards?${auth}&fields=name,id,closed,dueComplete`);
+      const cards = await cardsRes.json() as Array<{ id: string; name: string; closed?: boolean; dueComplete?: boolean }>;
+
+      const toArchive = archiveAction === 'closed'
+        ? cards.filter((c) => c.dueComplete)
+        : cards;
+
+      for (const card of toArchive) {
+        await fetch(`${api}/cards/${card.id}?${auth}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ closed: true }),
+        });
+        archived++;
+        process.stdout.write(`  \x1b[32m  \u2713 Archived: ${card.name.slice(0, 50)}\x1b[0m\n`);
+      }
+    }
+
+    console.log('');
+    console.log(`  \x1b[32m  \u2705  Done: ${archived} cards archived.\x1b[0m`);
+  } catch (err) {
+    console.error('  \x1b[31m  \u2717 Failed:\x1b[0m', (err as Error).message);
   }
   console.log('');
 }
@@ -967,9 +1225,9 @@ async function cmdInstall(): Promise<void> {
   console.log('  \x1b[90m     Two MCP servers registered globally in\x1b[0m');
   console.log('  \x1b[90m     ~/.config/opencode/opencode.json:\x1b[0m');
   console.log(
-    '  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    \u2014 kaede-trello (42 tools, fallback jika upstream tidak tersedia)\x1b[0m',
+    '  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    \u2014 kaede-trello (44 tools, fallback jika upstream tidak tersedia)\x1b[0m',
   );
-  console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     \u2014 4 orchestration tools\x1b[0m');
+  console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     \u2014 18 orchestration tools\x1b[0m');
   console.log('');
 }
 
@@ -1086,7 +1344,10 @@ function cmdHelp(): void {
   );
   console.log('    \x1b[36mbuild\x1b[0m     \x1b[90mBuild MCP server (dist/mcp-server.js)\x1b[0m');
   console.log('    \x1b[36mstart\x1b[0m     \x1b[90mStart API server (HTTP bridge for frontend) [port]\x1b[0m');
-  console.log('    \x1b[36mtest-tools\x1b[0m \x1b[90mUji koneksi 42 MCP tools (butuh Trello credentials)\x1b[0m');
+  console.log('    \x1b[36mtest-tools\x1b[0m \x1b[90mUji koneksi MCP tools (butuh Trello credentials)\x1b[0m');
+  console.log('    \x1b[36mtemplate\x1b[0m  \x1b[90mCard templates: list, show <name>, apply <name> [--task "x"]\x1b[0m');
+  console.log('    \x1b[36mreport\x1b[0m    \x1b[90mSprint report: sprint --board <id> [--name "Sprint X"] [--list "Done,Review"]\x1b[0m');
+  console.log('    \x1b[36marchive\x1b[0m   \x1b[90mArchive sprint: sprint --board <id> [--list "Done"] [--action all|closed]\x1b[0m');
   console.log('    \x1b[36minstall\x1b[0m   \x1b[90mInstall KAEDE globally via bun link\x1b[0m');
   console.log('    \x1b[36mhelp\x1b[0m      \x1b[90mTampilkan pesan ini\x1b[0m');
   console.log('');
@@ -1159,6 +1420,15 @@ async function main(): Promise<void> {
       break;
     case 'test-tools':
       await cmdTestTools();
+      break;
+    case 'template':
+      await cmdTemplate();
+      break;
+    case 'report':
+      await cmdReport();
+      break;
+    case 'archive':
+      await cmdArchiveSprint();
       break;
     case 'install':
       await cmdInstall();

@@ -106,6 +106,24 @@ Follow these rules to keep credentials safe:
 - In OpenCode, reference environment variables, not hardcoded values
 - Rotate tokens regularly
 
+## 7. KAEDE Orchestrator (Pre-Flight & Dedup)
+
+Selain `mcp.trello`, KAEDE menyediakan `mcp.kaede` — orchestrator untuk planning dan duplicate detection:
+
+| Tool | Fungsi |
+|---|---|
+| `generate_plan` (dengan `boards`) | Auto pre-flight check sebelum create_card / create_label |
+| `find_card` | Cari card by name (exact + similar match) |
+| `detect_duplicates` | Scan semua board untuk duplikat (sameList / crossList / crossBoard) |
+| `validate_context` | Validasi nama card, list, dan konflik cross-board |
+| `archive_duplicates` | Generate action plan untuk archive duplikat |
+
+**Workflow rekomendasi:**
+1. Ambil snapshot card dari board via `mcp.trello`
+2. Sertakan `boards` ke `mcp.kaede.generate_plan` — jika ada duplikat, system akan return `pre_flight_check` step
+3. Jika ada `blockers` → tanya user. Jika hanya `warnings` → informasikan user
+4. Eksekusi plan via `mcp.trello`
+
 ## Next Steps
 
 Once integration is complete, see the [Tools Reference](tools.html) for a full list of available tools.

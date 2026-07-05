@@ -14,49 +14,31 @@
       <div id="auth-unauthorized">
         <h2 class="text-base font-semibold text-kaede-text mb-2">Authorize KAEDE</h2>
         <p class="text-sm text-kaede-muted leading-relaxed mb-4">
-          Authorize this board to mark it as ready for KAEDE MCP orchestration. The MCP server reads Trello API
-          credentials from your local environment — no credentials are stored in Trello.
+          Enter your Trello API credentials to enable environment → label sync and MCP orchestration.
+          Credentials are stored in this board's shared storage (same access level as the board itself).
         </p>
-        <div
-          class="text-left bg-kaede-bg rounded-md p-3 mb-4 border border-kaede-border/50 text-[11px] text-kaede-muted leading-relaxed"
-        >
-          <p class="mb-1.5"><strong class="text-kaede-text">Prerequisites:</strong></p>
-          <ol class="list-decimal list-inside space-y-0.5">
-            <li>
-              Get
-              <a
-                href="https://trello.com/power-ups/admin"
-                target="_blank"
-                rel="noopener"
-                class="text-kaede-primary no-underline hover:underline"
-                >API Key & Token</a
-              >
-            </li>
-            <li>
-              Save in <code class="text-kaede-primary text-[10px]">secrets.env</code> or
-              <code class="text-kaede-primary text-[10px]">~/.kaede/secrets.env</code>
-            </li>
-            <li>Run <code class="text-kaede-primary text-[10px]">bun scripts/kaede.mjs start</code></li>
-          </ol>
-          <p class="mt-1.5">
-            See the
-            <a
-              href="https://konxc.github.io/kaede-powerup/api-key.html"
-              target="_blank"
-              rel="noopener"
-              class="text-kaede-primary no-underline hover:underline"
-              >full guide</a
-            >
-            for details.
+        <div class="text-left bg-kaede-bg rounded-md p-3 mb-4 border border-kaede-border/50 text-[11px]">
+          <div class="mb-3">
+            <label class="text-kaede-text font-medium text-xs">API Key</label>
+            <input type="text" id="auth-api-key" placeholder="Your Trello API Key"
+              class="w-full mt-1 px-2 py-1.5 rounded border border-kaede-border bg-kaede-surface text-kaede-text text-xs outline-none focus:border-kaede-primary" />
+          </div>
+          <div class="mb-3">
+            <label class="text-kaede-text font-medium text-xs">Token</label>
+            <input type="password" id="auth-token" placeholder="Your Trello Token"
+              class="w-full mt-1 px-2 py-1.5 rounded border border-kaede-border bg-kaede-surface text-kaede-text text-xs outline-none focus:border-kaede-primary" />
+          </div>
+          <p class="text-kaede-muted leading-relaxed">
+            Don't have credentials?
+            <a href="https://trello.com/power-ups/admin" target="_blank" rel="noopener"
+              class="text-kaede-primary no-underline hover:underline">Get them here</a>.
           </p>
         </div>
-        <button
-          type="button"
-          id="kaede-auth-btn"
-          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none bg-kaede-primary text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-kaede-primary-hover"
-        >
+        <button type="button" id="kaede-auth-btn"
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none bg-kaede-primary text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-kaede-primary-hover">
           Authorize Board
         </button>
+        <p id="auth-error" class="hidden text-kaede-danger text-[11px] mt-2"></p>
       </div>
       <div id="auth-authorized" class="hidden">
         <div class="flex items-center justify-center size-10 rounded-full bg-kaede-success/20 text-kaede-success mb-3">
@@ -104,19 +86,41 @@
           .catch(function () {});
 
         document.getElementById('kaede-auth-btn').addEventListener('click', function () {
+          var apiKey = document.getElementById('auth-api-key').value.trim();
+          var token = document.getElementById('auth-token').value.trim();
+          var errEl = document.getElementById('auth-error');
+
+          if (!apiKey || !token) {
+            errEl.textContent = 'Both API Key and Token are required.';
+            errEl.classList.remove('hidden');
+            return;
+          }
+
+          errEl.classList.add('hidden');
+
           t.set('board', 'shared', 'auth', { connected: true, provider: 'kaede-mcp', version: '1.0.0' })
+            .then(function () {
+              return t.set('board', 'shared', 'trelloAuth', { key: apiKey, token: token });
+            })
             .then(function () {
               unauthSection.classList.add('hidden');
               authSection.classList.remove('hidden');
             })
             .catch(function (err) {
               console.error('[KAEDE] Auth failed:', err);
+              errEl.textContent = 'Failed to save: ' + err.message;
+              errEl.classList.remove('hidden');
             });
         });
 
         document.getElementById('kaede-deauth-btn').addEventListener('click', function () {
-          t.set('board', 'shared', 'auth', null)
+          Promise.all([
+            t.set('board', 'shared', 'auth', null),
+            t.set('board', 'shared', 'trelloAuth', null),
+          ])
             .then(function () {
+              document.getElementById('auth-api-key').value = '';
+              document.getElementById('auth-token').value = '';
               authSection.classList.add('hidden');
               unauthSection.classList.remove('hidden');
             })

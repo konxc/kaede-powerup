@@ -35,26 +35,128 @@
   <script>
     TrelloPowerUp.initialize({'card-buttons': function(t) { return []; }});
 
+    var ENV_LABEL_MAP = {
+      production:  { name: 'Production',  color: 'red' },
+      staging:     { name: 'Staging',     color: 'yellow' },
+      development: { name: 'Development', color: 'green' },
+    };
+
+    function getTrelloAuth(t) {
+      return t.get('board', 'shared', 'trelloAuth', null);
+    }
+
+    function syncLabelViaMCP(cardId, env, t) {
+      return getTrelloAuth(t).then(function(auth) {
+        if (!auth || !auth.key || !auth.token) return;
+
+        var qs = 'key=' + encodeURIComponent(auth.key) + '&token=' + encodeURIComponent(auth.token);
+        var base = 'https://api.trello.com/1';
+
+        function trelloApi(path, opts) {
+          var url = base + path + (path.indexOf('?') > -1 ? '&' : '?') + qs;
+          return fetch(url, {
+            method: opts.method || 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            body: opts.body ? JSON.stringify(opts.body) : undefined,
+          }).then(function(r) {
+            if (!r.ok) return r.text().then(function(txt) { throw new Error(txt.slice(0, 200)); });
+            return r.json();
+          });
+        }
+
+        // First get card details to see current labels
+        return trelloApi('/cards/' + cardId + '?fields=idBoard').then(function(card) {
+          // Get board labels to find/create env labels
+          return trelloApi('/boards/' + card.idBoard + '/labels?fields=id,name,color').then(function(labels) {
+            var targetLabel = labels.find(function(l) {
+              return l.name === env || l.color === ENV_LABEL_MAP[env].color;
+            });
+
+            function ensureLabel() {
+              if (targetLabel) return Promise.resolve(targetLabel);
+              var lbl = ENV_LABEL_MAP[env];
+              return trelloApi('/boards/' + card.idBoard + '/labels', {
+                method: 'POST',
+                body: { name: lbl.name, color: lbl.color },
+              }).then(function(newLabel) {
+                targetLabel = newLabel;
+                return newLabel;
+              });
+            }
+
+            return ensureLabel().then(function(label) {
+              // Remove other env labels
+              var otherEnvs = Object.keys(ENV_LABEL_MAP).filter(function(e) { return e !== env; });
+              var labelNameToRemove = {};
+              otherEnvs.forEach(function(e) {
+                var lbl = labels.find(function(l) { return l.name === ENV_LABEL_MAP[e].name; });
+                if (lbl) labelNameToRemove[lbl.id] = true;
+              });
+
+              var removePromises = Object.keys(labelNameToRemove).map(function(labelId) {
+                return trelloApi('/cards/' + cardId + '/idLabels/' + labelId, { method: 'DELETE' })
+                  .catch(function() { /* ignore if label not on card */ });
+              });
+
+              return Promise.all(removePromises).then(function() {
+                // Add target label
+                return trelloApi('/cards/' + cardId + '/idLabels', {
+                  method: 'POST',
+                  body: { value: label.id },
+                }).catch(function() { /* label may already exist */ });
+              });
+            });
+          });
+        });
+      });
+    }
+
     document.querySelectorAll('.env-option').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var env = this.getAttribute('data-env');
         var t = TrelloPowerUp.iframe();
+        var cardId = '';
 
-        t.set('card', 'shared', 'environment', env)
-          .then(function() {
-            // Update board-level env stats
-            return t.get('board', 'shared', 'envStats', {});
+        t.card('id')
+          .then(function(card) {
+            cardId = card.id;
+            // Read old env and board stats in parallel
+            return Promise.all([
+              t.get('card', 'shared', 'environment', null),
+              t.get('board', 'shared', 'envStats', {}),
+            ]);
           })
-          .then(function(stats) {
-            // Count cards per env (simplified: store last-set count)
+          .then(function(results) {
+            var oldEnv = results[0];
+            var stats = results[1];
+
+            if (oldEnv === env) {
+              t.closePopup();
+              return;
+            }
+
+            // Decrement old env count
+            if (oldEnv && stats[oldEnv] !== undefined) {
+              stats[oldEnv] = Math.max(0, stats[oldEnv] - 1);
+              if (stats[oldEnv] === 0) delete stats[oldEnv];
+            }
+
+            // Increment new env count
             stats[env] = (stats[env] || 0) + 1;
-            return t.set('board', 'shared', 'envStats', stats);
+
+            // Save card env + board stats + sync label in parallel
+            return Promise.all([
+              t.set('card', 'shared', 'environment', env),
+              t.set('board', 'shared', 'envStats', stats),
+              syncLabelViaMCP(cardId, env, t),
+            ]);
           })
           .then(function() {
             t.closePopup();
           })
           .catch(function(err) {
             console.error('[KAEDE] Failed to set environment:', err);
+            t.closePopup();
           });
       });
     });

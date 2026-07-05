@@ -121,10 +121,21 @@
     <script src="https://p.trellocdn.net/power-up.min.js"></script>
     <script>
       (function () {
-        var API_BASE = 'http://localhost:3456';
+        function detectApiBase(t) {
+          return t.get('board', 'shared', 'apiBase', null).then(function (stored) {
+            if (stored) return stored;
+            var host = window.location.hostname;
+            if (host === 'localhost' || host === '127.0.0.1') {
+              return 'http://localhost:3456';
+            }
+            return '/.netlify/functions/trello-proxy';
+          });
+        }
+
         var t = TrelloPowerUp.iframe();
         var cardId = '';
         var cardName = '';
+        var API_BASE = 'http://localhost:3456';
 
         var statusDot = document.getElementById('status-dot');
         var statusText = document.getElementById('status-text');
@@ -144,18 +155,6 @@
         var quickComment = document.getElementById('quick-comment');
         var quickArchive = document.getElementById('quick-archive');
 
-        t.card('id', 'name')
-          .then(function (card) {
-            if (card && card.id) {
-              cardId = card.id;
-              cardName = card.name || 'Untitled';
-              contextSection.classList.remove('hidden');
-              contextName.textContent = cardName;
-              contextId.textContent = cardId;
-            }
-          })
-          .catch(function () {});
-
         function showResult(data) {
           errorArea.classList.add('hidden');
           resultArea.classList.remove('hidden');
@@ -169,19 +168,22 @@
         }
 
         function checkConnection() {
-          fetch(API_BASE + '/api/health', { method: 'POST' })
-            .then(function (r) {
-              return r.json();
-            })
+          var isLocal = API_BASE.indexOf('localhost') > -1 || API_BASE.indexOf('127.0.0.1') > -1;
+          var url = isLocal ? API_BASE + '/api/health' : API_BASE;
+          fetch(url)
+            .then(function (r) { return r.json(); })
             .then(function (data) {
               statusSection.classList.remove('hidden');
               statusDot.className = 'size-2 rounded-full bg-kaede-success';
-              statusText.textContent = 'API Server connected (v' + data.version + ')';
+              statusText.textContent = 'API Server connected (v' + (data.version || '?') + ')';
             })
             .catch(function () {
               statusSection.classList.remove('hidden');
               statusDot.className = 'size-2 rounded-full bg-kaede-warning';
-              statusText.textContent = 'API Server not found. Run: bun scripts/kaede.mjs start';
+              var hint = isLocal
+                ? 'Run: bun scripts/kaede.mjs start'
+                : 'Set TRELLO_API_KEY + TRELLO_TOKEN in Netlify env';
+              statusText.textContent = 'API Server not found. ' + hint;
             });
         }
 
@@ -194,22 +196,16 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ intent: intent, args: args, boardId: '' }),
           })
-            .then(function (r) {
-              return r.json();
-            })
+            .then(function (r) { return r.json(); })
             .then(function (data) {
-              if (data.success) {
-                showResult(data.results);
-              } else {
-                showError(data.error || 'Unknown error');
-              }
+              if (data.success) showResult(data.results);
+              else showError(data.error || 'Unknown error');
             })
             .catch(function (err) {
-              showError(
-                'Connection failed: ' +
-                  err.message +
-                  '\n\nMake sure KAEDE API is running:\nbun scripts/kaede.mjs start',
-              );
+              var hint = window.location.hostname === 'localhost'
+                ? 'bun scripts/kaede.mjs start'
+                : 'deploy the trello-proxy Netlify function';
+              showError('Connection failed: ' + err.message + '\n\nMake sure API is running:\n' + hint);
             })
             .finally(function () {
               executeBtn.disabled = false;
@@ -217,29 +213,34 @@
             });
         }
 
+        // Init: resolve API_BASE then setup UI
+        detectApiBase(t).then(function (base) {
+          API_BASE = base;
+          checkConnection();
+        });
+
+        t.card('id', 'name').then(function (card) {
+          if (card && card.id) {
+            cardId = card.id;
+            cardName = card.name || 'Untitled';
+            contextSection.classList.remove('hidden');
+            contextName.textContent = cardName;
+            contextId.textContent = cardId;
+          }
+        }).catch(function () {});
+
         executeBtn.addEventListener('click', function () {
           var intent = intentInput.value.trim();
-          if (!intent) {
-            showError('Please enter an intent');
-            return;
-          }
+          if (!intent) { showError('Please enter an intent'); return; }
           var args = {};
-          try {
-            if (argsInput.value.trim()) args = JSON.parse(argsInput.value.trim());
-          } catch (e) {
-            showError('Invalid JSON in args: ' + e.message);
-            return;
-          }
+          try { if (argsInput.value.trim()) args = JSON.parse(argsInput.value.trim()); }
+          catch (e) { showError('Invalid JSON in args: ' + e.message); return; }
           executeMCP(intent, args);
         });
 
         quickCard.addEventListener('click', function () {
           intentInput.value = 'buat card';
-          argsInput.value = JSON.stringify(
-            { task: 'New Task', desc: 'Created from KAEDE Power-Up', list: 'To Do' },
-            null,
-            2,
-          );
+          argsInput.value = JSON.stringify({ task: 'New Task', desc: 'Created from KAEDE Power-Up', list: 'To Do' }, null, 2);
         });
 
         quickMove.addEventListener('click', function () {
@@ -248,24 +249,16 @@
         });
 
         quickComment.addEventListener('click', function () {
-          if (!cardId) {
-            showError('No card context available. Open this from a card.');
-            return;
-          }
+          if (!cardId) { showError('No card context. Open this from a card.'); return; }
           intentInput.value = 'komentar';
           argsInput.value = JSON.stringify({ cardId: cardId, text: 'Update from KAEDE Power-Up' }, null, 2);
         });
 
         quickArchive.addEventListener('click', function () {
-          if (!cardId) {
-            showError('No card context available. Open this from a card.');
-            return;
-          }
+          if (!cardId) { showError('No card context. Open this from a card.'); return; }
           intentInput.value = 'arsipkan';
           argsInput.value = JSON.stringify({ cardId: cardId }, null, 2);
         });
-
-        checkConnection();
       })();
     </script>
   </body>

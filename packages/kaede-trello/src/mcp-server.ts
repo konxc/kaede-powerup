@@ -77,12 +77,20 @@ function getAuth(): Auth | null {
     resolve(process.cwd(), 'secrets.env'),
   ];
   let merged: Record<string, string> = {};
-  for (const p of searchPaths) merged = { ...merged, ...loadEnv(p) };
+  for (const p of searchPaths) {
+    const exists = existsSync(p);
+    process.stderr.write(`[kaede-mcp] scan secrets path: ${p} (exists=${exists})\n`);
+    if (exists) merged = { ...merged, ...loadEnv(p) };
+  }
   merged = { ...merged, ...(process.env as Record<string, string>) };
 
   const key = merged.TRELLO_API_KEY;
   const token = merged.TRELLO_TOKEN;
-  if (!key || !token) return null;
+  if (!key || !token) {
+    process.stderr.write(`[kaede-mcp] getAuth FAILED — key=${!!key} token=${!!token}\n`);
+    return null;
+  }
+  process.stderr.write(`[kaede-mcp] getAuth OK — key=${key.slice(0, 4)}... token=${token.slice(0, 8)}...\n`);
   return { key, token, qs: `key=${key}&token=${token}` };
 }
 
@@ -189,17 +197,67 @@ async function handleToolsCall(name: string, args: Record<string, unknown>): Pro
   switch (name) {
     // â”€â”€â”€ Boards â”€â”€â”€
     case 'list_boards': {
-      const boards = (await trello('/members/me/boards?fields=name,id,url,closed&filter=open')) as Array<
+      const boards = (await trello('/members/me/boards?fields=name,id,url,closed,desc&filter=open')) as Array<
         Record<string, unknown>
       >;
+      let filtered = boards;
+      if (args.nameFilter) {
+        const q = (args.nameFilter as string).toLowerCase();
+        filtered = boards.filter(
+          (b: Record<string, unknown>) =>
+            ((b.name as string) || '').toLowerCase().includes(q) ||
+            ((b.desc as string) || '').toLowerCase().includes(q),
+        );
+      }
       return {
-        boards: boards.map((b: Record<string, unknown>) => ({
+        boards: filtered.map((b: Record<string, unknown>) => ({
           id: b.id as string,
           name: b.name as string,
           url: b.url as string,
           closed: b.closed as boolean,
+          desc: b.desc as string,
         })),
       };
+    }
+    case 'search_boards': {
+      const query = (args.query as string || '').toLowerCase();
+      const allBoards = (await trello('/members/me/boards?fields=name,id,url,closed,desc,dateLastActivity&filter=open')) as Array<Record<string, unknown>>;
+      const scored = allBoards
+        .map((b: Record<string, unknown>) => {
+          const name = (b.name as string) || '';
+          const desc = (b.desc as string) || '';
+          let score = 0;
+          if (name.toLowerCase().includes(query)) score += 3;
+          if (name.toLowerCase().startsWith(query)) score += 2;
+          if (desc.toLowerCase().includes(query)) score += 1;
+          if (query.split(/\s+/).every((w) => name.toLowerCase().includes(w))) score += 2;
+          return { id: b.id as string, name, url: b.url as string, closed: b.closed as boolean, desc, score };
+        })
+        .filter((b) => b.score > 0)
+        .sort((a, b) => b.score - a.score);
+      return { results: scored };
+    }
+    case 'search_cards': {
+      const query = (args.query as string) || '';
+      const boardId = (args.boardId as string) || '';
+      const limit = (args.limit as number) || 50;
+      if (!query) throw new Error('search_cards: query is required');
+      let endpoint = `/search?query=${encodeURIComponent(query)}&card_fields=name,id,desc,idList,idBoard,due,start,dateLastActivity,labels,closed&cards_limit=${limit}`;
+      if (boardId) endpoint += `&idBoards=${boardId}`;
+      const result = (await trello(endpoint)) as { cards?: Array<Record<string, unknown>> };
+      const cards = (result.cards || []).map((c) => ({
+        id: c.id,
+        name: c.name,
+        desc: c.desc,
+        listId: c.idList,
+        boardId: c.idBoard,
+        due: c.due,
+        start: c.start,
+        dateLastActivity: c.dateLastActivity,
+        labels: c.labels,
+        closed: c.closed,
+      }));
+      return { cards };
     }
     case 'list_workspaces': {
       const orgs = (await trello('/members/me/organizations?fields=name,id,displayName')) as Array<
@@ -798,6 +856,21 @@ async function handleToolsCall(name: string, args: Record<string, unknown>): Pro
       };
     }
 
+    // ─── Set Board Project ──
+    case 'set_board_project': {
+      const bid = resolveBoardId(args);
+      if (!bid) throw new Error('set_board_project: boardId is required (set TRELLO_DEFAULT_BOARD_ID or pass boardId)');
+      const projectName = args.projectName as string;
+      if (!projectName) throw new Error('projectName is required');
+      const existing = (await trello(`/boards/${bid}?fields=desc`)) as Record<string, unknown>;
+      const oldDesc = (existing.desc as string) || '';
+      const lines = oldDesc.split('\n').filter((l: string) => !l.startsWith('KAEDE_PROJECT='));
+      lines.push(`KAEDE_PROJECT=${projectName}`);
+      if (args.playbookPath) lines.push(`KAEDE_PLAYBOOK=${args.playbookPath as string}`);
+      const board = (await trelloPut(`/boards/${bid}`, { desc: lines.join('\n').trim() })) as Record<string, unknown>;
+      return { id: board.id as string, name: board.name as string, desc: board.desc as string };
+    }
+
     // ─── Sort List Cards ──
     case 'sort_list_cards': {
       const sortField =
@@ -852,7 +925,27 @@ async function handleToolsCall(name: string, args: Record<string, unknown>): Pro
 // â”€â”€â”€ Tool Definitions â”€â”€â”€
 
 const TOOLS: ToolDef[] = [
-  toolSchema('list_boards', 'List all Trello boards the user has access to'),
+  toolSchema('list_boards', 'List all Trello boards the user has access to', {
+    nameFilter: { type: 'string', description: 'Optional substring to filter boards by name or description (case-insensitive)' },
+  }),
+  toolSchema(
+    'search_boards',
+    'Search Trello boards by name or description with relevance scoring. Returns boards ordered by best match.',
+    {
+      query: { type: 'string', description: 'Search query (matches name and description)' },
+    },
+    ['query'],
+  ),
+  toolSchema(
+    'search_cards',
+    'Search Trello cards by text query across one or all boards. Uses Trello full-text search API.',
+    {
+      query: { type: 'string', description: 'Search query' },
+      boardId: { type: 'string', description: 'Scope search to a specific board (optional, searches all boards if empty)' },
+      limit: { type: 'number', description: 'Max results (default 50)' },
+    },
+    ['query'],
+  ),
   toolSchema('list_workspaces', 'List all Trello workspaces/organizations'),
   toolSchema(
     'create_board',
@@ -1233,16 +1326,27 @@ const TOOLS: ToolDef[] = [
     },
     ['listId'],
   ),
+  toolSchema(
+    'set_board_project',
+    'Set project metadata on a board (stored in board description). Useful for linking boards to playbook paths.',
+    {
+      boardId: { type: 'string', description: 'Board ID (uses default if not provided)' },
+      projectName: { type: 'string', description: 'Project name, e.g. "SMART Presensi"' },
+      playbookPath: { type: 'string', description: 'Optional path to playbook' },
+    },
+    ['projectName'],
+  ),
 ];
 
 // â”€â”€â”€ Main â”€â”€â”€
 
 const auth = getAuth();
 if (!auth) {
-  process.stderr.write('TRELLO_API_KEY or TRELLO_TOKEN not configured\n');
-  process.stderr.write('Run `bun scripts/kaede.ts setup` to configure\n');
+  process.stderr.write('[kaede-mcp] FATAL: TRELLO_API_KEY or TRELLO_TOKEN not configured\n');
+  process.stderr.write('[kaede-mcp] Run `bun scripts/kaede.ts setup` to configure, or set env vars\n');
   process.exit(1);
 }
+process.stderr.write(`[kaede-mcp] Server starting — ROOT=${ROOT}\n`);
 
 let buffer = '';
 const stdin = process.stdin;

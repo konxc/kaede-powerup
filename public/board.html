@@ -37,16 +37,21 @@
       </div>
     </div>
 
+    <div id="env-stats-section" class="mt-4 hidden">
+      <div class="text-[11px] font-semibold text-kaede-text uppercase tracking-wide mb-2">Card Environment Stats</div>
+      <div id="stats-container" class="flex flex-col gap-2"></div>
+    </div>
+
+    <div id="list-breakdown" class="mt-4 hidden">
+      <div class="text-[11px] font-semibold text-kaede-text uppercase tracking-wide mb-2">Per-List Breakdown</div>
+      <div id="list-container" class="flex flex-col gap-2"></div>
+    </div>
+
     <div class="mt-4 p-3 bg-kaede-bg rounded-md border border-kaede-border/50">
       <p class="text-[11px] text-kaede-muted leading-relaxed">
         Open any card → click <strong class="text-kaede-text">KAEDE: Environment</strong>
         to manage the card's environment. A badge will appear on the card face.
       </p>
-    </div>
-
-    <div id="env-stats" class="mt-4 hidden">
-      <div class="text-[11px] font-semibold text-kaede-text uppercase tracking-wide mb-2">Card Environment Stats</div>
-      <div id="stats-container" class="flex flex-col gap-2"></div>
     </div>
   </div>
 
@@ -58,34 +63,97 @@
   <script>
     (function () {
       var t = TrelloPowerUp.iframe();
+      var ENV_COLORS = {
+        production:  { bg: 'rgba(225,112,85,0.15)', text: 'text-kaede-danger',  dot: 'bg-red-500' },
+        staging:     { bg: 'rgba(253,203,110,0.15)', text: 'text-kaede-warning', dot: 'bg-yellow-500' },
+        development: { bg: 'rgba(0,184,148,0.15)',  text: 'text-kaede-success', dot: 'bg-green-500' },
+      };
 
-      // Try to read environment stats from shared storage (set by card.html on each update)
-      t.get('board', 'shared', 'envStats', {})
-        .then(function (stats) {
-          var container = document.getElementById('stats-container');
-          var section = document.getElementById('env-stats');
-          if (!container || !stats || Object.keys(stats).length === 0) return;
+      function loadEnvStats() {
+        // Try reading environment stats from shared storage (set by card.html)
+        t.get('board', 'shared', 'envStats', {})
+          .then(function (stats) {
+            var container = document.getElementById('stats-container');
+            var section = document.getElementById('env-stats-section');
+            if (!container || !stats || Object.keys(stats).length === 0) return;
 
-          var colors = {
-            production:  { bg: 'rgba(225,112,85,0.15)', text: 'text-kaede-danger' },
-            staging:     { bg: 'rgba(253,203,110,0.15)', text: 'text-kaede-warning' },
-            development: { bg: 'rgba(0,184,148,0.15)',  text: 'text-kaede-success' },
-          };
+            section.classList.remove('hidden');
+            container.innerHTML = '';
+            Object.keys(stats).sort().forEach(function (env) {
+              var c = ENV_COLORS[env] || { bg: 'rgba(159,160,178,0.15)', text: 'text-kaede-muted' };
+              var row = document.createElement('div');
+              row.className = 'flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md';
+              row.innerHTML =
+                '<span class="text-sm font-medium text-kaede-text capitalize">' + env + '</span>' +
+                '<span class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded" style="background:' + c.bg + '">' +
+                '<span class="' + c.text + '">' + stats[env] + ' card' + (stats[env] > 1 ? 's' : '') + '</span></span>';
+              container.appendChild(row);
+            });
+          })
+          .catch(function () {});
+      }
 
-          Object.keys(stats).forEach(function (env) {
-            var c = colors[env] || { bg: 'rgba(159,160,178,0.15)', text: 'text-kaede-muted' };
-            var row = document.createElement('div');
-            row.className = 'flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md';
-            row.innerHTML =
-              '<span class="text-sm font-medium text-kaede-text text-capitalize">' + env + '</span>' +
-              '<span class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded" style="background:' + c.bg + '">' +
-              '<span class="' + c.text + '">' + stats[env] + ' card' + (stats[env] > 1 ? 's' : '') + '</span></span>';
-            container.appendChild(row);
-          });
+      function loadListBreakdown() {
+        t.get('board', 'shared', 'trelloAuth', null).then(function (auth) {
+          if (!auth || !auth.key || !auth.token) return;
 
-          section.classList.remove('hidden');
-        })
-        .catch(function () { /* stats not available — show guide only */ });
+          var qs = 'key=' + encodeURIComponent(auth.key) + '&token=' + encodeURIComponent(auth.token);
+          var base = 'https://api.trello.com/1';
+          var boardId = t.getContext().board;
+
+          function api(path) {
+            return fetch(base + path + (path.indexOf('?') > -1 ? '&' : '?') + qs).then(function (r) {
+              if (!r.ok) throw new Error('API error');
+              return r.json();
+            });
+          }
+
+          api('/boards/' + boardId + '/lists?fields=name,id,closed').then(function (lists) {
+            var openLists = lists.filter(function (l) { return !l.closed; });
+            var cardPromises = openLists.map(function (list) {
+              return api('/lists/' + list.id + '/cards?fields=name,due,dueComplete,idMembers').then(function (cards) {
+                return { listName: list.name, cards: cards };
+              });
+            });
+
+            return Promise.all(cardPromises);
+          }).then(function (listsWithCards) {
+            var listSection = document.getElementById('list-breakdown');
+            var listContainer = document.getElementById('list-container');
+
+            var hasCards = listsWithCards.some(function (l) { return l.cards.length > 0; });
+            if (!hasCards) return;
+
+            listSection.classList.remove('hidden');
+            listContainer.innerHTML = '';
+
+            listsWithCards.forEach(function (ld) {
+              if (ld.cards.length === 0) return;
+
+              var overdue = ld.cards.filter(function (c) {
+                return c.due && !c.dueComplete && new Date(c.due) < new Date();
+              }).length;
+              var assigned = ld.cards.filter(function (c) {
+                return c.idMembers && c.idMembers.length > 0;
+              }).length;
+
+              var div = document.createElement('div');
+              div.className = 'flex items-center justify-between px-3 py-2 bg-kaede-bg rounded-md';
+              div.innerHTML =
+                '<div><span class="text-sm font-medium text-kaede-text">' + ld.listName +
+                '</span><span class="text-[10px] text-kaede-muted ml-2">' + ld.cards.length + ' cards</span></div>' +
+                '<div class="flex gap-1.5 text-[10px]">' +
+                (overdue > 0 ? '<span class="px-1.5 py-0.5 rounded bg-kaede-danger/15 text-kaede-danger">' + overdue + ' overdue</span>' : '') +
+                (assigned > 0 ? '<span class="px-1.5 py-0.5 rounded bg-kaede-primary/15 text-kaede-primary">' + assigned + ' assigned</span>' : '') +
+                '</div>';
+              listContainer.appendChild(div);
+            });
+          }).catch(function () {});
+        });
+      }
+
+      loadEnvStats();
+      loadListBreakdown();
     })();
   </script>
 </body>

@@ -3,12 +3,14 @@
  *
  * Menjalankan rencana multi-langkah (PlanStep[]), melacak referensi
  * antar langkah, dan menyediakan undo/rollback.
+ * Action executors terpisah di plan-executors/{domain}.ts.
  */
 
 import { TrelloMCPClient } from './trello-client';
 import { getErrorMessage } from './types';
 import type { ExecStepResult, ExecutedStep, ExecPlanResult, PlanStep, BoardSpec } from './types';
 import { addExecutionHistory, getLastExecutionHistory, removeLastExecutionHistory } from './history-store';
+import { EXECUTORS } from './plan-executors/index';
 
 async function executePlanStep(
   client: TrelloMCPClient,
@@ -18,130 +20,9 @@ async function executePlanStep(
   cache: { lists?: Array<Record<string, unknown>> },
 ): Promise<{ id?: string; name?: string; error?: string }> {
   const p = { ...params };
-
-  switch (action) {
-    case 'create_list': {
-      const r = await client.createList(boardId, p.name as string);
-      const rr = r as Record<string, unknown>;
-      return { id: rr.id as string, name: p.name as string };
-    }
-
-    case 'create_card': {
-      if (!cache.lists) cache.lists = (await client.getLists(boardId)) as Array<Record<string, unknown>>;
-      const listName = (p.listName as string) || (p.list as string) || '';
-      let listId = p.listId as string;
-      if (!listId && listName) {
-        const target = cache.lists.find(
-          (l: Record<string, unknown>) => (l.name as string).toLowerCase() === listName.toLowerCase(),
-        );
-        if (!target) return { error: `List "${listName}" not found on board ${boardId}` };
-        listId = target.id as string;
-      }
-      if (!listId) return { error: 'listId or listName required' };
-
-      const labels = (p.labels as string[]) || [];
-      const r = await client.createCard(listId, p.name as string, (p.desc as string) || '', labels);
-      const rr = r as Record<string, unknown>;
-
-      if (p.start || p.due) {
-        const updates: Record<string, unknown> = {};
-        if (p.start) updates.start = p.start;
-        if (p.due) updates.due = p.due;
-        try { await client.updateCard(rr.id as string, updates); } catch {}
-      }
-
-      return { id: rr.id as string, name: p.name as string };
-    }
-
-    case 'create_checklist': {
-      const cardId = p.cardId as string;
-      if (!cardId) return { error: 'cardId required for create_checklist' };
-      const name = (p.name as string) || 'Checklist';
-      const r = await client.createChecklist(cardId, name);
-      const rr = r as Record<string, unknown>;
-
-      const items = (p.items as string[]) || [];
-      for (const item of items) {
-        try { await client.addChecklistItem(rr.id as string, item); } catch {}
-      }
-      return { id: rr.id as string, name: name };
-    }
-
-    case 'add_comment': {
-      const cardId = p.cardId as string;
-      if (!cardId) return { error: 'cardId required for add_comment' };
-      await client.addComment(cardId, p.text as string);
-      return { id: cardId };
-    }
-
-    case 'create_label': {
-      const r = await client.createLabel(boardId, p.name as string, (p.color as string) || 'blue');
-      const rr = r as Record<string, unknown>;
-      return { id: rr.id as string, name: p.name as string };
-    }
-
-    case 'assign_member': {
-      await client.assignMember(p.cardId as string, p.memberId as string);
-      return { id: p.cardId as string };
-    }
-
-    case 'move_card': {
-      if (!cache.lists) cache.lists = (await client.getLists(boardId)) as Array<Record<string, unknown>>;
-      const listName = p.listName as string;
-      let listId = p.listId as string;
-      if (!listId && listName) {
-        const target = cache.lists.find(
-          (l: Record<string, unknown>) => (l.name as string).toLowerCase() === listName.toLowerCase(),
-        );
-        if (!target) return { error: `Target list "${listName}" not found` };
-        listId = target.id as string;
-      }
-
-      try {
-        const card = await client.getCard(p.cardId as string) as Record<string, unknown>;
-        if (card && card.listId) {
-          p._sourceListId = card.listId as string;
-        }
-      } catch {}
-
-      await client.moveCard(p.cardId as string, listId, boardId);
-      return { id: p.cardId as string };
-    }
-
-    case 'archive_card': {
-      await client.archiveCard(p.cardId as string);
-      return { id: p.cardId as string };
-    }
-
-    case 'update_card': {
-      const updates: Record<string, unknown> = {};
-      if (p.name) updates.name = p.name;
-      if (p.description || p.desc) updates.description = p.description || p.desc;
-      if (p.due) updates.due = p.due;
-      if (p.start) updates.start = p.start;
-      if (p.closed !== undefined) updates.closed = p.closed;
-      await client.updateCard(p.cardId as string, updates);
-      return { id: p.cardId as string };
-    }
-
-    case 'archive_list': {
-      await client.archiveList(p.listId as string);
-      return { id: p.listId as string };
-    }
-
-    case 'delete_checklist': {
-      await client.deleteChecklist(p.checklistId as string);
-      return { id: p.checklistId as string };
-    }
-
-    case 'remove_member': {
-      await client.removeMember(p.cardId as string, p.memberId as string);
-      return { id: p.cardId as string };
-    }
-
-    default:
-      return { error: `Unknown action: ${action}` };
-  }
+  const executor = EXECUTORS[action];
+  if (!executor) return { error: `Unknown action: ${action}` };
+  return executor(client, p, boardId, cache);
 }
 
 function resolveRefs(params: Record<string, unknown>, refMap: Map<string, { id: string; type: string }>): Record<string, unknown> {
@@ -249,13 +130,7 @@ export async function executePlan(
       const result = await executePlanStep(client, step.action, resolvedParams, boardId, boardCache.get(boardId)!);
       if (result.error) {
         steps.push({ ref: step.ref, action: step.action, success: false, error: result.error });
-        executedSteps.push({
-          action: step.action,
-          params: originalParams,
-          ref: step.ref,
-          success: false,
-          error: result.error,
-        });
+        executedSteps.push({ action: step.action, params: originalParams, ref: step.ref, success: false, error: result.error });
       } else {
         if (step.ref && result.id) {
           refMap.set(step.ref, { id: result.id, type: step.action });
@@ -263,13 +138,7 @@ export async function executePlan(
         const stepResult: ExecStepResult = { ref: step.ref, action: step.action, success: true, resultId: result.id, resultName: result.name };
         steps.push(stepResult);
 
-        const executedStep: ExecutedStep = {
-          action: step.action,
-          params: originalParams,
-          ref: step.ref,
-          success: true,
-          resultId: result.id,
-        };
+        const executedStep: ExecutedStep = { action: step.action, params: originalParams, ref: step.ref, success: true, resultId: result.id };
 
         const inverse = buildInverseStep(stepResult, step.action, { ...originalParams, _sourceListId: resolvedParams._sourceListId });
         if (inverse) {
@@ -281,13 +150,7 @@ export async function executePlan(
       }
     } catch (err: unknown) {
       steps.push({ ref: step.ref, action: step.action, success: false, error: getErrorMessage(err) });
-      executedSteps.push({
-        action: step.action,
-        params: originalParams,
-        ref: step.ref,
-        success: false,
-        error: getErrorMessage(err),
-      });
+      executedSteps.push({ action: step.action, params: originalParams, ref: step.ref, success: false, error: getErrorMessage(err) });
     }
   }
 
@@ -299,14 +162,7 @@ export async function executePlan(
 
   addExecutionHistory({ steps: executedSteps, boardIds: boardIdsUsed });
 
-  return {
-    success: failed === 0,
-    steps,
-    refMap: refMapObj,
-    totalSteps: plan.length,
-    succeeded,
-    failed,
-  };
+  return { success: failed === 0, steps, refMap: refMapObj, totalSteps: plan.length, succeeded, failed };
 }
 
 export async function undoLastPlan(client: TrelloMCPClient): Promise<{
@@ -336,9 +192,5 @@ export async function undoLastPlan(client: TrelloMCPClient): Promise<{
 
   removeLastExecutionHistory();
 
-  return {
-    success: errors.length === 0,
-    undoneSteps,
-    errors,
-  };
+  return { success: errors.length === 0, undoneSteps, errors };
 }
