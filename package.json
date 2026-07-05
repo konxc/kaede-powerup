@@ -22,12 +22,12 @@
     "kaede:today": "bun scripts/kaede.ts today",
     "kaede:status": "bun scripts/kaede.ts status",
     "kaede:env": "bun scripts/kaede.ts env",
-    "test": "bun test test/*.test.js",
+    "test": "bun scripts/run-tests.ts",
     "test:orchestrator": "bun test test/orchestrator.test.js",
     "test:trello": "bun test test/trello-client.test.js",
     "test:e2e": "bun test test/e2e-orchestrator.test.js",
     "test:mcp": "bun test test/mcp-server.test.js",
-    "test:all": "bun test test/*.test.js"
+    "test:all": "bun scripts/run-tests.ts"
   },
   "bin": {
     "kaede": "./scripts/kaede.ts"

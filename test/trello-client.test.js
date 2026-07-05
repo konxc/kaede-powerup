@@ -34,11 +34,11 @@ let clients = [];
 
 after(() => {
   for (const c of clients) {
-    if (c && c.pending) {
-      for (const [, entry] of c.pending) clearTimeout(entry.timer);
-      c.pending.clear();
+    if (c && c.rpc && c.rpc.pending) {
+      for (const [, entry] of c.rpc.pending) clearTimeout(entry.timer);
+      c.rpc.pending.clear();
     }
-    if (c && c.process) c.process.removeAllListeners();
+    if (c && c.rpc && c.rpc.process) c.rpc.process.removeAllListeners();
     if (c) c.close();
   }
   clients = [];
@@ -47,34 +47,34 @@ after(() => {
 describe('TrelloMCPClient', () => {
   it('constructor sets default server path', () => {
     const client = new TrelloMCPClient();
-    assert.ok(client.serverPath.includes('mcp-server'));
-    assert.equal(client.rpcId, 0);
-    assert.ok(client.pending instanceof Map);
+    assert.ok(client.rpc.serverPath.includes('mcp-server'));
+    assert.equal(client.rpc.rpcId, 0);
+    assert.ok(client.rpc.pending instanceof Map);
   });
 
   it('constructor accepts custom server path', () => {
     const client = new TrelloMCPClient('/custom/path.js');
-    assert.equal(client.serverPath, '/custom/path.js');
+    assert.equal(client.rpc.serverPath, '/custom/path.js');
   });
 
   it('constructor accepts custom timeout', () => {
     const client = new TrelloMCPClient(undefined, 5000);
-    assert.equal(client.requestTimeout, 5000);
+    assert.equal(client.rpc.requestTimeout, 5000);
   });
 
   it('sendRequest increments rpcId and creates pending entry', async () => {
     const client = new FastClient();
     clients.push(client);
-    client.process = createMockProcess();
-    client.pending = new Map();
+    client.rpc.process = createMockProcess();
+    client.rpc.pending = new Map();
 
-    const origId = client.rpcId;
+    const origId = client.rpc.rpcId;
     const promise = client.sendRequest('test_method', { foo: 'bar' });
 
-    assert.equal(client.rpcId, origId + 1);
-    assert.equal(client.pending.size, 1);
+    assert.equal(client.rpc.rpcId, origId + 1);
+    assert.equal(client.rpc.pending.size, 1);
 
-    const [, entry] = client.pending.entries().next().value;
+    const [, entry] = client.rpc.pending.entries().next().value;
     clearTimeout(entry.timer);
     entry.reject(new Error('cleanup'));
     await promise.catch(() => {});
@@ -83,20 +83,20 @@ describe('TrelloMCPClient', () => {
   it('sendRequest timer rejects on timeout', async () => {
     const client = new FastClient();
     clients.push(client);
-    client.process = createMockProcess();
-    client.pending = new Map();
+    client.rpc.process = createMockProcess();
+    client.rpc.pending = new Map();
 
     const promise = client.sendRequest('timeout_test', {});
     await assert.rejects(promise, /RPC timeout/);
-    assert.equal(client.pending.size, 0);
+    assert.equal(client.rpc.pending.size, 0);
   });
 
   it('close kills process and readline', () => {
     const client = new FastClient();
     const proc = createMockProcess();
-    client.process = proc;
+    client.rpc.process = proc;
     const rlClose = createMockFn();
-    client.rl = { close: rlClose };
+    client.rpc.rl = { close: rlClose };
 
     client.close();
 
@@ -112,23 +112,22 @@ describe('TrelloMCPClient', () => {
   it('rejects pending requests on process exit', async () => {
     const client = new FastClient();
     const proc = createMockProcess();
-    client.process = proc;
-    client.pending = new Map();
+    client.rpc.process = proc;
+    client.rpc.pending = new Map();
 
     proc.on('exit', (code) => {
-      client._exited = true;
-      if (client.pending.size > 0) {
-        for (const [, entry] of client.pending) {
+      if (client.rpc.pending.size > 0) {
+        for (const [, entry] of client.rpc.pending) {
           clearTimeout(entry.timer);
           entry.reject(new Error(`MCP server exited with code ${code}`));
         }
-        client.pending.clear();
+        client.rpc.pending.clear();
       }
     });
 
     const promise = new Promise((resolve, reject) => {
       const timer = setTimeout(() => {}, 99999);
-      client.pending.set(1, { resolve, reject, timer });
+      client.rpc.pending.set(1, { resolve, reject, timer });
     });
 
     proc.emit('exit', 1);
@@ -138,7 +137,7 @@ describe('TrelloMCPClient', () => {
       throw new Error('Should have rejected');
     } catch (err) {
       assert.equal(err.message, 'MCP server exited with code 1');
-      assert.equal(client.pending.size, 0);
+      assert.equal(client.rpc.pending.size, 0);
     }
   });
 
@@ -146,21 +145,21 @@ describe('TrelloMCPClient', () => {
     const client = new FastClient();
     clients.push(client);
     const proc = createMockProcess();
-    client.process = proc;
-    client.rl = { close: createMockFn() };
+    client.rpc.process = proc;
+    client.rpc.rl = { close: createMockFn() };
 
     const resultPromise = new Promise((resolve, reject) => {
       const timer = setTimeout(() => {}, 99999);
-      client.pending.set(42, { resolve, reject, timer });
+      client.rpc.pending.set(42, { resolve, reject, timer });
     });
 
     const line = JSON.stringify({ id: 42, result: { boards: [{ id: 'b1' }] } });
     try {
       const msg = JSON.parse(line);
-      if (msg.id !== undefined && client.pending.has(msg.id)) {
-        const { resolve: res, reject: rej, timer } = client.pending.get(msg.id);
+      if (msg.id !== undefined && client.rpc.pending.has(msg.id)) {
+        const { resolve: res, reject: rej, timer } = client.rpc.pending.get(msg.id);
         clearTimeout(timer);
-        client.pending.delete(msg.id);
+        client.rpc.pending.delete(msg.id);
         res(msg.result);
       }
     } catch {
@@ -175,21 +174,21 @@ describe('TrelloMCPClient', () => {
     const client = new FastClient();
     clients.push(client);
     const proc = createMockProcess();
-    client.process = proc;
-    client.rl = { close: createMockFn() };
+    client.rpc.process = proc;
+    client.rpc.rl = { close: createMockFn() };
 
     const errPromise = new Promise((resolve) => {
       const timer = setTimeout(() => {}, 99999);
-      client.pending.set(7, { resolve: () => {}, reject: resolve, timer });
+      client.rpc.pending.set(7, { resolve: () => {}, reject: resolve, timer });
     });
 
     const line = JSON.stringify({ id: 7, error: { message: 'Not found' } });
     try {
       const msg = JSON.parse(line);
-      if (msg.id !== undefined && client.pending.has(msg.id)) {
-        const { resolve: res, reject: rej, timer } = client.pending.get(msg.id);
+      if (msg.id !== undefined && client.rpc.pending.has(msg.id)) {
+        const { resolve: res, reject: rej, timer } = client.rpc.pending.get(msg.id);
         clearTimeout(timer);
-        client.pending.delete(msg.id);
+        client.rpc.pending.delete(msg.id);
         rej(new Error(msg.error.message));
       }
     } catch {
@@ -202,7 +201,7 @@ describe('TrelloMCPClient', () => {
 
   it('callTool parses text content to JSON', async () => {
     const client = new FastClient();
-    client.sendRequest = async () => ({
+    client.rpc.sendRequest = async () => ({
       content: [{ type: 'text', text: JSON.stringify({ boards: [{ id: 'b1' }] }) }],
     });
     const result = await client.callTool('list_boards', {});
@@ -211,7 +210,7 @@ describe('TrelloMCPClient', () => {
 
   it('callTool returns raw result for non-text content', async () => {
     const client = new FastClient();
-    client.sendRequest = async () => ({
+    client.rpc.sendRequest = async () => ({
       content: [{ type: 'image', data: 'base64...' }],
     });
     const result = await client.callTool('get_card', { cardId: 'c1' });
@@ -220,7 +219,7 @@ describe('TrelloMCPClient', () => {
 
   it('listBoards delegates to callTool', async () => {
     const client = new FastClient();
-    client.callTool = async () => ({ boards: [{ id: 'b1', name: 'Board 1' }] });
+    client.rpc.sendRequest = async () => ({ boards: [{ id: 'b1', name: 'Board 1' }] });
     const boards = await client.listBoards();
     assert.equal(boards.length, 1);
     assert.equal(boards[0].name, 'Board 1');
@@ -228,7 +227,7 @@ describe('TrelloMCPClient', () => {
 
   it('getLists delegates to callTool', async () => {
     const client = new FastClient();
-    client.callTool = async () => ({ lists: [{ id: 'l1', name: 'To Do' }] });
+    client.rpc.sendRequest = async () => ({ lists: [{ id: 'l1', name: 'To Do' }] });
     const lists = await client.getLists('b1');
     assert.equal(lists.length, 1);
     assert.equal(lists[0].name, 'To Do');
@@ -236,21 +235,21 @@ describe('TrelloMCPClient', () => {
 
   it('listWorkspaces delegates to callTool', async () => {
     const client = new FastClient();
-    client.callTool = async () => ({ workspaces: [{ id: 'w1' }] });
+    client.rpc.sendRequest = async () => ({ workspaces: [{ id: 'w1' }] });
     const ws = await client.listWorkspaces();
     assert.equal(ws.length, 1);
   });
 
   it('getBoardMembers delegates to callTool', async () => {
     const client = new FastClient();
-    client.callTool = async () => ({ members: [{ id: 'm1' }] });
+    client.rpc.sendRequest = async () => ({ members: [{ id: 'm1' }] });
     const m = await client.getBoardMembers('b1');
     assert.equal(m.length, 1);
   });
 
   it('getMyCards delegates to callTool', async () => {
     const client = new FastClient();
-    client.callTool = async () => ({ cards: [{ id: 'c1' }] });
+    client.rpc.sendRequest = async () => ({ cards: [{ id: 'c1' }] });
     const c = await client.getMyCards();
     assert.equal(c.length, 1);
   });

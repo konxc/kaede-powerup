@@ -89,16 +89,22 @@ describe('kaede-mcp-server (via stdio RPC)', () => {
     const names = tools.map((t) => t.name).sort();
     assert.deepEqual(names, [
       'archive_duplicates',
+      'batch_update_cards',
       'bundle_context',
+      'clear_execution_history',
       'detect_duplicates',
       'execute_plan',
       'find_card',
       'generate_plan',
+      'generate_sprint_report',
       'generate_template',
+      'get_execution_history',
+      'load_templates',
       'parse_playbook',
       'resolve_board',
       'resolve_context',
       'status',
+      'undo_last_plan',
       'validate_context',
     ]);
   });
