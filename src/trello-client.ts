@@ -11,6 +11,7 @@ import { resolve } from 'path';
 import { readFileSync, existsSync } from 'fs';
 import { homedir } from 'os';
 import { createInterface } from 'readline';
+import type { ITrelloMCPClient } from './trello-client.interface';
 
 const REQUEST_TIMEOUT = 15000;
 const MAX_RETRIES = 3;
@@ -58,7 +59,7 @@ function getGlobalMcpServerPath(): string {
   return resolve(process.cwd(), 'dist', 'mcp-server.js');
 }
 
-export class TrelloMCPClient {
+export class TrelloMCPClient implements ITrelloMCPClient {
   serverPath: string;
   rpcId: number;
   pending: Map<number, PendingEntry>;

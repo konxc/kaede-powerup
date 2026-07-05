@@ -5,593 +5,23 @@
  * serangkaian tindakan Trello berdasarkan intent pengguna.
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { resolve } from 'path';
 import { TrelloMCPClient } from './trello-client';
-import { getErrorMessage } from './types';
+import type { BatchCard, TemplateVars, PlaybookResult, BoardSpec, CardItem, BoardSnapshot, PlanStep, IntentResult } from './types';
+import { generateCardFromTemplate, getTemplate } from './templates';
+import { inferFromGoal, resolveList } from './prompter';
 
-// ── Type Definitions ──
-
-export interface PlaybookConventions {
-  titlePrefixes: string[];
-  descriptionTemplate: string;
-  labels: Array<{ color: string; meaning: string }>;
-}
-
-export interface PlaybookResult {
-  title: string;
-  roles: Array<{
-    name: string;
-    responsibilities: string[];
-    access: string;
-    aiInstructions: string;
-  }>;
-  workflow: { lists: string[] };
-  conventions: PlaybookConventions;
-}
-
-interface IntentHandler {
-  patterns: string[];
-  fn: (
-    client: TrelloMCPClient,
-    pb: PlaybookResult,
-    boardId: string,
-    args?: Record<string, unknown>,
-  ) => Promise<unknown[]>;
-}
+// Re-exports from extracted modules (preserve API surface for consumers like kaede-mcp-server.ts)
+export { findCard, detectDuplicates, validateContext, archiveDuplicates } from './duplicate-detector';
+export { getExecutionHistory, clearExecutionHistory } from './history-store';
+export { parsePlaybook, bundleContext } from './playbook-parser';
+export { generateSprintReport } from './report-generator';
+export { batchUpdateCards } from './batch-updater';
+export { executeIntent } from './intent-handlers';
+export { executePlan, undoLastPlan } from './plan-executor';
 
 interface PlanHandler {
   patterns: string[];
-  fn: (pb: PlaybookResult, args: Record<string, unknown>) => Array<Record<string, unknown>>;
-}
-
-export interface IntentResult {
-  success: boolean;
-  type: string;
-  name: string;
-  error?: string;
-  result?: unknown;
-  detail?: unknown;
-}
-
-export interface BundlePaths {
-  playbook?: string;
-  openkb?: string;
-  opencode?: string;
-}
-
-export interface BundleContextResult {
-  playbook: PlaybookResult | null;
-  openkb: { glossary: string[]; decisions: string[] };
-  opencode: Record<string, unknown> | null;
-}
-
-// ── Section Map ──
-
-const SECTION_MAP: Record<string, string[]> = {
-  roles: ['peran', 'role', 'roles & responsibilities', 'team roles', 'roles', 'siapa saja'],
-  workflow: ['alur', 'workflow', 'sprint workflow', 'kanban', 'sprint'],
-  conventions: ['konvensi', 'nama', 'naming', 'standards', 'aturan', 'conventions', 'convention'],
-};
-
-function mapSection(title: string): string | null {
-  const lower = title.toLowerCase();
-  for (const [key, keywords] of Object.entries(SECTION_MAP)) {
-    if (keywords.some((k) => lower.includes(k))) return key;
-  }
-  return null;
-}
-
-// ── Parse Playbook ──
-
-export function parsePlaybook(content: string): PlaybookResult {
-  const lines = content.split('\n');
-  const result: PlaybookResult = {
-    title: '',
-    roles: [],
-    workflow: { lists: [] },
-    conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
-  };
-
-  let currentSection: string | null = null;
-  let currentRole: PlaybookResult['roles'][0] | null = null;
-  let inCodeBlock = false;
-
-  for (const raw of lines) {
-    const line = raw.trimEnd();
-
-    if (line.startsWith('```')) {
-      inCodeBlock = !inCodeBlock;
-      continue;
-    }
-    if (inCodeBlock) continue;
-
-    const h1 = line.match(/^#\s+(.+)/);
-    const h2 = line.match(/^##\s+(.+)/);
-    const h3 = line.match(/^###\s+(.+)/);
-    const listItem = line.match(/^[-*]\s+\*\*(.+?)\*\*:\s*(.*)/);
-
-    if (h1 && !result.title) {
-      result.title = h1[1].trim();
-      continue;
-    }
-
-    if (h2) {
-      currentSection = mapSection(h2[1]);
-      continue;
-    }
-
-    if (currentSection === 'roles' && h3) {
-      if (currentRole) result.roles.push(currentRole);
-      const roleName = h3[1].replace(/Peran:\s*/i, '').trim();
-      currentRole = { name: roleName, responsibilities: [], access: '', aiInstructions: '' };
-      continue;
-    }
-
-    if (currentRole && listItem) {
-      const key = listItem[1].toLowerCase();
-      const value = listItem[2].trim();
-      if (key.includes('tanggung')) {
-        currentRole.responsibilities.push(value);
-      } else if (key.includes('akses')) {
-        currentRole.access = value;
-      } else if (key.includes('ai')) {
-        currentRole.aiInstructions = value;
-      }
-    }
-
-    if (currentSection === 'workflow') {
-      const wfListLine = line.match(/^[-*\d]+\.?\s+\*\*(.+?)\*\*/);
-      if (wfListLine) {
-        const listName = wfListLine[1].trim();
-        if (listName && !result.workflow.lists.includes(listName)) {
-          result.workflow.lists.push(listName);
-        }
-      }
-    }
-
-    if (currentSection === 'conventions') {
-      const prefixMatch = line.match(/`(feat|fix|docs|chore|refactor|test):/g);
-      if (prefixMatch) {
-        for (const p of prefixMatch) {
-          const cleaned = p.replace(/`/g, '');
-          if (!result.conventions.titlePrefixes.includes(cleaned)) {
-            result.conventions.titlePrefixes.push(cleaned);
-          }
-        }
-      }
-      const labelColorMatch = line.match(/\*{0,2}(merah|kuning|hijau|red|yellow|green)\*{0,2}\s*:\s*(.+)/i);
-      if (labelColorMatch) {
-        result.conventions.labels.push({ color: labelColorMatch[1], meaning: labelColorMatch[2].trim() });
-      }
-    }
-  }
-
-  if (currentRole) result.roles.push(currentRole);
-  return result;
-}
-
-// ── Intent Handlers ──
-
-const intentHandlers: IntentHandler[] = [];
-
-function onIntent(patterns: string[], fn: IntentHandler['fn']): void {
-  intentHandlers.push({ patterns: patterns.map((p) => p.toLowerCase()), fn });
-}
-
-onIntent(['mulai sprint', 'setup sprint'], async (client, pb, boardId) => {
-  const results: IntentResult[] = [];
-  for (const listName of pb.workflow.lists) {
-    try {
-      const r = await client.createList(boardId, listName);
-      results.push({ success: true, type: 'create_list', name: listName, result: r });
-    } catch (err) {
-      results.push({ success: false, type: 'create_list', name: listName, error: getErrorMessage(err) });
-    }
-  }
-  return results;
-});
-
-onIntent(['buat card', 'buat kartu', 'create card', 'tambah task', 'new task'], async (client, pb, boardId, args) => {
-  const name = (args?.task as string) || (args?.name as string) || 'New Task';
-  const desc = (args?.desc as string) || (args?.description as string) || '';
-  const listName = (args?.list as string) || pb.workflow.lists[0];
-  const listId = (args?.listId as string) || '';
-
-  if (listId) {
-    try {
-      const r = await client.createCard(listId, name, desc);
-      return [{ success: true, type: 'create_card', name: (r as Record<string, unknown>).name as string }];
-    } catch (err) {
-      return [{ success: false, type: 'create_card', name, error: getErrorMessage(err) }];
-    }
-  }
-
-  const lists = (await client.getLists(boardId)) as Array<Record<string, unknown>>;
-  const target = lists.find((l) => (l.name as string).toLowerCase() === (listName || '').toLowerCase());
-  if (!target) {
-    return [{ success: false, type: 'create_card', name, error: `List "${listName}" not found` }];
-  }
-  try {
-    const r = await client.createCard(target.id as string, name, desc);
-    return [{ success: true, type: 'create_card', name: (r as Record<string, unknown>).name as string }];
-  } catch (err) {
-    return [{ success: false, type: 'create_card', name, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['assign', 'tugaskan', 'tambahkan anggota'], async (client, _pb, _boardId, args) => {
-  const memberId = (args?.memberId as string) || (args?.member as string) || '';
-  const cardId = (args?.cardId as string) || (args?.card as string) || '';
-
-  if (!memberId || !cardId) {
-    return [{ success: false, type: 'assign_member', name: 'missing args', error: 'memberId and cardId required' }];
-  }
-  try {
-    await client.assignMember(cardId, memberId);
-    return [{ success: true, type: 'assign_member', name: `Member ${memberId} → Card ${cardId}` }];
-  } catch (err) {
-    return [{ success: false, type: 'assign_member', name: `${memberId} → ${cardId}`, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['tutup sprint', 'close sprint', 'archive sprint'], async (client, _pb, boardId) => {
-  const results: IntentResult[] = [];
-  const lists = (await client.getLists(boardId)) as Array<Record<string, unknown>>;
-  const toArchive = lists.filter((l) =>
-    ['done', 'selesai', 'qa', 'code review', 'qa/code review'].some((k) =>
-      (l.name as string).toLowerCase().includes(k),
-    ),
-  );
-  for (const list of toArchive) {
-    try {
-      const cards = (await client.callTool('get_cards_by_list_id', { listId: list.id })) as {
-        cards?: Array<Record<string, unknown>>;
-      };
-      for (const card of cards.cards || []) {
-        try {
-          await client.callTool('archive_card', { cardId: card.id });
-          results.push({ success: true, type: 'archive_card', name: card.name as string });
-        } catch (err) {
-          results.push({
-            success: false,
-            type: 'archive_card',
-            name: card.name as string,
-            error: getErrorMessage(err),
-          });
-        }
-      }
-    } catch (err) {
-      results.push({ success: false, type: 'get_cards', name: list.name as string, error: getErrorMessage(err) });
-    }
-  }
-  return results;
-});
-
-onIntent(['pindah semua', 'move all', 'pindahkan semua'], async (client, _pb, boardId, args) => {
-  const fromListName = (args?.dari as string) || (args?.from as string) || (args?.listName as string) || '';
-  const toListName = (args?.ke as string) || (args?.to as string) || (args?.listNameTarget as string) || '';
-
-  if (!fromListName || !toListName) {
-    return [{ success: false, type: 'move_all_cards', name: 'missing args', error: 'from and to list names required' }];
-  }
-
-  try {
-    const lists = (await client.getLists(boardId)) as Array<Record<string, unknown>>;
-    const fromList = lists.find((l) => (l.name as string).toLowerCase().includes(fromListName.toLowerCase()));
-    const toList = lists.find((l) => (l.name as string).toLowerCase().includes(toListName.toLowerCase()));
-    if (!fromList)
-      return [
-        { success: false, type: 'move_all_cards', name: fromListName, error: `List "${fromListName}" not found` },
-      ];
-    if (!toList)
-      return [{ success: false, type: 'move_all_cards', name: toListName, error: `List "${toListName}" not found` }];
-
-    const cards = (await client.getCardsByListId(fromList.id as string, boardId)) as Array<Record<string, unknown>>;
-    const results: IntentResult[] = [];
-    for (const card of cards) {
-      try {
-        await client.callTool('move_card', { cardId: card.id, listId: toList.id });
-        results.push({ success: true, type: 'move_card', name: card.name as string });
-      } catch (err) {
-        results.push({ success: false, type: 'move_card', name: card.name as string, error: getErrorMessage(err) });
-      }
-    }
-    return results;
-  } catch (err) {
-    return [{ success: false, type: 'move_all_cards', name: fromListName, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['pindah', 'move card', 'pindahkan'], async (client, _pb, boardId, args) => {
-  const cardId = (args?.cardId as string) || (args?.card as string) || '';
-  const listId = (args?.listId as string) || (args?.list as string) || '';
-  const listName = (args?.listName as string) || '';
-
-  if (!cardId || (!listId && !listName)) {
-    return [{ success: false, type: 'move_card', name: 'missing args', error: 'cardId and listId/listName required' }];
-  }
-
-  let targetListId = listId;
-  if (!targetListId && listName) {
-    const lists = (await client.getLists(boardId)) as Array<Record<string, unknown>>;
-    const target = lists.find((l) => (l.name as string).toLowerCase() === listName.toLowerCase());
-    if (!target) return [{ success: false, type: 'move_card', name: cardId, error: `List "${listName}" not found` }];
-    targetListId = target.id as string;
-  }
-
-  try {
-    await client.callTool('move_card', { cardId, listId: targetListId });
-    return [{ success: true, type: 'move_card', name: `Card ${cardId} → List ${targetListId}` }];
-  } catch (err) {
-    return [{ success: false, type: 'move_card', name: cardId, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['komentar', 'comment', 'tambah komentar'], async (client, _pb, _boardId, args) => {
-  const cardId = (args?.cardId as string) || (args?.card as string) || '';
-  const text = (args?.text as string) || (args?.comment as string) || '';
-
-  if (!cardId || !text) {
-    return [{ success: false, type: 'add_comment', name: 'missing args', error: 'cardId and text required' }];
-  }
-  try {
-    await client.callTool('add_comment', { cardId, text });
-    return [{ success: true, type: 'add_comment', name: `Comment on ${cardId}` }];
-  } catch (err) {
-    return [{ success: false, type: 'add_comment', name: cardId, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['buat label', 'create label', 'tambah label baru'], async (client, _pb, boardId, args) => {
-  const colorName = (args?.color as string) || (args?.warna as string) || '';
-  const labelName = (args?.name as string) || (args?.nama as string) || '';
-  let targetColor = colorName.toLowerCase();
-
-  const colorMap: Record<string, string> = {
-    merah: 'red',
-    kuning: 'yellow',
-    hijau: 'green',
-    biru: 'blue',
-    orange: 'orange',
-    ungu: 'purple',
-    pink: 'pink',
-    abu: 'gray',
-    red: 'red',
-    yellow: 'yellow',
-    green: 'green',
-    blue: 'blue',
-    purple: 'purple',
-    gray: 'gray',
-  };
-  targetColor = colorMap[targetColor] || targetColor;
-
-  const validColors = ['red', 'yellow', 'green', 'blue', 'orange', 'purple', 'pink', 'gray'];
-  if (!targetColor || !validColors.includes(targetColor)) {
-    return [
-      {
-        success: false,
-        type: 'create_label',
-        name: labelName || '(no name)',
-        error: `Invalid color "${colorName}". Gunakan: merah/kuning/hijau/biru/orange/ungu/pink/abu`,
-      },
-    ];
-  }
-
-  const displayName = labelName || targetColor;
-  try {
-    const r = await client.createLabel(boardId, displayName, targetColor);
-    return [{ success: true, type: 'create_label', name: displayName, result: r }];
-  } catch (err) {
-    return [{ success: false, type: 'create_label', name: displayName, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['arsip list', 'archive list', 'hapus list'], async (client, _pb, boardId, args) => {
-  const listName = (args?.nama as string) || (args?.name as string) || '';
-  const listId = (args?.listId as string) || '';
-
-  if (!listId && !listName) {
-    return [{ success: false, type: 'archive_list', name: 'missing args', error: 'listId or name required' }];
-  }
-
-  let targetListId = listId;
-  if (!targetListId && listName) {
-    const lists = (await client.getLists(boardId)) as Array<Record<string, unknown>>;
-    const target = lists.find((l) => (l.name as string).toLowerCase() === listName.toLowerCase());
-    if (!target)
-      return [{ success: false, type: 'archive_list', name: listName, error: `List "${listName}" not found` }];
-    targetListId = target.id as string;
-  }
-
-  try {
-    await client.archiveList(targetListId);
-    return [{ success: true, type: 'archive_list', name: `List ${listName || targetListId} archived` }];
-  } catch (err) {
-    return [{ success: false, type: 'archive_list', name: listName, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['arsipkan', 'archive card', 'hapus card', 'delete card'], async (client, _pb, _boardId, args) => {
-  const cardId = (args?.cardId as string) || (args?.card as string) || '';
-  if (!cardId) {
-    return [{ success: false, type: 'archive_card', name: 'missing args', error: 'cardId required' }];
-  }
-  try {
-    await client.archiveCard(cardId);
-    return [{ success: true, type: 'archive_card', name: `Archived ${cardId}` }];
-  } catch (err) {
-    return [{ success: false, type: 'archive_card', name: cardId, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['update card', 'ubah kartu', 'edit card', 'update kartu'], async (client, _pb, _boardId, args) => {
-  const cardId = (args?.cardId as string) || (args?.card as string) || '';
-  if (!cardId) {
-    return [{ success: false, type: 'update_card', name: 'missing args', error: 'cardId required' }];
-  }
-
-  const updates: Record<string, unknown> = {};
-  if (args?.name) updates.name = args.name;
-  if (args?.description || args?.desc) updates.description = args.description || args.desc;
-  if (args?.dueDate) updates.dueDate = args.dueDate;
-  if (args?.start) updates.start = args.start;
-  if (args?.dueComplete !== undefined) updates.dueComplete = args.dueComplete;
-  if (args?.labels) updates.labels = args.labels;
-
-  try {
-    await client.updateCard(cardId, updates);
-    return [{ success: true, type: 'update_card', name: `Card ${cardId} updated` }];
-  } catch (err) {
-    return [{ success: false, type: 'update_card', name: cardId, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['buat checklist', 'add checklist', 'tambah checklist'], async (client, _pb, _boardId, args) => {
-  const cardId = (args?.cardId as string) || (args?.card as string) || '';
-  const name = (args?.name as string) || (args?.nama as string) || 'Checklist';
-  const items = (args?.items as string[]) || [];
-
-  if (!cardId) {
-    return [{ success: false, type: 'create_checklist', name: 'missing args', error: 'cardId required' }];
-  }
-
-  try {
-    const r = (await client.createChecklist(cardId, name)) as Record<string, unknown>;
-    const results: IntentResult[] = [{ success: true, type: 'create_checklist', name: r.name as string, result: r }];
-    for (const item of items) {
-      try {
-        const ir = await client.addChecklistItem(r.id as string, item);
-        results.push({ success: true, type: 'add_checklist_item', name: item, result: ir });
-      } catch (err) {
-        results.push({ success: false, type: 'add_checklist_item', name: item, error: getErrorMessage(err) });
-      }
-    }
-    return results;
-  } catch (err) {
-    return [{ success: false, type: 'create_checklist', name, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['buat board', 'create board', 'new board'], async (client, _pb, _boardId, args) => {
-  const name = (args?.name as string) || (args?.nama as string) || 'New Board';
-  try {
-    const r = await client.createBoard(name, {});
-    return [{ success: true, type: 'create_board', name, result: r }];
-  } catch (err) {
-    return [{ success: false, type: 'create_board', name, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['hapus anggota', 'remove member', 'keluarkan anggota'], async (client, _pb, _boardId, args) => {
-  const cardId = (args?.cardId as string) || (args?.card as string) || '';
-  const memberId = (args?.memberId as string) || (args?.member as string) || '';
-  if (!cardId || !memberId) {
-    return [{ success: false, type: 'remove_member', name: 'missing args', error: 'cardId and memberId required' }];
-  }
-  try {
-    await client.removeMember(cardId, memberId);
-    return [{ success: true, type: 'remove_member', name: `${memberId} removed from ${cardId}` }];
-  } catch (err) {
-    return [{ success: false, type: 'remove_member', name: cardId, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['tambah label ke card', 'add label to card', 'pasang label'], async (client, _pb, _boardId, args) => {
-  const cardId = (args?.cardId as string) || (args?.card as string) || '';
-  const labelId = (args?.labelId as string) || (args?.label as string) || '';
-  if (!cardId || !labelId) {
-    return [{ success: false, type: 'add_label_to_card', name: 'missing args', error: 'cardId and labelId required' }];
-  }
-  try {
-    await client.addLabelToCard(cardId, labelId);
-    return [{ success: true, type: 'add_label_to_card', name: `Label ${labelId} → Card ${cardId}` }];
-  } catch (err) {
-    return [{ success: false, type: 'add_label_to_card', name: cardId, error: getErrorMessage(err) }];
-  }
-});
-
-onIntent(['report', 'progress', 'my cards', 'kartu saya'], async (client, _pb, _boardId) => {
-  try {
-    const r = (await client.callTool('get_my_cards', {})) as { cards?: Array<Record<string, unknown>> };
-    const cards = r.cards || [];
-    const grouped: Record<string, unknown[]> = {};
-    for (const c of cards) {
-      const listName = (c.listId as string) || 'Unknown';
-      if (!grouped[listName]) grouped[listName] = [];
-      grouped[listName].push(c);
-    }
-    return [{ success: true, type: 'report', name: `Found ${cards.length} cards assigned to you`, detail: grouped }];
-  } catch (err) {
-    return [{ success: false, type: 'report', name: 'failed', error: getErrorMessage(err) }];
-  }
-});
-
-// ── Execute Intent ──
-
-export async function executeIntent(
-  client: TrelloMCPClient,
-  intent: string,
-  playbookContext: PlaybookResult,
-  boardId: string,
-  extraArgs: Record<string, unknown> = {},
-): Promise<unknown[]> {
-  const lower = intent.toLowerCase();
-  for (const h of intentHandlers) {
-    if (h.patterns.some((p) => lower.includes(p))) {
-      return h.fn(client, playbookContext, boardId, extraArgs);
-    }
-  }
-  return [
-    {
-      success: false,
-      type: 'unknown_intent',
-      name: intent,
-      error:
-        'No handler matched. Try: mulai sprint, buat card, assign, buat label, arsipkan, arsip list, pindah semua, buat board, update card, buat checklist, komentar, report, tutup sprint',
-    },
-  ];
-}
-
-// ── Bundle Context ──
-
-export function bundleContext(paths: BundlePaths): BundleContextResult {
-  const context: BundleContextResult = {
-    playbook: null,
-    openkb: { glossary: [], decisions: [] },
-    opencode: null,
-  };
-
-  if (paths.playbook && existsSync(paths.playbook)) {
-    const content = readFileSync(paths.playbook, 'utf-8');
-    context.playbook = parsePlaybook(content);
-  }
-
-  if (paths.openkb) {
-    const glossaryPath = resolve(paths.openkb, 'SHARED', 'glossary.md');
-    if (existsSync(glossaryPath)) {
-      const gl = readFileSync(glossaryPath, 'utf-8');
-      context.openkb.glossary = gl.split('\n').filter((l) => l.startsWith('- **'));
-    }
-    const decisionPath = resolve(paths.openkb, 'SHARED', 'decision-log.md');
-    if (existsSync(decisionPath)) {
-      const dl = readFileSync(decisionPath, 'utf-8');
-      context.openkb.decisions = dl.split('\n').filter((l) => l.startsWith('## '));
-    }
-  }
-
-  if (paths.opencode) {
-    const configPath = resolve(paths.opencode, 'opencode.json');
-    if (existsSync(configPath)) {
-      try {
-        context.opencode = JSON.parse(readFileSync(configPath, 'utf-8')) as Record<string, unknown>;
-      } catch {
-        context.opencode = null;
-      }
-    }
-  }
-
-  return context;
+  fn: (pb: PlaybookResult, args: Record<string, unknown>, goal?: string) => Array<Record<string, unknown>>;
 }
 
 // ── Plan Handlers ──
@@ -602,7 +32,7 @@ function onPlan(patterns: string[], fn: PlanHandler['fn']): void {
   planHandlers.push({ patterns: patterns.map((p) => p.toLowerCase()), fn });
 }
 
-onPlan(['mulai sprint', 'setup sprint'], (pb, _args) => {
+onPlan(['mulai sprint'], (pb, _args) => {
   return pb.workflow.lists.map((listName) => ({
     action: 'create_list',
     params: { name: listName },
@@ -770,17 +200,283 @@ onPlan(['report', 'progress', 'my cards', 'kartu saya'], (_pb, _args) => {
   ];
 });
 
+onPlan(['sprint report', 'generate report', 'laporan sprint', 'buat laporan'], (_pb, args) => {
+  return [
+    {
+      action: 'sprint_report',
+      params: {
+        listNames: args.listNames || args.lists || [],
+        sprint: args.sprint || args.name || 'Current Sprint',
+      },
+      description: `Generate sprint report: "${args.sprint as string || args.name as string || 'Current Sprint'}"`,
+    },
+  ];
+});
+
+onPlan(['undo', 'batalkan', 'rollback', 'kembalikan'], (_pb, _args) => {
+  return [
+    {
+      action: 'undo',
+      params: {},
+      description: 'Batalkan eksekusi plan sebelumnya',
+    },
+  ];
+});
+
+onPlan(['batch update', 'update massal', 'batch pindah', 'batch move'], (_pb, args) => {
+  return [
+    {
+      action: 'batch_update_cards',
+      params: {
+        filterList: args.filterList || args.fromList || '',
+        toList: args.toList || args.moveTo || '',
+        filterLabel: args.filterLabel || '',
+        memberId: args.memberId || '',
+        dueBefore: args.dueBefore || '',
+        dueAfter: args.dueAfter || '',
+        setName: args.setName || '',
+        setDesc: args.setDesc || args.setDescription || '',
+        setDue: args.setDue || '',
+        setStart: args.setStart || '',
+        addLabels: args.addLabels || [],
+        removeLabels: args.removeLabels || [],
+      },
+      description: `Batch update cards from "${args.fromList || args.filterList || '(all)'}"`,
+    },
+  ];
+});
+
+// ── Template Filler Helper ──
+
+function fillCardFromTemplate(card: BatchCard, args: Record<string, unknown>, goal?: string): BatchCard {
+  const templateName = (args.template as string) || '';
+  const resolved = { ...card };
+
+  // If card already has all fields, skip
+  if (resolved.desc && resolved.checklist?.length && (resolved.comment || resolved.checklist.length > 0)) {
+    return resolved;
+  }
+
+  // Determine template
+  let tplName = templateName;
+  if (!tplName && goal) {
+    const inference = inferFromGoal(goal);
+    tplName = inference.templateName || '';
+  }
+
+  if (!tplName) return resolved;
+  const template = getTemplate(tplName);
+  if (!template) return resolved;
+
+  const vars: TemplateVars = {
+    task: card.task,
+    role: (args.role as string) || 'user',
+    want: (args.want as string) || 'this feature',
+    benefit: (args.benefit as string) || '',
+    feature: (args.feature as string) || '',
+    techStack: (args.techStack as string) || '',
+    convention: (args.convention as string) || '',
+    reference: (args.reference as string) || '',
+    priority: (args.priority as string) || '',
+    assignee: (args.assignee as string) || '',
+  };
+
+  const generated = generateCardFromTemplate(template, vars);
+
+  if (!resolved.desc) resolved.desc = generated.description;
+  if (!resolved.checklist || resolved.checklist.length === 0) resolved.checklist = generated.checklist;
+  if (!resolved.comment) resolved.comment = generated.comment || '';
+  if (!resolved.labels || resolved.labels.length === 0) resolved.labels = generated.labels;
+
+  return resolved;
+}
+
+// ── Composite Plan Handlers (Batch, Multi-board) ──
+
+onPlan(['setup sprint', 'set up sprint', 'mulai sprint baru'], (pb, args) => {
+  const steps: PlanStep[] = [];
+  const boardsInput = (args.boards as Array<Record<string, unknown>>) || [];
+  const rawCardsInput = (args.cards as BatchCard[]) || [];
+  const boardNames = (args.boardNames as string[]) || boardsInput.map((b) => b.boardName as string) || [''];
+
+  const goal = (args.goal as string) || '';
+  const cardsInput = rawCardsInput.map((c) => fillCardFromTemplate(c, args, goal));
+
+  for (let bi = 0; bi < boardNames.length; bi++) {
+    const bName = boardNames[bi];
+    const listRef = `lists:${bi}`;
+
+    // Create missing lists from playbook
+    let ci = 0;
+    for (const listName of pb.workflow.lists) {
+      steps.push({
+        action: 'create_list',
+        params: { name: listName, boardName: bName },
+        description: `Buat list "${listName}" di ${bName}`,
+        ref: `${listRef}:${ci}`,
+      });
+      ci++;
+    }
+
+    // Create cards for this board
+    const boardCards = cardsInput.filter((c) => !c.list || boardsInput.length <= 1);
+    for (let k = 0; k < boardCards.length; k++) {
+      const card = boardCards[k];
+      const cardRef = `card:${bi}:${k}`;
+      const targetList = card.list || pb.workflow.lists[0] || '';
+
+      steps.push({
+        action: 'create_card',
+        params: {
+          name: card.task,
+          desc: card.desc || '',
+          listName: targetList,
+          boardName: bName,
+          start: card.start || '',
+          due: card.due || '',
+          labels: card.labels || [],
+        },
+        description: `Buat card "${card.task}" di ${bName}/${targetList}`,
+        ref: cardRef,
+      });
+
+      // Checklist
+      if (card.checklist && card.checklist.length > 0) {
+        steps.push({
+          action: 'create_checklist',
+          params: { cardId: `ref:${cardRef}`, name: 'Acceptance Criteria', items: card.checklist },
+          description: `Buat checklist Acceptance Criteria untuk "${card.task}"`,
+          dependsOn: [cardRef],
+        });
+      }
+
+      // Comment
+      if (card.comment) {
+        steps.push({
+          action: 'add_comment',
+          params: { cardId: `ref:${cardRef}`, text: card.comment },
+          description: `Tambah komentar untuk "${card.task}"`,
+          dependsOn: [cardRef],
+        });
+      }
+    }
+  }
+
+  return steps;
+});
+
+onPlan(['buat cards batch', 'batch cards', 'create batch'], (_pb, args) => {
+  const rawCardsInput = (args.cards as BatchCard[]) || [];
+  const goal = (args.goal as string) || '';
+  const cardsInput = rawCardsInput.map((c) => fillCardFromTemplate(c, args, goal));
+  const boardName = (args.boardName as string) || '';
+  const listName = (args.list as string) || (args.listName as string) || 'Sprint';
+
+  const steps: PlanStep[] = [];
+  for (let i = 0; i < cardsInput.length; i++) {
+    const card = cardsInput[i];
+    const cardRef = `card:${i}`;
+
+    steps.push({
+      action: 'create_card',
+      params: {
+        name: card.task,
+        desc: card.desc || '',
+        listName: card.list || listName,
+        boardName: boardName,
+        start: card.start || '',
+        due: card.due || '',
+        labels: card.labels || [],
+      },
+      description: `Buat card "${card.task}"`,
+      ref: cardRef,
+    });
+
+    if (card.checklist && card.checklist.length > 0) {
+      steps.push({
+        action: 'create_checklist',
+        params: { cardId: `ref:${cardRef}`, name: 'Acceptance Criteria', items: card.checklist },
+        description: `Buat checklist untuk "${card.task}"`,
+        dependsOn: [cardRef],
+      });
+    }
+
+    if (card.comment) {
+      steps.push({
+        action: 'add_comment',
+        params: { cardId: `ref:${cardRef}`, text: card.comment },
+        description: `Tambah komentar untuk "${card.task}"`,
+        dependsOn: [cardRef],
+      });
+    }
+  }
+  return steps;
+});
+
+onPlan(['setup labels batch', 'batch labels', 'create labels batch'], (_pb, args) => {
+  const labels = (args.labels as Array<{ name: string; color: string }>) || [];
+  const boardName = (args.boardName as string) || '';
+
+  return labels.map((l, i) => ({
+    action: 'create_label',
+    params: { name: l.name, color: l.color, boardName },
+    description: `Buat label "${l.name}" (${l.color})`,
+    ref: `label:${i}`,
+  }));
+});
+
 // ── Generate Plan ──
+
+function runPreFlight(
+  plan: Array<Record<string, unknown>>,
+  boards: BoardSnapshot[],
+): Array<Record<string, unknown>> {
+  const steps: Array<Record<string, unknown>> = [];
+
+  for (const step of plan) {
+    const action = step.action as string;
+    if (action === 'create_card' || action === 'create_label') {
+      const result = validateContext(action, step.params as Record<string, unknown>, boards);
+
+      if (result.warnings.length > 0 || result.blockers.length > 0) {
+        steps.push({
+          action: 'pre_flight_check',
+          params: {
+            targetAction: action,
+            targetParams: step.params,
+            safe: result.safe,
+            warnings: result.warnings,
+            blockers: result.blockers,
+          },
+          description: result.blockers.length > 0
+            ? `⚠️ BLOCKER: ${result.blockers.join('; ')}`
+            : `ℹ️ Warning: ${result.warnings.map((w) => w.message).join('; ')}`,
+          preFlight: { safe: result.safe, warnings: result.warnings, blockers: result.blockers },
+        });
+      }
+    }
+  }
+
+  return steps;
+}
 
 export function generatePlan(
   goal: string,
   playbook: PlaybookResult,
   extraArgs: Record<string, unknown> = {},
+  boards?: BoardSnapshot[],
 ): Array<Record<string, unknown>> {
   const lower = goal.toLowerCase();
   for (const h of planHandlers) {
     if (h.patterns.some((p) => lower.includes(p))) {
-      return h.fn(playbook, extraArgs);
+      const plan = h.fn(playbook, extraArgs, goal);
+      if (boards && boards.length > 0) {
+        const preFlight = runPreFlight(plan, boards);
+        if (preFlight.length > 0) {
+          return [...preFlight, ...plan];
+        }
+      }
+      return plan;
     }
   }
   return [
@@ -788,7 +484,7 @@ export function generatePlan(
       success: false,
       action: 'unknown_intent',
       params: { goal },
-      description: `Intent tidak dikenal: "${goal}". Coba: mulai sprint, buat card, assign, buat label, arsipkan, arsip list, pindah semua, buat board, update card, buat checklist, komentar, report, tutup sprint`,
+      description: `Intent tidak dikenal: "${goal}". Coba: mulai sprint, buat card, assign, buat label, arsipkan, arsip list, pindah semua, buat board, update card, buat checklist, komentar, report, tutup sprint, undo, batch update, sprint report`,
     },
   ];
 }
