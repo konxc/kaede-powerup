@@ -1,12 +1,29 @@
 #!/usr/bin/env bun
 
-import { existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import * as orch from './orchestrator';
-import * as tmpl from './templates';
-import * as prompter from './prompter';
-import { withTrelloClient } from './mcp-helpers';
+import {
+  handleStatus,
+  handleParsePlaybook,
+  handleBundleContext,
+  handleResolveBoard,
+  handleResolveContext,
+} from './tool-handlers/context';
+import {
+  handleGeneratePlan,
+  handleExecutePlan,
+  handleUndoLastPlan,
+  handleGetExecutionHistory,
+  handleClearExecutionHistory,
+} from './tool-handlers/plan';
+import {
+  handleFindCard,
+  handleDetectDuplicates,
+  handleValidateContext,
+  handleArchiveDuplicates,
+} from './tool-handlers/duplicate';
+import { handleGenerateTemplate, handleLoadTemplates } from './tool-handlers/template';
+import { handleGenerateSprintReport, handleBatchUpdateCards } from './tool-handlers/report';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -479,309 +496,28 @@ const TOOLS: ToolSchema[] = [
 type ToolHandler = (args: Record<string, unknown>) => Promise<Record<string, unknown>> | Record<string, unknown>;
 
 const TOOL_HANDLERS: Record<string, ToolHandler> = {
-  status(args) {
-    let playbookOk = false;
-    let openkbOk = false;
-    if (args.playbookPath as string) playbookOk = existsSync(args.playbookPath as string);
-    if (args.openkbPath as string) openkbOk = existsSync(args.openkbPath as string);
-    return { server: SERVER, playbookPathAccessible: playbookOk, openkbPathAccessible: openkbOk };
-  },
+  status: handleStatus,
+  parse_playbook: handleParsePlaybook,
+  bundle_context: handleBundleContext,
+  resolve_board: handleResolveBoard,
+  resolve_context: handleResolveContext,
 
-  parse_playbook(args) {
-    return orch.parsePlaybook(args.content as string);
-  },
+  generate_plan: handleGeneratePlan,
+  execute_plan: handleExecutePlan,
+  undo_last_plan: handleUndoLastPlan,
+  get_execution_history: handleGetExecutionHistory,
+  clear_execution_history: handleClearExecutionHistory,
 
-  bundle_context(args) {
-    const ctx = orch.bundleContext({
-      playbook: args.playbookPath as string,
-      openkb: args.openkbPath as string,
-      opencode: args.opencodePath as string,
-    });
-    const result: Record<string, unknown> = {
-      title: ctx.playbook?.title || null,
-      rolesCount: ctx.playbook?.roles?.length || 0,
-      lists: ctx.playbook?.workflow?.lists || [],
-      labels: ctx.playbook?.conventions?.labels || [],
-      openkbTerms: ctx.openkb.glossary?.length || 0,
-      openkbDecisions: ctx.openkb.decisions?.length || 0,
-      hasMCP: !!(ctx.opencode as Record<string, unknown>)?.mcp,
-    };
-    if (args.boardName) result.boardName = args.boardName as string;
-    return result;
-  },
+  find_card: handleFindCard,
+  detect_duplicates: handleDetectDuplicates,
+  validate_context: handleValidateContext,
+  archive_duplicates: handleArchiveDuplicates,
 
-  generate_plan(args) {
-    interface PlaybookContext {
-      title: string;
-      roles: Array<Record<string, unknown>>;
-      workflow: { lists: string[] };
-      conventions: Record<string, unknown>;
-    }
+  generate_template: handleGenerateTemplate,
+  load_templates: handleLoadTemplates,
 
-    let context: PlaybookContext = {
-      title: '',
-      roles: [],
-      workflow: { lists: [] },
-      conventions: { titlePrefixes: [], descriptionTemplate: '', labels: [] },
-    };
-    if (args.playbook as string) {
-      context = orch.parsePlaybook(args.playbook as string) as PlaybookContext;
-    }
-
-    const extraArgs: Record<string, unknown> = {};
-    for (const key of [
-      'task', 'name', 'desc', 'list', 'member', 'memberId',
-      'color', 'cardId', 'text', 'from', 'to', 'items',
-      'cards', 'boardNames', 'labels',
-      'template', 'role', 'want', 'benefit', 'feature',
-      'techStack', 'convention', 'reference', 'priority', 'assignee',
-    ]) {
-      if (args[key] !== undefined) extraArgs[key] = args[key];
-    }
-    extraArgs.goal = args.goal as string;
-
-    let boards: Array<Record<string, unknown>> | undefined;
-    if (args.boards) {
-      boards = (args.boards as Array<Record<string, unknown>>).map((b) => ({
-        boardId: b.boardId as string,
-        boardName: b.boardName as string,
-        lists: (b.lists as Array<Record<string, unknown>>).map((l) => ({
-          listId: l.listId as string,
-          listName: l.listName as string,
-          cards: (l.cards as Array<Record<string, unknown>>).map((c) => ({
-            id: c.id as string,
-            name: c.name as string,
-            desc: c.desc as string | undefined,
-            listName: c.listName as string | undefined,
-            boardName: c.boardName as string | undefined,
-          })),
-        })),
-      }));
-    }
-
-    const plan = orch.generatePlan(args.goal as string, context, extraArgs, boards);
-    return { plan };
-  },
-
-  generate_template(args) {
-    const templateName = (args.template as string) || '';
-    const vars: Record<string, string | undefined> = {
-      task: (args.task as string) || '',
-      role: args.role as string | undefined,
-      want: args.want as string | undefined,
-      benefit: args.benefit as string | undefined,
-      feature: args.feature as string | undefined,
-      techStack: args.techStack as string | undefined,
-      convention: args.convention as string | undefined,
-      reference: args.reference as string | undefined,
-      priority: args.priority as string | undefined,
-      assignee: args.assignee as string | undefined,
-      sprint: args.sprint as string | undefined,
-      technologies: args.technologies as string | undefined,
-    };
-    const result = tmpl.generateCardFromTemplate(templateName, vars);
-    return result as Record<string, unknown>;
-  },
-
-  resolve_context(args) {
-    const goal = (args.goal as string) || '';
-    const boardName = (args.boardName as string) || '';
-    const list = (args.list as string) || '';
-    const rawBoards = (args.boards as Array<Record<string, unknown>>) || [];
-    const playbookMd = (args.playbook as string) || '';
-
-    const boards = rawBoards.map((b) => ({
-      boardId: b.boardId as string,
-      boardName: (b.boardName as string) || '',
-    }));
-
-    let playbookResult: orch.PlaybookResult | null = null;
-    if (playbookMd) playbookResult = orch.parsePlaybook(playbookMd);
-
-    const ctx = prompter.resolveContext(
-      { boardName, list },
-      {
-        goal,
-        playbook: playbookResult || undefined,
-        boards: boards.length > 0 ? boards : undefined,
-      },
-    );
-
-    const inference = prompter.inferFromGoal(goal);
-    return { resolvedContext: ctx, inference } as Record<string, unknown>;
-  },
-
-  resolve_board(args) {
-    const desc = (args.description as string) || '';
-    const lower = desc.toLowerCase();
-
-    const projectNames: string[] = [];
-    const boardMatch = lower.match(/(\w+)\s+board/);
-    if (boardMatch) projectNames.push(boardMatch[1]);
-    const projMatch = lower.match(/project\s+(\w[\w\s]{0,20}?\w)/);
-    if (projMatch) projectNames.push(projMatch[1]);
-
-    const stopwords = new Set([
-      'di', 'dan', 'ke', 'dari', 'untuk', 'yang', 'ini', 'itu', 'dengan', 'pada',
-      'saya', 'kami', 'kita', 'akan', 'telah', 'sudah', 'ada', 'dapat', 'bisa',
-      'the', 'and', 'for', 'that', 'this', 'with', 'from', 'what', 'board',
-      'project', 'semua', 'semua', 'apapun', 'khusus', 'belum', 'menyiapkan',
-    ]);
-    const keywords = desc
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, ' ')
-      .split(/\s+/)
-      .filter((w) => w.length > 2 && !stopwords.has(w))
-      .filter((w, i, a) => a.indexOf(w) === i);
-
-    return {
-      original: desc,
-      suggestedNameFilter: keywords.join(' '),
-      suggestedQuery: projectNames.length > 0 ? projectNames[0] : keywords[0] || '',
-      projectHints: projectNames,
-      keywords,
-      note: 'Gunakan suggestedQuery dengan search_boards, atau suggestedNameFilter dengan list_boards(nameFilter) di mcp.trello',
-    };
-  },
-
-  find_card(args) {
-    const cards = (args.cards as Array<Record<string, unknown>>) || [];
-    const query = args.query as string;
-    const typedCards = cards.map((c) => ({
-      id: c.id as string,
-      name: c.name as string,
-      listName: c.listName as string | undefined,
-      listId: c.listId as string | undefined,
-      boardId: c.boardId as string | undefined,
-      boardName: c.boardName as string | undefined,
-    }));
-    return orch.findCard(typedCards, query);
-  },
-
-  detect_duplicates(args) {
-    const boards = (args.boards as Array<Record<string, unknown>>) || [];
-    const typedBoards = boards.map((b) => ({
-      boardId: b.boardId as string,
-      boardName: b.boardName as string,
-      lists: (b.lists as Array<Record<string, unknown>>).map((l) => ({
-        listId: l.listId as string,
-        listName: l.listName as string,
-        cards: (l.cards as Array<Record<string, unknown>>).map((c) => ({
-          id: c.id as string,
-          name: c.name as string,
-          desc: c.desc as string | undefined,
-          listName: c.listName as string | undefined,
-          boardName: c.boardName as string | undefined,
-        })),
-      })),
-    }));
-    return orch.detectDuplicates(typedBoards);
-  },
-
-  validate_context(args) {
-    const action = args.action as string;
-    const params = args.params as Record<string, unknown>;
-    const boards = (args.boards as Array<Record<string, unknown>> || []).map((b) => ({
-      boardId: b.boardId as string,
-      boardName: b.boardName as string,
-      lists: (b.lists as Array<Record<string, unknown>> || []).map((l) => ({
-        listId: l.listId as string,
-        listName: l.listName as string,
-        cards: (l.cards as Array<Record<string, unknown>> || []).map((c) => ({
-          id: c.id as string,
-          name: c.name as string,
-          listName: c.listName as string | undefined,
-          boardName: c.boardName as string | undefined,
-        })),
-      })),
-    }));
-    return orch.validateContext(action, params, boards);
-  },
-
-  archive_duplicates(args) {
-    const groups = (args.groups as Array<Record<string, unknown>>) || [];
-    const keepStrategy = (args.keepStrategy as 'oldest' | 'newest' | 'longest_desc') || 'oldest';
-    const typedGroups = groups.map((g) => ({
-      name: g.name as string,
-      count: g.count as number,
-      location: g.location as 'sameList' | 'crossList' | 'crossBoard',
-      cards: (g.cards as Array<Record<string, unknown>>).map((c) => ({
-        id: c.id as string,
-        name: c.name as string,
-        desc: c.desc as string | undefined,
-        listName: c.listName as string | undefined,
-        boardName: c.boardName as string | undefined,
-      })),
-    }));
-    return orch.archiveDuplicates(typedGroups, keepStrategy);
-  },
-
-  async execute_plan(args) {
-    const rawPlan = (args.plan as Array<Record<string, unknown>>) || [];
-    const rawBoards = (args.boards as Array<Record<string, unknown>>) || [];
-
-    const plan = rawPlan.map((s) => ({
-      action: s.action as string,
-      params: (s.params as Record<string, unknown>) || {},
-      description: (s.description as string) || '',
-      ref: s.ref as string | undefined,
-      dependsOn: s.dependsOn as string[] | undefined,
-    }));
-
-    const boards = rawBoards.map((b) => ({
-      boardId: b.boardId as string,
-      boardName: (b.boardName as string) || '',
-    }));
-
-    const result = await withTrelloClient((client) => orch.executePlan(client, plan, boards));
-    return result as Record<string, unknown>;
-  },
-
-  async undo_last_plan(args) {
-    const result = await withTrelloClient((client) => orch.undoLastPlan(client));
-    return result as Record<string, unknown>;
-  },
-
-  async generate_sprint_report(args) {
-    const boardId = args.boardId as string;
-    const listNames = (args.listNames as string[]) || [];
-    const sprintName = (args.sprintName as string) || 'Sprint Report';
-
-    const result = await withTrelloClient((client) => orch.generateSprintReport(client, boardId, listNames, sprintName));
-    return { report: result } as Record<string, unknown>;
-  },
-
-  async batch_update_cards(args) {
-    const boardId = args.boardId as string;
-    const filter: Record<string, unknown> = {};
-    for (const key of ['filterList', 'memberId', 'dueBefore', 'dueAfter', 'moveToListName', 'setName', 'setDesc', 'setDue', 'setStart']) {
-      if (args[key]) filter[key] = args[key];
-    }
-    if (args.addLabels) filter.addLabels = args.addLabels;
-    if (args.removeLabels) filter.removeLabels = args.removeLabels;
-
-    const result = await withTrelloClient((client) => orch.batchUpdateCards(client, boardId, filter as Record<string, unknown>));
-    return result as Record<string, unknown>;
-  },
-
-  load_templates(args) {
-    const dirPath = args.dirPath as string;
-    if (!existsSync(dirPath)) {
-      return { success: false, error: `Directory not found: ${dirPath}` } as Record<string, unknown>;
-    }
-    const count = tmpl.loadTemplatesFromDir(dirPath);
-    return { success: true, templatesLoaded: count, totalTemplates: tmpl.listTemplates().length } as Record<string, unknown>;
-  },
-
-  get_execution_history() {
-    const history = orch.getExecutionHistory();
-    return { history } as Record<string, unknown>;
-  },
-
-  clear_execution_history() {
-    orch.clearExecutionHistory();
-    return { success: true } as Record<string, unknown>;
-  },
+  generate_sprint_report: handleGenerateSprintReport,
+  batch_update_cards: handleBatchUpdateCards,
 };
 
 async function handleToolsCall(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
