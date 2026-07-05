@@ -38,7 +38,11 @@ function getGlobalMcpServerPath(): string {
     try {
       const config: MCPConfig = JSON.parse(readFileSync(globalConfig, 'utf-8'));
       const cmd = config.mcp?.trello?.command;
-      if (Array.isArray(cmd) && cmd.length >= 2) return cmd[cmd.length - 1];
+      if (Array.isArray(cmd) && cmd.length >= 2) {
+        const last = cmd[cmd.length - 1];
+        if (existsSync(last)) return last;
+        if (cmd[0] !== 'bunx') return last;
+      }
     } catch {
       // ignore parse errors
     }
