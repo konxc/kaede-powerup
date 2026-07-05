@@ -34,4 +34,12 @@ export class ListService implements IListClient {
   async sortListCards(listId: string, sort: string): Promise<unknown> {
     return this.callTool('sort_list_cards', { listId, sort });
   }
+
+  async copyList(sourceListId: string, targetBoardId: string, name?: string): Promise<unknown> {
+    return this.callTool('copy_list', { sourceListId, targetBoardId, name });
+  }
+
+  async moveList(listId: string, targetBoardId: string): Promise<unknown> {
+    return this.callTool('move_list', { listId, targetBoardId });
+  }
 }

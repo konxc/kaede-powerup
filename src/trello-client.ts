@@ -144,6 +144,14 @@ export class TrelloMCPClient implements ITrelloMCPClient {
     return this.lists.sortListCards(listId, sort);
   }
 
+  copyList(sourceListId: string, targetBoardId: string, name?: string): Promise<unknown> {
+    return this.lists.copyList(sourceListId, targetBoardId, name);
+  }
+
+  moveList(listId: string, targetBoardId: string): Promise<unknown> {
+    return this.lists.moveList(listId, targetBoardId);
+  }
+
   // ─── ILabelClient ───
 
   getBoardLabels(boardId: string): Promise<unknown[]> {

@@ -917,6 +917,37 @@ async function handleToolsCall(name: string, args: Record<string, unknown>): Pro
       };
     }
 
+    // ─── Copy List ──
+    case 'copy_list': {
+      const sourceListId = args.sourceListId as string;
+      const targetBoardId = args.targetBoardId as string;
+      const name = (args.name as string) || '';
+
+      if (!sourceListId || !targetBoardId) {
+        throw new Error('copy_list: sourceListId and targetBoardId are required');
+      }
+
+      const list = (await trelloPost(`/lists`, {
+        idBoardSource: sourceListId,
+        idBoard: targetBoardId,
+        name: name || (await trello(`/lists/${sourceListId}?fields=name`)).name,
+      })) as Record<string, unknown>;
+      return { id: list.id as string, name: list.name as string, boardId: targetBoardId };
+    }
+
+    // ─── Move List ──
+    case 'move_list': {
+      const listId = args.listId as string;
+      const targetBoardId = args.targetBoardId as string;
+
+      if (!listId || !targetBoardId) {
+        throw new Error('move_list: listId and targetBoardId are required');
+      }
+
+      const list = (await trelloPut(`/lists/${listId}/idBoard`, { value: targetBoardId })) as Record<string, unknown>;
+      return { id: list.id as string, name: list.name as string, boardId: targetBoardId };
+    }
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
@@ -1325,6 +1356,25 @@ const TOOLS: ToolDef[] = [
       subscribed: { type: 'boolean', description: 'Subscribe/unsubscribe' },
     },
     ['listId'],
+  ),
+  toolSchema(
+    'copy_list',
+    'Copy a list to another board (including all cards)',
+    {
+      sourceListId: { type: 'string', description: 'ID of the source list to copy' },
+      targetBoardId: { type: 'string', description: 'ID of the target board' },
+      name: { type: 'string', description: 'New list name (optional, defaults to original name)' },
+    },
+    ['sourceListId', 'targetBoardId'],
+  ),
+  toolSchema(
+    'move_list',
+    'Move a list to another board',
+    {
+      listId: { type: 'string', description: 'ID of the list to move' },
+      targetBoardId: { type: 'string', description: 'ID of the target board' },
+    },
+    ['listId', 'targetBoardId'],
   ),
   toolSchema(
     'set_board_project',

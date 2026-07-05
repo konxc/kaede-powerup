@@ -5,7 +5,7 @@
  */
 
 import type { ExecutorFn } from './types';
-import { execCreateList, execArchiveList } from './list';
+import { execCreateList, execArchiveList, execCopyList, execMoveList } from './list';
 import { execCreateCard, execUpdateCard, execArchiveCard, execMoveCard } from './card';
 import { execCreateLabel } from './label';
 import { execCreateChecklist, execDeleteChecklist } from './checklist';
@@ -25,6 +25,8 @@ export const EXECUTORS: Record<string, ExecutorFn> = {
   archive_card: execArchiveCard,
   update_card: execUpdateCard,
   archive_list: execArchiveList,
+  copy_list: execCopyList,
+  move_list: execMoveList,
   delete_checklist: execDeleteChecklist,
   remove_member: execRemoveMember,
 };

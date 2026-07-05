@@ -14,3 +14,15 @@ export const execArchiveList: ExecutorFn = async (client, p) => {
   await client.archiveList(p.listId as string);
   return { id: p.listId as string };
 };
+
+export const execCopyList: ExecutorFn = async (client, p) => {
+  const r = await client.copyList(p.sourceListId as string, p.targetBoardId as string, p.name as string | undefined);
+  const rr = r as Record<string, unknown>;
+  return { id: rr.id as string, name: p.name as string || (rr.name as string) };
+};
+
+export const execMoveList: ExecutorFn = async (client, p) => {
+  const r = await client.moveList(p.listId as string, p.targetBoardId as string);
+  const rr = r as Record<string, unknown>;
+  return { id: rr.id as string, name: rr.name as string };
+};
