@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAEDE — API Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    .refresh-btn { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-kaede-bg text-kaede-text font-sans antialiased">
+  <div class="max-w-6xl mx-auto px-4 py-8" x-data="dashboard()" x-init="init()">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3">
+        <span class="flex items-center justify-center size-8 rounded-lg bg-kaede-primary text-white text-sm font-bold">K</span>
+        <div>
+          <h1 class="text-xl font-bold">KAEDE Dashboard</h1>
+          <p class="text-xs text-kaede-muted">Sprint metrics &amp; MCP server status</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-kaede-muted" x-text="'Last updated: ' + lastUpdated"></span>
+        <button @click="refresh()" :disabled="loading"
+          class="px-3 py-1.5 rounded-lg bg-kaede-primary text-white text-xs font-medium cursor-pointer border-none transition-colors hover:bg-kaede-primary-hover disabled:opacity-40"
+          x-html="loading ? '&hellip;' : 'Refresh'">
+        </button>
+      </div>
+    </div>
+
+    <!-- Connection & Config -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="glass rounded-xl p-4">
+        <div class="text-[10px] font-semibold uppercase tracking-wide text-kaede-muted mb-2">MCP Server</div>
+        <div class="flex items-center gap-2">
+          <span class="size-2.5 rounded-full" :class="connected ? 'bg-kaede-success' : 'bg-kaede-warning'"></span>
+          <span class="text-sm font-medium" x-text="connected ? 'Connected v' + serverVersion : 'Not connected'"></span>
+        </div>
+        <input type="text" x-model="apiBase"
+          class="w-full mt-2 px-2 py-1 rounded border border-kaede-border bg-kaede-surface text-xs text-kaede-text outline-none focus:border-kaede-primary"
+          placeholder="http://localhost:3456" />
+      </div>
+
+      <div class="glass rounded-xl p-4">
+        <div class="text-[10px] font-semibold uppercase tracking-wide text-kaede-muted mb-2">Trello Auth</div>
+        <div class="flex items-center gap-2">
+          <span class="size-2.5 rounded-full" :class="authed ? 'bg-kaede-success' : 'bg-kaede-warning'"></span>
+          <span class="text-sm font-medium" x-text="authed ? 'Authorized' : 'Not authorized'"></span>
+        </div>
+        <p class="text-[10px] text-kaede-muted mt-1">Set via <strong>KAEDE: Authorize</strong> in Trello Power-Up</p>
+      </div>
+
+      <div class="glass rounded-xl p-4">
+        <div class="text-[10px] font-semibold uppercase tracking-wide text-kaede-muted mb-2">Board</div>
+        <select x-model="selectedBoardId" @change="loadBoardData()"
+          class="w-full px-2 py-1.5 rounded border border-kaede-border bg-kaede-surface text-xs text-kaede-text outline-none focus:border-kaede-primary">
+          <option value="">Select board...</option>
+          <template x-for="b in boards" :key="b.id">
+            <option :value="b.id" x-text="b.name"></option>
+          </template>
+        </select>
+        <p class="text-[10px] text-kaede-muted mt-1" x-show="!authed">Authorize Trello to list boards</p>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" x-show="boardData.lists">
+      <template x-for="stat in listStats" :key="stat.name">
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold" x-text="stat.count"></div>
+          <div class="text-[10px] text-kaede-muted uppercase tracking-wide mt-1" x-text="stat.name"></div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Per-List Breakdown -->
+    <div class="glass rounded-xl p-5 mb-6" x-show="boardData.lists">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold">Per-List Breakdown</h2>
+        <span class="text-[10px] text-kaede-muted" x-text="totalCards + ' total cards'"></span>
+      </div>
+
+      <template x-for="listItem in boardData.lists" :key="listItem.name">
+        <div class="flex items-center justify-between py-2.5 border-b border-kaede-border/30 last:border-0">
+          <div class="flex items-center gap-2">
+            <span class="size-2 rounded-full" :style="'background:' + listItem.color"></span>
+            <span class="text-sm" x-text="listItem.name"></span>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="font-medium" x-text="listItem.cards.length + ' cards'"></span>
+            <span x-show="listItem.overdue > 0" class="px-1.5 py-0.5 rounded bg-kaede-danger/15 text-kaede-danger" x-text="listItem.overdue + ' overdue'"></span>
+            <span x-show="listItem.assigned > 0" class="px-1.5 py-0.5 rounded bg-kaede-primary/15 text-kaede-primary" x-text="listItem.assigned + ' assigned'"></span>
+          </div>
+        </div>
+      </template>
+
+      <p x-show="!boardData.lists || boardData.lists.length === 0" class="text-xs text-kaede-muted text-center py-4">
+        No lists found. Select a board.
+      </p>
+    </div>
+
+    <!-- Enforcement -->
+    <div class="glass rounded-xl p-5 mb-6" x-show="enforcement.warnings.length > 0 || enforcement.blockers.length > 0">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold">Playbook Enforcement</h2>
+        <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded"
+          :class="enforcement.safe ? 'bg-kaede-success/20 text-kaede-success' : 'bg-kaede-warning/20 text-kaede-warning'"
+          x-text="enforcement.safe ? 'Compliant' : enforcement.warnings.length + enforcement.blockers.length + ' issues'">
+        </span>
+      </div>
+
+      <template x-for="w in enforcement.warnings" :key="w.type + w.message">
+        <div class="flex items-start gap-2 py-1.5 text-xs">
+          <span class="text-kaede-warning shrink-0 mt-px">&#9888;</span>
+          <span class="text-kaede-muted"><span class="font-medium text-kaede-text capitalize" x-text="w.type.replace(/_/g, ' ')"></span>: <span x-text="w.message"></span></span>
+        </div>
+      </template>
+      <template x-for="b in enforcement.blockers" :key="b.type + b.message">
+        <div class="flex items-start gap-2 py-1.5 text-xs">
+          <span class="text-kaede-danger shrink-0 mt-px font-bold">!</span>
+          <span class="text-kaede-muted"><span class="font-medium text-kaede-text capitalize" x-text="b.type.replace(/_/g, ' ')"></span>: <span x-text="b.message"></span></span>
+        </div>
+      </template>
+    </div>
+
+    <!-- Execution History -->
+    <div class="glass rounded-xl p-5" x-show="execHistory.length > 0">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold">Execution History</h2>
+        <button @click="clearHistory()"
+          class="text-[10px] text-kaede-muted hover:text-kaede-danger underline cursor-pointer bg-transparent border-none">
+          Clear
+        </button>
+      </div>
+
+      <template x-for="(entry, i) in execHistory" :key="i">
+        <div class="flex items-start gap-3 py-2 border-b border-kaede-border/30 last:border-0">
+          <span class="size-2 rounded-full mt-1" :class="entry.success ? 'bg-kaede-success' : 'bg-kaede-danger'"></span>
+          <div class="min-w-0">
+            <div class="text-xs font-medium truncate" x-text="entry.intent || entry.action"></div>
+            <div class="text-[10px] text-kaede-muted">
+              <span x-text="entry.timestamp || ''"></span>
+              <span x-show="entry.duration"> &middot; <span x-text="entry.duration + 'ms'"></span></span>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 glass rounded-xl p-5">
+      <h2 class="text-sm font-semibold mb-3">Quick Actions</h2>
+      <div class="flex flex-wrap gap-2">
+        <button @click="quickAction('generate_sprint_report')"
+          class="px-3 py-1.5 rounded-lg bg-kaede-primary/20 text-kaede-primary text-xs font-medium cursor-pointer border-none transition-colors hover:bg-kaede-primary/30">
+          Sprint Report
+        </button>
+        <button @click="quickAction('detect_duplicates')"
+          class="px-3 py-1.5 rounded-lg border border-kaede-border text-kaede-muted text-xs font-medium cursor-pointer transition-colors hover:border-kaede-primary">
+          Detect Duplicates
+        </button>
+        <button @click="quickAction('get_execution_history')"
+          class="px-3 py-1.5 rounded-lg border border-kaede-border text-kaede-muted text-xs font-medium cursor-pointer transition-colors hover:border-kaede-primary">
+          Show History
+        </button>
+      </div>
+      <div x-show="quickResult" class="mt-3 p-3 bg-kaede-surface rounded-lg text-xs text-kaede-muted leading-relaxed max-h-48 overflow-y-auto">
+        <pre x-text="quickResult" class="whitespace-pre-wrap"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/mcp-client.js"></script>
+  <script>
+    function dashboard() {
+      return {
+        apiBase: 'http://localhost:3456',
+        connected: false,
+        serverVersion: '',
+        authed: false,
+        boards: [],
+        selectedBoardId: '',
+        boardData: { lists: [] },
+        listStats: [],
+        totalCards: 0,
+        enforcement: { safe: true, warnings: [], blockers: [] },
+        execHistory: [],
+        loading: false,
+        lastUpdated: '',
+        quickResult: '',
+
+        async init() {
+          var stored = localStorage.getItem('kaede_api_base');
+          if (stored) this.apiBase = stored;
+
+          KAEDEMCP.init(null).then(function () {
+            return KAEDEMCP.health();
+          }.bind(this)).then(function (data) {
+            this.connected = true;
+            this.serverVersion = data.version || '?';
+          }.bind(this)).catch(function () {
+            this.connected = false;
+          }.bind(this));
+        },
+
+        async refresh() {
+          this.loading = true;
+          localStorage.setItem('kaede_api_base', this.apiBase);
+
+          try {
+            var health = await KAEDEMCP.health();
+            this.connected = true;
+            this.serverVersion = health.version || '?';
+          } catch (e) {
+            this.connected = false;
+          }
+
+          if (this.selectedBoardId) await this.loadBoardData();
+          this.lastUpdated = new Date().toLocaleTimeString();
+          this.loading = false;
+        },
+
+        async loadBoardData() {
+          if (!this.selectedBoardId) return;
+
+          var qs = '';
+          try {
+            var raw = prompt('Enter Trello API Key:Token for board access:');
+            if (!raw || !raw.includes(':')) return;
+            var parts = raw.split(':');
+            qs = 'key=' + encodeURIComponent(parts[0]) + '&token=' + encodeURIComponent(parts[1]);
+            this.authed = true;
+          } catch (e) { return; }
+
+          var base = 'https://api.trello.com/1';
+          try {
+            var lists = await fetch(base + '/boards/' + this.selectedBoardId + '/lists?fields=name,id,closed&' + qs).then(function (r) { return r.json(); });
+            var openLists = lists.filter(function (l) { return !l.closed; });
+
+            var colors = ['#6c5ce7', '#00b894', '#fdcb6e', '#ff7675', '#74b9ff', '#a29bfe', '#fd79a8', '#e17055'];
+            var listData = await Promise.all(openLists.map(function (list, i) {
+              return fetch(base + '/lists/' + list.id + '/cards?fields=name,due,dueComplete,idMembers&' + qs)
+                .then(function (r) { return r.json(); })
+                .then(function (cards) {
+                  return {
+                    name: list.name,
+                    color: colors[i % colors.length],
+                    cards: cards,
+                    overdue: cards.filter(function (c) { return c.due && !c.dueComplete && new Date(c.due) < new Date(); }).length,
+                    assigned: cards.filter(function (c) { return c.idMembers && c.idMembers.length > 0; }).length,
+                  };
+                });
+            }));
+
+            this.boardData = { lists: listData };
+            this.totalCards = listData.reduce(function (sum, l) { return sum + l.cards.length; }, 0);
+            this.listStats = [
+              { name: 'Total Lists', count: listData.length },
+              { name: 'Total Cards', count: this.totalCards },
+              { name: 'Overdue', count: listData.reduce(function (s, l) { return s + l.overdue; }, 0) },
+              { name: 'Assigned', count: listData.reduce(function (s, l) { return s + l.assigned; }, 0) },
+            ];
+          } catch (e) {
+            console.error('Board load failed:', e);
+          }
+        },
+
+        async quickAction(action) {
+          try {
+            var result = await KAEDEMCP.callTool(action, {});
+            this.quickResult = JSON.stringify(result, null, 2);
+          } catch (e) {
+            this.quickResult = 'Error: ' + e.message;
+          }
+        },
+
+        clearHistory() {
+          KAEDEMCP.callTool('clear_execution_history', {}).then(function () {
+            this.execHistory = [];
+          }.bind(this)).catch(function () {});
+        },
+      };
+    }
+  </script>
+</body>
+</html>
