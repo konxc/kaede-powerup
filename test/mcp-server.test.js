@@ -722,9 +722,32 @@ describe('KAEDE MCP Server (42 Trello tools — kaede-trello lib)', () => {
     assert.ok(data.success !== false);
   });
 
+  // ── List Copy/Move Tools ──
+
+  it('43. copy_list copies a list to another board', async () => {
+    const res = await rpc(proc, 'tools/call', {
+      name: 'copy_list',
+      arguments: { sourceListId: 'l1', targetBoardId: 'b2', name: 'Copied To Do' },
+    });
+    const data = JSON.parse(res.result.content[0].text);
+    assert.equal(data.id, 'l-copy');
+    assert.equal(data.name, 'Copied To Do');
+    assert.equal(data.boardId, 'b2');
+  });
+
+  it('44. move_list moves a list to another board', async () => {
+    const res = await rpc(proc, 'tools/call', {
+      name: 'move_list',
+      arguments: { listId: 'l1', targetBoardId: 'b2' },
+    });
+    const data = JSON.parse(res.result.content[0].text);
+    assert.equal(data.id, 'l1');
+    assert.equal(data.boardId, 'b2');
+  });
+
   // ── Error Handling ──
 
-  it('43. missing required parameter returns error', async () => {
+  it('45. missing required parameter returns error', async () => {
     try {
       await rpc(proc, 'tools/call', { name: 'get_card', arguments: {} });
       assert.fail('Should have thrown');
@@ -733,7 +756,7 @@ describe('KAEDE MCP Server (42 Trello tools — kaede-trello lib)', () => {
     }
   });
 
-  it('44. unknown tool returns error', async () => {
+  it('46. unknown tool returns error', async () => {
     try {
       await rpc(proc, 'tools/call', { name: 'nonexistent_tool', arguments: {} });
       assert.fail('Should have thrown');

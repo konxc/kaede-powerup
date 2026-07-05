@@ -148,6 +148,12 @@ function mockFetch(url, opts = {}) {
 
   //---- Lists ----
   if (path.match(/^\/lists\/[^/]+\/cards$/) && method === 'GET') return ok(MOCK_CARDS);
+  if (path === '/lists' && method === 'POST') {
+    const body = Object.fromEntries(new URLSearchParams(opts.body || ''));
+    return ok({ id: 'l-copy', name: body.name || 'Copied List', closed: false });
+  }
+  if (path.match(/^\/lists\/[^/]+\/idBoard$/) && method === 'PUT')
+    return ok({ id: 'l1', name: 'To Do', closed: false });
   if (path.match(/^\/lists\/[^/]+$/) && method === 'PUT')
     return ok({ id: 'l1', name: 'Updated List', closed: false, subscribed: true });
   if (path.match(/^\/lists\/[^/]+$/) && method === 'DELETE') return ok({});

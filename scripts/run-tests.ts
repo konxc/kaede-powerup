@@ -6,6 +6,7 @@ const testFiles = [
   'test/trello-client.test.js',
   'test/mcp-server.test.js',
   'test/kaede-mcp-server.test.js',
+  'test/auto-chainer.test.js',
 ];
 
 let exitCode = 0;
