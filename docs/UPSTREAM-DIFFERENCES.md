@@ -129,7 +129,7 @@ kaede-powerup/
 │   ├── connect.html
 │   ├── auth.html
 │   └── mcp.html
-└── test/                      ← 192 tests across 9 files
+└── test/                      ← 209 tests across 9 files
 ```
 
 ## Key Enhancements
@@ -142,4 +142,4 @@ kaede-powerup/
 6. **HTTP bridge** — REST endpoints for Power-Up integration
 7. **Execution safety** — Undo, history, duplicate detection
 8. **Template engine** — 5 built-in card templates + custom
-9. **192 tests** — Full coverage across all modules
+9. **209 tests** — Full coverage across all modules

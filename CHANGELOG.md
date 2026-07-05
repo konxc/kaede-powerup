@@ -24,7 +24,7 @@ _Note: Source files now reside under `packages/kaede-trello/` in the current mon
 - `packages/kaede-trello`: Added copy_list, move_list tools
 
 **Build: 56 modules, 85.84 KB (KAEDE MCP) + 29.55 KB (Trello MCP)**
-**Tests: 192 pass, 0 fail across 9 test files**
+**Tests: 209 pass, 0 fail across 9 test files**
 
 ## [1.0.1] — 2026-06-30
 
@@ -144,8 +144,8 @@ _Note: Source files now reside under `packages/kaede-trello/` in the current mon
 **Tools:**
 - `attach_file_to_card` — Attach file from URL
 - `attach_image_to_card` — Attach image from URL
-- `attach_data_to_card` — Attach from base64/data URL (stub)
-- `attach_image_data_to_card` — Attach image data (stub)
+- `attach_data_to_card` — Attach from base64/data URL
+- `attach_image_data_to_card` — Attach image data
 - `get_card_attachments` — Get all attachments ✨ **NEW CONTRIBUTION**
 - `copy_card` — Copy card to another list
 
@@ -239,11 +239,11 @@ mv secrets.env ~/.config/kaede/
 
 ### Phase 6: Upstream Contribution
 
-- [ ] Prepare PR #1: `get_card_attachments`
-- [ ] Prepare PR #2: `get_card_checklists`
-- [ ] Prepare PR #3: `watch_card` + `watch_list`
-- [ ] Submit to delorenj/mcp-server-trello
-- [ ] Track and merge PRs
+- [x] Prepare PR #1: `get_card_attachments` (PR #98)
+- [x] Prepare PR #2: `get_card_checklists` (PR #98)
+- [x] Prepare PR #3: `watch_card` + `watch_list` (PR #99)
+- [x] Submit to delorenj/mcp-server-trello (PRs #98, #99, #100)
+- [ ] Track and merge PRs (3 PRs still open)
 
 ### Phase 7: Sync & Cleanup
 

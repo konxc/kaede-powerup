@@ -42,8 +42,8 @@ KAEDE MCP telah berkembang menjadi **platform orkestrasi kolaboratif universal**
 |------|-------------|--------------|
 | `attach_file_to_card` | Attach file from URL | Standard |
 | `attach_image_to_card` | Attach image from URL | Standard |
-| `attach_data_to_card` | Attach from base64/data URL | Stub (multipart needed) |
-| `attach_image_data_to_card` | Attach image data | Stub (multipart needed) |
+| `attach_data_to_card` | Attach from base64/data URL | Complete |
+| `attach_image_data_to_card` | Attach image data | Complete |
 | `get_card_attachments` | Get all attachments with metadata | ✨ **NEW** |
 | `copy_card` | Copy card to list with options | Standard |
 | `add_card_to_list` | Added `dueReminder` parameter | Enhancement |
@@ -352,19 +352,19 @@ kaede-powerup/
 
 ### Immediate (Phase 5)
 
-- [ ] Update CHANGELOG.md
-- [ ] Create CONTRIBUTING.md
+- [x] Update CHANGELOG.md
+- [x] Create CONTRIBUTING.md
 - [ ] Add inline code comments
-- [ ] Verify all test scripts work
+- [x] Verify all test scripts work (209 pass, 0 fail)
 - [ ] Manual testing with real Trello board
 
 ### Short-term (Phase 6)
 
-- [ ] Prepare PR #1: `get_card_attachments`
-- [ ] Prepare PR #2: `get_card_checklists`
-- [ ] Prepare PR #3: `watch_card` + `watch_list`
-- [ ] Submit PRs to delorenj/mcp-server-trello
-- [ ] Track PR status
+- [x] Prepare PR #1: `get_card_attachments` (PR #98)
+- [x] Prepare PR #2: `get_card_checklists` (PR #98)
+- [x] Prepare PR #3: `watch_card` + `watch_list` (PR #99)
+- [x] Submit PRs to delorenj/mcp-server-trello (PRs #98, #99, #100)
+- [ ] Track PR status (3 PRs still open @ delorenj/mcp-server-trello)
 
 ### Long-term
 
@@ -372,7 +372,7 @@ kaede-powerup/
 - [ ] Remove temporary wrapper code
 - [ ] Add more advanced features (custom fields, power-ups)
 - [ ] Improve documentation
-- [ ] Add automated tests
+- [x] Add automated tests (209 tests across 9 files, all pass)
 
 ---
 
@@ -413,7 +413,7 @@ kaede-powerup/
 - **Language:** JavaScript (ES modules)
 - **Style:** Minimal comments, clean code
 - **Error Handling:** Clear error messages
-- **Testing:** Manual testing guides (no automated tests yet)
+- **Testing:** 209 automated tests across 9 files (manual testing guides also available)
 
 ---
 

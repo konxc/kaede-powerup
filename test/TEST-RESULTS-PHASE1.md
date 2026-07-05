@@ -19,8 +19,8 @@
 | attach_file_to_card | ✅ Pass | Successfully attached PDF from URL |
 | attach_image_to_card | ✅ Pass | Successfully attached image from URL |
 | get_card_attachments | ✅ Pass | Retrieved 2 attachments correctly |
-| attach_data_to_card | ⚠️ Stub | Expected - multipart not implemented |
-| attach_image_data_to_card | ⚠️ Stub | Expected - multipart not implemented |
+| attach_data_to_card | ✅ Pass | Implemented via createAttachmentFormData |
+| attach_image_data_to_card | ✅ Pass | Implemented via createAttachmentFormData |
 | copy_card | ⏳ Pending | Will test after checklist |
 
 ### Verified
@@ -83,5 +83,5 @@
 
 ## Summary
 
-**Phase 1 Status:** ✅ COMPLETE (3/3 tools tested, 2 stubs expected)
+**Phase 1 Status:** ✅ COMPLETE (5/5 tools tested, all passed)
 **Next:** Phase 2 - Checklist tools testing
