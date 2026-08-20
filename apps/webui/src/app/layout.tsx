@@ -1,8 +1,13 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { AppShell } from '@/components/layout/app-shell';
 
 export const metadata: Metadata = {
-  title: 'KAEDE Dashboard',
+  title: {
+    default: 'KAEDE Dashboard',
+    template: '%s | KAEDE',
+  },
   description: 'Team & Role Management — OpenKB/Playbook steering',
   icons: { icon: '/favicon.svg' },
 };
@@ -14,7 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased">{children}</body>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <TooltipProvider>
+          <AppShell>{children}</AppShell>
+        </TooltipProvider>
+      </body>
     </html>
   );
 }
