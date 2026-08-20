@@ -1,0 +1,12 @@
+{
+  "name": "@kaede/core",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KAEDE — Core orchestrator, MCP server, intent handlers, services",
+  "main": "src/kaede-mcp-server.ts",
+  "scripts": {
+    "build": "bun scripts/build-mcp.ts",
+    "test": "bun test test/"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@kaede/static",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KAEDE Power-Up web app — Vite + SolidJS + TypeScript (Netlify deploy)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.2.0",
+    "vite-plugin-solid": "^2.11.14"
+  }
+}

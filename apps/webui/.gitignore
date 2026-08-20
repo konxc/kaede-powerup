@@ -1,0 +1,11 @@
+# Next.js build output & cache
+.next/
+out/
+build/
+dist/
+
+# Node modules & env
+node_modules/
+.env
+.env.*
+!.env.example

@@ -1,4 +1,3 @@
 [test]
-# Only test KAEDE's own tests in test/ directory
-# Exclude submodule's vitest tests
-pathIgnorePatterns = ["packages/**"]
+# Exclude upstream submodule's vitest tests
+pathIgnorePatterns = ["packages/mcp-server-trello/**"]

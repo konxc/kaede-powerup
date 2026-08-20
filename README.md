@@ -21,7 +21,8 @@
 - **Otorisasi** — Koneksi aman ke penyedia deployment
 
 ### CLI Tool (`kaede`)
-- **`kaede setup`** — Setup Trello API Key & Token interaktif
+- **`kaede setup`** — Onboarding lengkap: auth OAuth Trello + registrasi MCP + verifikasi (`--yes`, `--no-mcp`, `--no-init`)
+- **`kaede auth`** — Login/logout akun Trello via OAuth: `login`, `status`, `logout`, `token`
 - **`kaede today`** — Lihat task Trello yang ditugaskan untuk hari ini
 - **`kaede init`** — Inisialisasi KAEDE di project (konfigurasi MCP Trello)
 - **`kaede env`** — Export credentials ke environment variable
@@ -37,54 +38,47 @@
 ## Struktur Repo
 
 ```
-├── public/                  # Static site (deploy ke Netlify)
-├── src/
-│   ├── kaede-mcp-server.ts  # KAEDE Orchestrator MCP (entry point)
-│   ├── trello-client.ts     # Trello MCP Client facade
-│   ├── orchestrator.ts      # Intent engine barrel
-│   ├── plan-handlers.ts     # Plan handler logic (19 patterns)
-│   ├── plan-executor.ts     # Plan execution facade
-│   ├── intent-handlers.ts   # Intent handlers barrel
-│   ├── prompter.ts          # Prompt builder & smart defaults
-│   ├── mcp-helpers.ts       # MCP helper utilities
-│   ├── types.ts             # Type exports barrel
-│   ├── intent-handlers/     # 10 domain intent files
-│   ├── plan-executors/      # 6 domain executor files + types
-│   ├── tool-handlers/       # 5 domain tool handler files
-│   ├── services/            # 10 domain service classes
-│   ├── types/               # 4 domain type files
-│   └── style.css            # Source CSS (Tailwind v4)
+├── apps/
+│   └── web/                 # Trello Power-Up & Web Dashboard (Vite + Tailwind v4)
 ├── packages/
 │   ├── README.md            # Dokumentasi arsitektur packages
-│   ├── mcp-server-trello/   # Git submodule → delorenj/mcp-server-trello
-│   └── kaede-trello/
-│       └── src/
-│           ├── mcp-server.ts    # Lib Trello (42 tools, fallback/penyangga)
-│           └── trello/
-│               └── attachments.ts  # Attachment utilities
+│   ├── mcp-server-trello/   # [Submodule] Git submodule → delorenj/mcp-server-trello
+│   └── kaede-trello/        # Library Trello MCP (42 tools standalone)
+├── src/                     # KAEDE Orchestrator MCP (backend engine)
+│   ├── kaede-mcp-server.ts  # Entry point MCP server
+│   ├── orchestrator.ts      # Intent engine barrel
+│   ├── intent-handlers/     # Domain intent handlers
+│   ├── plan-executors/      # Domain plan executors
+│   ├── tool-handlers/       # Domain tool handlers
+│   └── services/            # Domain service classes
+├── apps/docs/content/                    # Dokumentasi & Laporan (Markdown & reports)
+│   ├── IMPLEMENTATION-SUMMARY.md
+│   ├── SUMMARY.md
+│   └── pr-submissions/      # PR submission drafts
 ├── dist/                    # Build output (gitignored)
 ├── scripts/
-│   ├── kaede.ts            # CLI tool (setup, today, init, push, env, status)
+│   ├── kaede.ts            # CLI tool (setup, today, init, env, status)
 │   ├── build-docs.ts       # Build docs: Markdown → HTML
 │   └── build-mcp.ts        # Compile MCP server via bun build
-├── .opencode/
-│   ├── opencode.json        # Konfigurasi AI Agent
-│   └── SHARED/              # Project context & agent rules
-├── docs/                    # Dokumentasi (sumber: Markdown)
-├── netlify.toml             # Konfigurasi deploy Netlify
-├── package.json             # Build scripts + CLI entry
-└── secrets.env              # Trello credentials (gitignored)
+├── .opencode/               # Konfigurasi & aturan AI Agent
+├── netlify.toml             # Konfigurasi deploy Netlify & functions
+├── package.json             # Root monorepo package.json (workspaces)
+└── secrets.env              # Trello credentials (gitignored, dipindah ke global)
 ```
 
 ---
 
 ## Quick Start
 
-### 1. Setup Credentials
+### 1. Onboarding
 
 ```bash
-# Interaktif — masukkan API Key & Token Trello
+# Onboarding lengkap: OAuth Trello (browser) + registrasi MCP + verifikasi
 bun scripts/kaede.ts setup
+
+# Atau langkah per langkah:
+bun scripts/kaede.ts auth login     # OAuth browser (auto) / --manual untuk paste token
+bun scripts/kaede.ts auth status    # cek akun aktif
 ```
 
 Atau buat `secrets.env` manual:
@@ -165,10 +159,35 @@ Push ke `main` → Netlify auto-deploy:
 
 ### GitHub Pages (Dokumentasi)
 
-Dokumentasi di `docs/*.md` auto-build ke `gh-pages` branch via GitHub Actions.
+Dokumentasi di `apps/docs/content/*.md` auto-build ke `gh-pages` branch via GitHub Actions.
 
 - **URL (default):** `konxc.github.io/kaede-powerup`
 - **URL (target):** `konxc.github.io/kaede` (rename repo → `kaede`)
+
+---
+
+## Deployment Modes
+
+KAEDE beroperasi dalam **dua mode disiplin** (detail: [`apps/docs/content/architecture-topology.md`](apps/docs/content/architecture-topology.md)):
+
+| Mode | Kapan | Kemampuan |
+|---|---|---|
+| **Mode 1 — Full Orchestrator Lokal** (`kaede start`) | Pengembangan / internal | 45 tools MCP + git + history + `bundle_context`. Kredensial dari `secrets.env`. |
+| **Mode 2 — Stateless Serverless** (`trello-proxy.mjs`) | Power-Up public / pihak ke-3 | Subset aman kategori A+B+C. Auth per-user (`Authorization: Bearer` token OAuth member-private, divalidasi server-side via `/1/tokens`) ATAU path integrator `X-KAEDE-Key`. **Semua intent butuh auth** — tidak ada baca terbuka. |
+
+Aturan utama:
+
+- **Orkestrasi hanya lokal** — `generate_plan`, `execute_plan`, `undo_last_plan`, tool git tidak pernah diekspos di serverless.
+- **Kredensial service tidak pernah di browser** — browser hanya menyimpan token OAuth **per-user** di scope member-private (`kaede_token`); tidak ada key/token service di Trello shared storage (browser-direct REST dihapus).
+- Pemilihan mode otomatis via hostname (`localhost` → Mode 1, lainnya → Mode 2) di `public/js/mcp-client.js`.
+
+**Env Netlify yang wajib diset:**
+
+```
+TRELLO_API_KEY=<consumer key publik Power-Up>
+TRELLO_TOKEN=<token akun service>
+KAEDE_API_KEY=<key untuk path integrator pihak ke-3>
+```
 
 ---
 
@@ -195,7 +214,7 @@ Dokumentasi di `docs/*.md` auto-build ke `gh-pages` branch via GitHub Actions.
 | **Stakeholder** | Badge environment langsung di card, zero config |
 | **AI Engineer** | Extensible MCP server, kontribusi upstream via PR |
 
-Dokumentasi lengkap: [`docs/sdlc-roles.md`](docs/sdlc-roles.md) (EN) | [`docs/id/sdlc-roles.md`](docs/id/sdlc-roles.md) (ID)
+Dokumentasi lengkap: [`apps/docs/content/sdlc-roles.md`](apps/docs/content/sdlc-roles.md) (EN) | [`apps/docs/content/id/sdlc-roles.md`](apps/docs/content/id/sdlc-roles.md) (ID)
 
 ---
 

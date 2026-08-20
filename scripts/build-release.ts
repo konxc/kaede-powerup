@@ -56,6 +56,7 @@ for (const d of [RELEASE_DIR, BIN_DIR, BUNDLE_DIR]) if (!existsSync(d)) mkdirSyn
 const SERVERS = [
   { name: 'kaede-mcp-server', label: 'Orchestrator MCP', entry: 'src/kaede-mcp-server.ts' },
   { name: 'kaede-trello-mcp', label: 'Trello MCP Library', entry: 'packages/kaede-trello/src/mcp-server.ts' },
+  { name: 'kaede-cli', label: 'CLI', entry: 'scripts/kaede.ts' },
 ];
 
 // Step 1: JS bundles
@@ -103,6 +104,7 @@ const readmeContent = `# KAEDE v${VERSION} \u2014 ${PLATFORM}
 bin/
 \u2514\u2500\u2500 kaede-mcp-server${ext}     \u2014 Orchestrator (4 tools)
 \u2514\u2500\u2500 kaede-trello-mcp${ext}     \u2014 Trello MCP (42 tools)
+\u2514\u2500\u2500 kaede-cli${ext}            \u2014 CLI orchestrator
 bundle/
 \u2514\u2500\u2500 kaede-mcp-server.js       \u2014 JS bundle
 \u2514\u2500\u2500 kaede-trello-mcp.js       \u2014 JS bundle

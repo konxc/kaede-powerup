@@ -1,0 +1,15 @@
+{
+  "name": "@kaede/docs",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KAEDE — Documentation site (GitHub Pages)",
+  "scripts": {
+    "build": "bun scripts/build-docs.ts",
+    "deploy": "bun scripts/deploy-gh-pages.ts",
+    "preview": "bun x serve dist -p 3001 -L"
+  },
+  "dependencies": {
+    "marked": "^18.0.5"
+  }
+}

@@ -1,13 +1,15 @@
 const testFiles = [
-  'test/orchestrator.test.js',
-  'test/e2e-orchestrator.test.js',
-  'test/prompter.test.js',
-  'test/templates.test.js',
-  'test/trello-client.test.js',
-  'test/mcp-server.test.js',
-  'test/kaede-mcp-server.test.js',
-  'test/auto-chainer.test.js',
-  'test/enforcer.test.js',
+  'packages/kaede/test/orchestrator.test.js',
+  'packages/kaede/test/e2e-orchestrator.test.js',
+  'packages/kaede/test/prompter.test.js',
+  'packages/kaede/test/templates.test.js',
+  'packages/kaede/test/trello-client.test.js',
+  'packages/kaede/test/mcp-server.test.js',
+  'packages/kaede/test/kaede-mcp-server.test.js',
+  'packages/kaede/test/auto-chainer.test.js',
+  'packages/kaede/test/enforcer.test.js',
+  'packages/kaede/test/netlify-proxy.test.js',
+  'packages/kaede/test/kaede-auth.test.js',
 ];
 
 let exitCode = 0;

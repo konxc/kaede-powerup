@@ -19,6 +19,18 @@
     "verbatimModuleSyntax": false,
     "types": ["@types/bun"],
   },
-  "include": ["packages/kaede-trello/src/**/*.ts", "src/**/*.ts", "scripts/**/*.ts"],
-  "exclude": ["node_modules", "dist", "dist-docs", "packages/mcp-server-trello", "public", "test"],
+  "include": [
+    "packages/kaede-trello/src/**/*.ts",
+    "packages/kaede/src/**/*.ts",
+    "scripts/**/*.ts",
+    "apps/static/netlify/functions/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "apps/docs/dist",
+    "packages/mcp-server-trello",
+    "public",
+    "packages/kaede/test"
+  ],
 }

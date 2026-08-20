@@ -79,27 +79,22 @@ Terima kasih atas minat Anda untuk berkontribusi! Dokumen ini adalah panduan len
 
 ```
 kaede-powerup/
+├── apps/
+│   ├── static/                       # Power-Up UI (Vite+SolidJS) → Netlify
+│   ├── webui/                        # Dashboard (Next.js) → Vercel
+│   └── docs/                         # Documentation (Markdown → HTML) → GitHub Pages
+│       ├── content/                  # Markdown source (*.md, id/*.md)
+│       ├── scripts/                  # build-docs.ts, deploy-gh-pages.ts
+│       └── dist/                     # Built HTML output
 ├── packages/
-│   └── kaede-trello/
+│   ├── kaede/                        # Core orchestrator + MCP server
+│   │   ├── src/                      # Source code
+│   │   └── test/                     # Tests
+│   └── kaede-trello/                 # Custom MCP tools (lib fallback)
 │       └── src/
-│           ├── mcp-server.ts          # Main MCP server
-│           └── trello/
-│               └── attachments.ts     # Utility module
-├── src/
-│   ├── trello-client.ts               # Client wrapper
-│   ├── kaede-mcp-server.ts            # Orchestrator
-│   ├── api-server.ts                 # API server
-│   └── orchestrator.js                # Orchestrator logic
-├── test/
-│   ├── manual-test-*.js               # Test scripts
-│   └── *-TESTING.md                   # Test guides
-├── docs/
-│   └── DEVELOPMENT-ROADMAP.md
-├── scripts/
-│   └── kaede.ts                      # CLI tool
-├── public/                            # Static assets
-├── pr-submissions/                    # PR submissions
-└── README.md
+├── scripts/                          # CLI scripts (kaede.ts, kaede-auth.ts)
+├── netlify.toml                      # Netlify config
+└── package.json                      # Monorepo root
 ```
 
 ### Build Commands
@@ -184,7 +179,7 @@ toolSchema('your_tool_name', 'Description of what it does', {
 }, ['arg1']), // Required arguments
 ```
 
-#### 3. Add Wrapper Method (`src/trello-client.ts`)
+#### 3. Add Wrapper Method (`packages/kaede/src/trello-client.ts`)
 
 ```javascript
 async yourToolName(arg1, arg2) {
@@ -255,7 +250,7 @@ Create test guide in `test/`:
 
 ### Documentation Standards
 
-- **English** is the default language for `docs/`. Indonesian translations live in `docs/id/`.
+- **English** is the default language for `apps/docs/content/`. Indonesian translations live in `apps/docs/content/id/`.
 - **Clear headings** with hierarchy
 - **Code examples** with syntax highlighting
 - **Screenshots** for UI changes
@@ -266,7 +261,7 @@ When adding features, update:
 
 1. `CHANGELOG.md` — Document changes
 2. `README.md` — Update if user-facing changes
-3. `docs/[lang]/DEVELOPMENT-ROADMAP.md` — Mark phase complete
+3. `apps/docs/content/[lang]/DEVELOPMENT-ROADMAP.md` — Mark phase complete
 
 ---
 
@@ -277,21 +272,21 @@ Documentation is available in multiple languages. You can contribute by translat
 ### Language Structure
 
 ```
-docs/           ← English (default)
-docs/id/        ← Bahasa Indonesia
-docs/[lang]/    ← Other languages (created by contributors)
+apps/docs/content/← English (default)
+apps/docs/content/id/        ← Bahasa Indonesia
+apps/docs/content/[lang]/    ← Other languages (created by contributors)
 ```
 
 ### How to Contribute a Translation
 
 1. **Check existing issues** — someone may already be working on it
 2. **Open a translation issue** — use the [translation template](https://github.com/konxc/kaede-powerup/issues/new?template=translation.yml)
-3. **Fork and translate** — create `docs/[lang]/filename.md` mirroring the English version
+3. **Fork and translate** — create `apps/docs/content/[lang]/filename.md` mirroring the English version
 4. **Submit a PR** — reference the issue number
 
 ### Documents Needing Translation
 
-| English (`docs/`) | Indonesian (`docs/id/`) | Status |
+| English (`apps/docs/content/`) | Indonesian (`apps/docs/content/id/`) | Status |
 |---|---|---|
 | `index.md` | ✅ | Both ready |
 | `api-key.md` | ✅ | Both ready |
@@ -391,7 +386,7 @@ KAEDE implements features first, then contributes to upstream TRELLO MCP.
 
 ## Questions?
 
-- **Documentation:** Check `docs/` folder
+- **Documentation:** Check `apps/docs/content/` folder
 - **Test Board:** https://trello.com/b/rAKmlRj3/lab-testing-kaede
 - **Upstream:** https://github.com/delorenj/mcp-server-trello
 - **API Docs:** https://developer.trello.com/docs

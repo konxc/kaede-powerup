@@ -1,7 +1,7 @@
 /**
  * Translate KAEDE landing page between Indonesian and English.
  *
- * The English version (public/index.html) is the source of truth.
+ * The English version (apps/static/index.html) is the source of truth.
  * Run: bun scripts/translate-landing.ts
  *   --to=en   (default) translate id.html → index.html
  *   --to=id   translate index.html → id.html
@@ -12,8 +12,8 @@
 import { readFileSync, writeFileSync } from 'fs';
 
 const mode = process.argv.includes('--to=id') ? 'id' : 'en';
-const srcFile = mode === 'id' ? 'public/index.html' : 'public/id.html';
-const dstFile = mode === 'id' ? 'public/id.html' : 'public/index.html';
+const srcFile = mode === 'id' ? 'apps/static/index.html' : 'apps/static/id.html';
+const dstFile = mode === 'id' ? 'apps/static/id.html' : 'apps/static/index.html';
 
 let html = readFileSync(srcFile, 'utf-8');
 

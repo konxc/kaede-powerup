@@ -927,10 +927,11 @@ async function handleToolsCall(name: string, args: Record<string, unknown>): Pro
         throw new Error('copy_list: sourceListId and targetBoardId are required');
       }
 
+      const existing = (await trello(`/lists/${sourceListId}?fields=name`)) as Record<string, unknown>;
       const list = (await trelloPost(`/lists`, {
         idBoardSource: sourceListId,
         idBoard: targetBoardId,
-        name: name || (await trello(`/lists/${sourceListId}?fields=name`)).name,
+        name: name || (existing.name as string) || '',
       })) as Record<string, unknown>;
       return { id: list.id as string, name: list.name as string, boardId: targetBoardId };
     }

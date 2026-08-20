@@ -4,7 +4,7 @@ All notable changes to KAEDE MCP server implementation.
 
 _Note: Source files now reside under `packages/kaede-trello/` in the current monorepo architecture._
 
-## [1.1.0] — 2026-07-05
+## [1.1.0] — 2026-07-06
 
 ### Added — Orchestration & Enforcement
 
@@ -16,12 +16,23 @@ _Note: Source files now reside under `packages/kaede-trello/` in the current mon
 | **#7 Power-Up Sync** | MCP client module, t-connect (connect.html), enforcement in card/board, `/api/tool` endpoint |
 | **#8 Documentation** | UPSTREAM-DIFFERENCES.md, CI test workflow (GitHub Actions) |
 | **#9 API Dashboard** | Standalone dashboard UI for sprint metrics (public/dashboard.html) |
+| **#10 Read-Only Query Intents** | 6 new intent handlers for read queries: list boards, my cards, view cards, list labels, list lists, get board info |
 
 ### Changed
 - `src/api-server.ts`: Added `POST /api/tool` endpoint (enforce_playbook, generate_plan, parse_playbook)
 - `src/enforcer.ts`: New module (195 lines) — playbook compliance engine
 - `src/auto-chainer.ts`: New module (140 lines) — compound intent handling
 - `packages/kaede-trello`: Added copy_list, move_list tools
+- `src/intent-handlers/query.ts`: **NEW** — 6 read-only query intent handlers (list_boards, get_my_cards, get_cards_by_list, get_board_labels, get_board_lists, get_board)
+- `src/intent-handlers/index.ts`: Registered queryIntents
+- `scripts/kaede.ts`: Enhanced result display to show detail data for query results
+- `netlify/functions/trello-proxy.mjs`: New file — API bridge untuk Power-Up di Trello (health, tool dispatch, 11 MCP intent handlers via Trello REST API)
+- `public/_redirects`: Added `/api/*` → `/.netlify/functions/trello-proxy` route (sebelum SPA catch-all `/*`)
+- `public/js/mcp-client.js`: `detectBase()` — relative path `/.netlify/functions/trello-proxy` instead of hardcoded absolute URL
+
+### Fixed
+- `mcp-client.js` `detectBase()`: `'trello'` in hostname never matched (Power-Up popups load on Netlify domain, not trello.com)
+- **Design Gap**: KAEDE lacked natural language support for read-only Trello queries — now fixed with query intents
 
 **Build: 56 modules, 85.84 KB (KAEDE MCP) + 29.55 KB (Trello MCP)**
 **Tests: 209 pass, 0 fail across 9 test files**

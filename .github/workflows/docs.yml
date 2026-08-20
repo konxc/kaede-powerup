@@ -19,16 +19,16 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build Tailwind CSS
-        run: bun run build
+      - name: Build web assets (Tailwind CSS via Vite)
+        run: bun run build:static
 
       - name: Build static docs (Markdown → HTML)
-        run: bun scripts/build-docs.ts
+        run: bun run --filter @kaede/docs build
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist-docs
+          publish_dir: ./apps/docs/dist
           publish_branch: gh-pages
           full_commit_message: 'docs: auto-build from ${{ github.sha }}'

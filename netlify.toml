@@ -1,12 +1,12 @@
 [build]
-  command = "bun install && bun run build"
-  publish = "public"
+  command = "bun install && bun run build:static"
+  publish = "apps/static/dist"
 
 [build.environment]
   BUN_VERSION = "1"
 
 [functions]
-  directory = "netlify/functions"
+  directory = "apps/static/netlify/functions"
 
 [functions.trello-proxy]
   external_node_modules = []
@@ -36,11 +36,6 @@
     Content-Security-Policy = "frame-ancestors https://trello.com https://*.trello.com;"
 
 [[headers]]
-  for = "/css/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/js/*"
+  for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"

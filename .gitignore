@@ -4,11 +4,12 @@ packages/mcp-server-trello/node_modules/
 
 # Build artifacts
 dist/
-dist-docs/
-public/css/style.css
+apps/docs/dist/
 
 # Environment variables (API keys, tokens)
 .env
+.env.*
+!.env.example
 secrets.env
 
 # Personal knowledge base
@@ -17,18 +18,15 @@ secrets.env
 # AI agent session cache
 .sisyphus/
 
-# Upstream PR submission drafts
-pr-submissions/
-
 # Netlify
 .netlify
 .playwright-mcp/
 
 # Temp files & deploy artifacts
+.tmp/
 .tmp-gh-pages/
 .worktree-gh-pages/
 nul
-netlify/
 _test_*
 
 # Release build output (binaries besar, pengguna download dari GitHub Releases)

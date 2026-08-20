@@ -47,7 +47,7 @@ async function main(): Promise<void> {
 
   const kaedeOk = buildOne(
     'KAEDE Orchestrator MCP',
-    resolve(ROOT, 'src', 'kaede-mcp-server.ts'),
+    resolve(ROOT, 'packages', 'kaede', 'src', 'kaede-mcp-server.ts'),
     resolve(ROOT, 'dist', 'kaede-mcp-server.js'),
   );
 
