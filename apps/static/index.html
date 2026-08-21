@@ -760,62 +760,6 @@
       <div id="kaede-footer"></div>
     </div>
     <!-- /kaede-site -->
-
-    <!-- ===================================================================
-     JavaScript
-     =================================================================== -->
     <script src="https://p.trellocdn.net/power-up.min.js"></script>
-    <script>
-      (function () {
-        'use strict';
-
-        var isIframe = window.self !== window.top;
-        var observer;
-
-        var iframeRoot = document.getElementById('kaede-iframe');
-        var siteRoot = document.getElementById('kaede-site');
-
-        if (isIframe) {
-          // --- Trello Power-Up mode: iframe visible (init handled by kaede.js) ---
-          iframeRoot.classList.remove('hidden');
-          iframeRoot.classList.add('flex');
-          siteRoot.classList.add('hidden');
-        } else {
-          // --- Full site mode ---
-          iframeRoot.classList.add('hidden');
-          siteRoot.classList.remove('hidden');
-
-          // ── Scroll-triggered fade-in ──
-          observer = new IntersectionObserver(
-            function (entries) {
-              entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                  entry.target.classList.add('visible');
-                  observer.unobserve(entry.target);
-                }
-              });
-            },
-            { threshold: 0.1 },
-          );
-
-          document.querySelectorAll('.fade-in').forEach(function (el) {
-            observer.observe(el);
-          });
-
-          // ── Smooth scroll for anchor links ──
-          document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-            a.addEventListener('click', function (e) {
-              var target = document.querySelector(this.getAttribute('href'));
-              if (target) {
-                e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            });
-          });
-
-          console.log('[KAEDE] Site mode ready.');
-        }
-      })();
-    </script>
   </body>
 </html>
