@@ -5,9 +5,10 @@
   "type": "module",
   "description": "KAEDE — Documentation site (GitHub Pages)",
   "scripts": {
+    "dev": "bun scripts/build-docs.ts && concurrently \"bun --watch scripts/build-docs.ts\" \"bun x serve dist -p 3001 -L\"",
     "build": "bun scripts/build-docs.ts",
     "deploy": "bun scripts/deploy-gh-pages.ts",
-    "preview": "bun x serve dist -p 3001 -L"
+    "preview": "bun scripts/build-docs.ts && bun x serve dist -p 3001 -L"
   },
   "dependencies": {
     "marked": "^18.0.5"

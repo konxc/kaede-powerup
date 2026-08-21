@@ -12,7 +12,7 @@
     "dev": "bun run build:mcp && bun run dev:static",
     "dev:static": "bun run --filter @kaede/static dev",
     "dev:webui": "bun run --filter @kaede/webui dev",
-    "dev:docs": "bun run --filter @kaede/docs preview",
+    "dev:docs": "bun run --filter @kaede/docs dev",
     "build": "bun run build:static",
     "build:static": "bun run --filter @kaede/static build",
     "build:webui": "bun run --filter @kaede/webui build",

@@ -256,24 +256,55 @@ async function main(): Promise<void> {
 
     // These utilities are used by docs template but not compiled into Power-Up CSS
     const docsOnlyUtilities = `
-/* ── Docs-only responsive utilities (not in Power-Up build) ── */
-@media (width>=64rem){.lg\\:block{display:block}.lg\\:flex{display:flex}.lg\\:hidden{display:none}}
-.w-56{width:calc(var(--spacing)*56)}.top-16{top:calc(var(--spacing)*16)}
-.mb-0{margin-bottom:0}.mb-16{margin-bottom:calc(var(--spacing)*16)}
-.pt-24{padding-top:calc(var(--spacing)*24)}.pb-16{padding-bottom:calc(var(--spacing)*16)}
-.mr-2{margin-right:calc(var(--spacing)*2)}
-.p-4{padding:calc(var(--spacing)*4)}.p-10{padding:calc(var(--spacing)*10)}
-.mt-1{margin-top:var(--spacing)}.mt-6{margin-top:calc(var(--spacing)*6)}
-.ml-12{padding-left:calc(var(--spacing)*12)}
-.gap-8{gap:calc(var(--spacing)*8)}
-.self-start{align-self:flex-start}
-.shrink-0{flex-shrink:0}
-.inline-flex{display:inline-flex}.items-start{align-items:flex-start}
-.justify-around{justify-content:space-around}
-.truncate{text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
-.max-h-\\[calc\\(100vh-5rem\\)\\]{max-height:calc(100vh - 5rem)}
-.overflow-y-auto{overflow-y:auto}
-.z-50{z-index:50}
+/* ── Docs-only responsive & layout utilities ── */
+@media (min-width: 1024px) {
+  .lg\\:block { display: block !important; }
+  .lg\\:flex { display: flex !important; }
+  .lg\\:hidden { display: none !important; }
+  .lg\\:mb-0 { margin-bottom: 0 !important; }
+}
+
+/* Fix icon sizing & aspect-ratio (mencegah icon gepeng) */
+.size-3\\.5 { width: 0.875rem !important; height: 0.875rem !important; min-width: 0.875rem !important; min-height: 0.875rem !important; flex-shrink: 0 !important; }
+.size-4 { width: 1rem !important; height: 1rem !important; min-width: 1rem !important; min-height: 1rem !important; flex-shrink: 0 !important; }
+.size-5 { width: 1.25rem !important; height: 1.25rem !important; min-width: 1.25rem !important; min-height: 1.25rem !important; flex-shrink: 0 !important; }
+.size-6 { width: 1.5rem !important; height: 1.5rem !important; min-width: 1.5rem !important; min-height: 1.5rem !important; flex-shrink: 0 !important; }
+.size-7 { width: 1.75rem !important; height: 1.75rem !important; min-width: 1.75rem !important; min-height: 1.75rem !important; flex-shrink: 0 !important; }
+.size-8 { width: 2rem !important; height: 2rem !important; min-width: 2rem !important; min-height: 2rem !important; flex-shrink: 0 !important; }
+.size-10 { width: 2.5rem !important; height: 2.5rem !important; min-width: 2.5rem !important; min-height: 2.5rem !important; flex-shrink: 0 !important; }
+.size-12 { width: 3rem !important; height: 3rem !important; min-width: 3rem !important; min-height: 3rem !important; flex-shrink: 0 !important; }
+.size-16 { width: 4rem !important; height: 4rem !important; min-width: 4rem !important; min-height: 4rem !important; flex-shrink: 0 !important; }
+
+/* Sticky sidebar & layout fixes */
+.sticky { position: sticky !important; }
+.top-16 { top: 4rem !important; }
+.top-20 { top: 5rem !important; }
+.top-24 { top: 6rem !important; }
+.w-56 { width: 14rem !important; flex-shrink: 0 !important; }
+.w-64 { width: 16rem !important; flex-shrink: 0 !important; }
+.max-h-\\[calc\\(100vh-5rem\\)\\] { max-height: calc(100vh - 5rem) !important; }
+.max-h-\\[calc\\(100vh-6rem\\)\\] { max-height: calc(100vh - 6rem) !important; }
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-12 { margin-bottom: 3rem !important; }
+.mb-16 { margin-bottom: 4rem !important; }
+.pt-24 { padding-top: 6rem !important; }
+.pb-16 { padding-bottom: 4rem !important; }
+.mr-2 { margin-right: 0.5rem !important; }
+.p-4 { padding: 1rem !important; }
+.p-6 { padding: 1.5rem !important; }
+.p-10 { padding: 2.5rem !important; }
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-6 { margin-top: 1.5rem !important; }
+.gap-8 { gap: 2rem !important; }
+.self-start { align-self: flex-start !important; }
+.shrink-0 { flex-shrink: 0 !important; }
+.inline-flex { display: inline-flex !important; }
+.items-start { align-items: flex-start !important; }
+.justify-around { justify-content: space-around !important; }
+.truncate { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+.overflow-y-auto { overflow-y: auto !important; }
+.z-50 { z-index: 50 !important; }
 `;
     writeFileSync(join(cssOutDir, 'style.css'), cssContent + docsOnlyUtilities, 'utf-8');
     console.log(`\x1b[36m  ✓\x1b[0m Copied css/style.css + docs utilities`);
