@@ -33,10 +33,10 @@ export default function HomePage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-16 space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+        <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl text-foreground">
           KAEDE Dashboard
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Team & Role Management berdasarkan OpenKB/Playbook steering.
           Kelola akses GitHub, Trello, dan AI Agent untuk tim Anda.
         </p>
@@ -45,13 +45,13 @@ export default function HomePage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-5xl mx-auto">
         {FEATURES.map((feature) => (
           <Link key={feature.href} href={feature.href}>
-            <Card className="h-full transition-colors hover:bg-accent/50 cursor-pointer">
+            <Card className="h-full border border-border/60 bg-card/60 backdrop-blur transition-all hover:bg-accent/40 hover:border-primary/50 cursor-pointer shadow-md hover:shadow-lg">
               <CardHeader>
                 <div className="mb-2 text-primary">
                   <feature.icon className="size-8" />
                 </div>
-                <CardTitle className="text-lg">{feature.title}</CardTitle>
-                <CardDescription>{feature.description}</CardDescription>
+                <CardTitle className="text-lg text-foreground font-semibold">{feature.title}</CardTitle>
+                <CardDescription className="text-muted-foreground">{feature.description}</CardDescription>
               </CardHeader>
             </Card>
           </Link>
@@ -63,7 +63,9 @@ export default function HomePage() {
           Powered by{' '}
           <a
             href="https://kaede-powerup.netlify.app"
-            className="text-primary underline-offset-4 hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary font-medium underline-offset-4 hover:underline"
           >
             KAEDE
           </a>{' '}
