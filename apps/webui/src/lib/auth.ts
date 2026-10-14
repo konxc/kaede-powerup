@@ -6,8 +6,9 @@ const ADMIN_GITHUB_USERNAMES = ['sandikodev', 'konxc'];
 
 const providers = [
   GitHub({
-    clientId: process.env.AUTH_GITHUB_ID,
-    clientSecret: process.env.AUTH_GITHUB_SECRET,
+    clientId: process.env.AUTH_GITHUB_ID || process.env.GITHUB_ID || process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.AUTH_GITHUB_SECRET || process.env.GITHUB_SECRET || process.env.GITHUB_CLIENT_SECRET,
+    issuer: 'https://github.com/login/oauth',
     profile(profile) {
       return {
         id: profile.id.toString(),
