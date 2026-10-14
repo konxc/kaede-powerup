@@ -67,7 +67,7 @@ class KaedeNavbar extends HTMLElement {
       toggleLang: 'Bahasa Indonesia'
     };
 
-    const baseLanding = isId ? 'https://kaede-powerup.netlify.app/id.html' : 'https://kaede-powerup.netlify.app/';
+    const baseLanding = isId ? 'id.html' : './';
     const baseDocs = isId ? 'https://konxc.github.io/kaede-powerup/id/' : 'https://konxc.github.io/kaede-powerup/';
 
     this.innerHTML = `
@@ -140,7 +140,6 @@ class KaedeFooter extends HTMLElement {
     const lang = document.documentElement.getAttribute('lang') || 'en';
     const isId = lang === 'id';
 
-    const baseLanding = isId ? 'https://kaede-powerup.netlify.app/id.html' : 'https://kaede-powerup.netlify.app/';
     const baseDocs = isId ? 'https://konxc.github.io/kaede-powerup/id/' : 'https://konxc.github.io/kaede-powerup/';
 
     const copyright = isId
@@ -158,7 +157,7 @@ class KaedeFooter extends HTMLElement {
             <span>${copyright}</span>
           </div>
           <div class="flex items-center gap-4">
-            <a href="${baseLanding}privacy.html" class="hover:text-kaede-primary no-underline transition-colors">${privacyLabel}</a>
+            <a href="privacy.html" class="hover:text-kaede-primary no-underline transition-colors">${privacyLabel}</a>
             <span>&middot;</span>
             <a href="${baseDocs}" class="hover:text-kaede-primary no-underline transition-colors">${docsLabel}</a>
           </div>

@@ -35,16 +35,18 @@ export interface ProxyEnvelope {
 }
 
 class McpClient {
-  private apiBase = API_BASE_DEFAULT;
+  // Backing fields memakai underscore: nama field tidak boleh sama dengan
+  // accessor publik di bawah (TS2300 duplicate identifier).
+  private _apiBase = API_BASE_DEFAULT;
   private userToken = '';
-  private initialized = false;
+  private _initialized = false;
 
   get apiBase(): string {
-    return this.apiBase;
+    return this._apiBase;
   }
 
   get initialized(): boolean {
-    return this.initialized;
+    return this._initialized;
   }
 
   get token(): string {
@@ -100,17 +102,17 @@ class McpClient {
         ? t.get('member', 'private', 'kaede_token', '')
         : Promise.resolve('');
     return Promise.all([apiPromise, tokenPromise]).then(([stored, token]) => {
-      this.apiBase = stored || this.detectBase(window.location.hostname);
+      this._apiBase = stored || this.detectBase(window.location.hostname);
       this.userToken = token || '';
-      this.initialized = true;
+      this._initialized = true;
     });
   }
 
   /** Health check */
   health(): Promise<any> {
     const isLocal =
-      this.apiBase.indexOf('localhost') > -1 || this.apiBase.indexOf('127.0.0.1') > -1;
-    const url = isLocal ? this.apiBase + '/api/health' : this.apiBase;
+      this._apiBase.indexOf('localhost') > -1 || this._apiBase.indexOf('127.0.0.1') > -1;
+    const url = isLocal ? this._apiBase + '/api/health' : this._apiBase;
     return fetch(url, { method: 'POST' }).then((r) => r.json());
   }
 
