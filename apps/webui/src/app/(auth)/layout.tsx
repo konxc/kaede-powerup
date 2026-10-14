@@ -18,12 +18,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="my-auto py-2 sm:py-4">{children}</div>
 
-        <div className="shrink-0 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3">
+        <div className="shrink-0 text-xs text-slate-400 flex flex-wrap items-center justify-between gap-3 border-t border-white/15 pt-3">
           <span>© {new Date().getFullYear()} PT Koneksi Jaringan Indonesia</span>
           <div className="flex items-center gap-4">
-            <Link href="/legal/privacy" className="hover:text-slate-400">Privacy</Link>
-            <Link href="/legal/terms" className="hover:text-slate-400">Terms</Link>
-            <Link href="/legal/security" className="hover:text-slate-400">Security</Link>
+            <Link href="/legal/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/legal/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/legal/security" className="hover:text-white transition-colors">Security</Link>
           </div>
         </div>
       </div>

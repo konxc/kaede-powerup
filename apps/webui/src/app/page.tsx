@@ -137,7 +137,7 @@ export default async function HomePage() {
           {/* CTAs */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link href="/dashboard">
-              <Button size="lg" className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-7 h-12 shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.02]">
+              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-7 h-12 shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.02]">
                 <Bot className="mr-2 size-5" /> Launch Agent Desktop (Free)
               </Button>
             </Link>
@@ -431,7 +431,7 @@ export default async function HomePage() {
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link href="/dashboard">
-              <Button size="lg" className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-8 h-12 shadow-xl shadow-emerald-500/30">
+              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 h-12 shadow-xl shadow-emerald-500/30">
                 <Bot className="mr-2 size-5" /> Buka KAEDE Agent Desktop
               </Button>
             </Link>

@@ -49,7 +49,7 @@ export default function BoardsPage() {
               <Trello className="mr-1.5 size-3.5 text-sky-400" /> Buka Trello Board
             </Button>
           </a>
-          <Button className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs h-9">
+          <Button className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-9 shadow-md shadow-emerald-500/20">
             <Plus className="mr-1.5 size-3.5" /> Buat Rule Otomasi
           </Button>
         </div>

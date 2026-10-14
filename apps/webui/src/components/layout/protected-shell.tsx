@@ -87,7 +87,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
           {/* Logo & Workspace Selector (Shrink-0) */}
           <div className="space-y-3 pb-3 border-b border-white/10 shrink-0">
             <Link href="/" className="flex items-center gap-2.5 px-2">
-              <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-500 font-extrabold text-slate-950 text-xs shadow-md shadow-emerald-500/20">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-500 font-black text-white text-xs shadow-md shadow-emerald-500/20">
                 K
               </div>
               <span className="text-base font-extrabold tracking-tight text-white">KAEDE</span>
@@ -105,7 +105,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                   </div>
                   <span className="text-xs font-semibold text-white truncate">SMA UII / Koneksi</span>
                 </div>
-                <ChevronDown className="size-3.5 text-slate-500 shrink-0" />
+                <ChevronDown className="size-3.5 text-slate-400 shrink-0" />
               </button>
             </div>
           </div>
@@ -114,7 +114,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
           <nav className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden space-y-5 pt-3 pr-1">
             {NAV_GROUPS.map((group) => (
               <div key={group.title} className="space-y-1">
-                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   {group.title}
                 </p>
                 {group.items.map((item) => {
@@ -127,7 +127,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                       className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                         isActive
                           ? 'bg-emerald-500/15 text-emerald-300 font-semibold border border-emerald-500/30'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          : 'text-slate-300 hover:text-white hover:bg-white/10'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -163,7 +163,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                     <ShieldCheck className="size-4 text-amber-400" />
                     <span>Super Admin</span>
                   </div>
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 shrink-0">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-white shrink-0">
                     VIP
                   </span>
                 </Link>
@@ -213,7 +213,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
               </SheetTrigger>
               <SheetContent side="left" className="w-72 bg-[#0B0F17] text-white border-white/10 p-5 flex flex-col h-full">
                 <div className="flex items-center gap-2.5 mb-6 shrink-0">
-                  <div className="size-7 rounded-lg bg-emerald-500 font-bold text-slate-950 flex items-center justify-center text-xs">
+                  <div className="size-7 rounded-lg bg-emerald-500 font-black text-white flex items-center justify-center text-xs">
                     K
                   </div>
                   <span className="font-extrabold text-base">KAEDE Console</span>
@@ -221,7 +221,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                 <nav className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden space-y-4 pr-1">
                   {NAV_GROUPS.map((group) => (
                     <div key={group.title} className="space-y-1">
-                      <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         {group.title}
                       </p>
                       {group.items.map((item) => (
@@ -229,9 +229,9 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                           key={item.href}
                           href={item.href}
                           onClick={() => setSidebarOpen(false)}
-                          className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg text-xs text-slate-300 hover:text-white hover:bg-white/5"
+                          className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg text-xs text-slate-200 hover:text-white hover:bg-white/10"
                         >
-                          <item.icon className="size-4 text-slate-400" />
+                          <item.icon className="size-4 text-emerald-400" />
                           <span>{item.label}</span>
                         </Link>
                       ))}
@@ -260,8 +260,8 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
             </Sheet>
 
             {/* Current Route Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span className="text-slate-500">App</span>
+            <div className="flex items-center gap-2 text-xs text-slate-300">
+              <span className="text-slate-400">App</span>
               <span>/</span>
               <span className="text-white font-semibold capitalize">
                 {pathname.split('/')[2] || 'Console'}
@@ -280,11 +280,11 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
             {/* Command Palette Trigger */}
             <button
               onClick={() => setCommandOpen(true)}
-              className="flex items-center gap-2 text-xs text-slate-400 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg transition-colors"
+              className="flex items-center gap-2 text-xs text-slate-200 bg-white/10 hover:bg-white/15 border border-white/15 px-3 py-1.5 rounded-lg transition-colors"
             >
               <SearchIcon className="size-3.5" />
               <span className="hidden sm:inline">Search...</span>
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-white/10 bg-white/5 px-1 font-mono text-[9px] text-slate-400">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-white/20 bg-white/10 px-1 font-mono text-[9px] text-slate-200">
                 ⌘K
               </kbd>
             </button>
@@ -292,7 +292,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
             {/* Back to Public Web Link */}
             <Link
               href="/"
-              className="hidden lg:flex items-center gap-1 text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-white/5 transition-colors"
+              className="hidden lg:flex items-center gap-1 text-xs text-slate-300 hover:text-white px-2 py-1 rounded hover:bg-white/5 transition-colors"
             >
               <Globe className="size-3.5 text-emerald-400" />
               <span>Public</span>

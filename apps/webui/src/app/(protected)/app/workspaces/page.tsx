@@ -119,7 +119,7 @@ export default async function WorkspacesPage() {
                     required
                     minLength={2}
                     placeholder="e.g. SMA UII Yogyakarta / Brand Klien"
-                    className="w-full h-9 rounded-lg border border-white/10 bg-white/5 px-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500"
+                    className="w-full h-9 rounded-lg border border-white/15 bg-white/5 px-3 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-400"
                   />
                 </div>
 
@@ -129,7 +129,7 @@ export default async function WorkspacesPage() {
                     <select
                       name="targetType"
                       defaultValue="organization"
-                      className="w-full h-9 rounded-lg border border-white/10 bg-slate-900 px-2 text-xs text-white focus:outline-none"
+                      className="w-full h-9 rounded-lg border border-white/15 bg-slate-900 px-2 text-xs text-white focus:outline-none"
                     >
                       <option value="organization">GitHub Organization</option>
                       <option value="personal">Personal Account</option>
@@ -141,12 +141,12 @@ export default async function WorkspacesPage() {
                     <input
                       name="targetGithubLogin"
                       placeholder="e.g. SMA-UII-Yogyakarta"
-                      className="w-full h-9 rounded-lg border border-white/10 bg-white/5 px-3 text-xs text-white placeholder:text-slate-600 focus:outline-none"
+                      className="w-full h-9 rounded-lg border border-white/15 bg-white/5 px-3 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-400"
                     />
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs h-9">
+                <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-9 shadow-md shadow-emerald-500/20">
                   <Plus className="mr-1.5 size-4" /> Simpan & Inisialisasi
                 </Button>
               </form>

@@ -62,7 +62,7 @@ export default async function RegisterPage(props: {
         <form action={signUpWithGitHub}>
           <Button
             type="submit"
-            className="w-full h-10 sm:h-11 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition-all"
+            className="w-full h-10 sm:h-11 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/25 transition-all"
           >
             <Github className="mr-2 size-4 sm:size-5" /> Daftar Cepat dengan GitHub
           </Button>
@@ -70,50 +70,50 @@ export default async function RegisterPage(props: {
 
         <div className="relative my-2 sm:my-2.5">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-white/10" />
+            <span className="w-full border-t border-white/15" />
           </div>
           <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-            <span className="bg-[#0B0F17] px-2.5 text-slate-500">Kupon & Referal Opsional</span>
+            <span className="bg-[#0B0F17] px-2.5 text-slate-300 font-medium">Kupon & Referal Opsional</span>
           </div>
         </div>
 
         {/* Affiliate & Coupon Inputs */}
         <div className="grid grid-cols-2 gap-2.5 text-xs">
           <div className="space-y-1">
-            <label className="text-[11px] text-slate-400 font-medium" htmlFor="ref-input">
+            <label className="text-[11px] text-slate-200 font-semibold" htmlFor="ref-input">
               Kode Referal
             </label>
             <input
               id="ref-input"
               defaultValue={affiliateRef}
               placeholder="e.g. SANDIKO"
-              className="h-8.5 sm:h-9 w-full rounded-lg border border-white/10 bg-white/5 px-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 uppercase font-mono"
+              className="h-8.5 sm:h-9 w-full rounded-lg border border-white/20 bg-white/10 px-2.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-400 uppercase font-mono"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[11px] text-slate-400 font-medium" htmlFor="coupon-input">
+            <label className="text-[11px] text-slate-200 font-semibold" htmlFor="coupon-input">
               Kupon Diskon
             </label>
             <input
               id="coupon-input"
               defaultValue={couponCode}
               placeholder="e.g. LAUNCH50"
-              className="h-8.5 sm:h-9 w-full rounded-lg border border-white/10 bg-white/5 px-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 uppercase font-mono"
+              className="h-8.5 sm:h-9 w-full rounded-lg border border-white/20 bg-white/10 px-2.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-400 uppercase font-mono"
             />
           </div>
         </div>
       </div>
 
-      <div className="p-2.5 sm:p-3 rounded-xl border border-white/10 bg-white/5 flex items-start gap-2.5 text-[11px] sm:text-xs text-slate-400 leading-relaxed">
+      <div className="p-2.5 sm:p-3 rounded-xl border border-white/15 bg-white/5 flex items-start gap-2.5 text-[11px] sm:text-xs text-slate-200 leading-relaxed">
         <ShieldCheck className="size-4 text-emerald-400 mt-0.5 shrink-0" />
         <span>
           Dengan mendaftar, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi PT Koneksi Jaringan Indonesia. Zero code training guarantee.
         </span>
       </div>
 
-      <div className="text-center text-xs text-slate-400 pt-3 sm:pt-4 border-t border-white/10">
+      <div className="text-center text-xs text-slate-300 pt-3 sm:pt-4 border-t border-white/15">
         Sudah memiliki akun?{' '}
-        <Link href="/login" className="text-emerald-400 hover:underline font-semibold">
+        <Link href="/login" className="text-emerald-400 hover:text-emerald-300 hover:underline font-bold">
           Masuk ke Workspace →
         </Link>
       </div>

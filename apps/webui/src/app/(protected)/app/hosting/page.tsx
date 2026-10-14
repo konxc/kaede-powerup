@@ -145,7 +145,7 @@ export default function HostingPage() {
           {/* Live Logs Dropdown */}
           {logsOpen && (
             <div className="p-4 rounded-xl bg-slate-950 border border-white/10 font-mono text-xs text-slate-300 space-y-1.5 max-h-60 overflow-y-auto">
-              <p className="text-slate-500">[2026-10-14 20:15:01] Container hermes-whatsapp initialized on srv1.konxc.space</p>
+              <p className="text-slate-400">[2026-10-14 20:15:01] Container hermes-whatsapp initialized on srv1.konxc.space</p>
               <p className="text-emerald-400">[2026-10-14 20:15:02] WhatsApp gateway connected. Listening on port 3044</p>
               <p className="text-sky-400">[2026-10-14 20:21:14] Incoming webhook from Trello board "Kaede Development"</p>
               <p className="text-slate-300">[2026-10-14 20:21:15] Context bundled via KAEDE MCP from SMA-UII/.github</p>
@@ -210,7 +210,7 @@ export default function HostingPage() {
               </ul>
             </div>
             <Link href="/app/billing">
-              <Button className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs h-9">
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-9 shadow-md shadow-emerald-500/20">
                 Sewa Kontainer Hermes
               </Button>
             </Link>

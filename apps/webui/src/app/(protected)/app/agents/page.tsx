@@ -97,9 +97,9 @@ export default function AgentsPage() {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-500">
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
               <span className="truncate max-w-[200px] text-[10px]">{agent.mcpTools}</span>
-              <span className="text-emerald-400 font-medium">Ready</span>
+              <span className="text-emerald-400 font-semibold">Ready</span>
             </div>
           </div>
         ))}

@@ -24,7 +24,7 @@ export default async function AffiliatePage() {
           </p>
         </div>
 
-        <Button className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs h-9">
+        <Button className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-9 shadow-md shadow-emerald-500/20">
           <Wallet className="mr-1.5 size-3.5" /> Ajukan Penarikan Komisi
         </Button>
       </div>
@@ -39,13 +39,13 @@ export default async function AffiliatePage() {
           <input
             readOnly
             value={referralUrl}
-            className="flex-1 h-10 rounded-xl border border-white/10 bg-white/5 px-4 text-xs sm:text-sm font-mono text-emerald-300 focus:outline-none"
+            className="flex-1 h-10 rounded-xl border border-white/15 bg-white/5 px-4 text-xs sm:text-sm font-mono text-emerald-300 focus:outline-none"
           />
           <Button variant="outline" className="border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10 text-xs px-4">
             <Copy className="mr-1.5 size-3.5" /> Salin Tautan
           </Button>
         </div>
-        <p className="text-[11px] text-slate-400">
+        <p className="text-[11px] text-slate-300">
           Cookie referal disimpan selama 30 hari. Siapa pun yang mendaftar via tautan ini akan otomatis terikat ke akun Anda.
         </p>
       </div>
@@ -53,21 +53,21 @@ export default async function AffiliatePage() {
       {/* Performance Metrics Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-1.5">
-          <span className="text-xs text-slate-400">Total Klik Tautan</span>
+          <span className="text-xs text-slate-300">Total Klik Tautan</span>
           <p className="text-2xl font-black text-white">184</p>
-          <p className="text-[10px] text-slate-500">Unik pengunjung</p>
+          <p className="text-[10px] text-slate-400">Unik pengunjung</p>
         </div>
 
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-1.5">
-          <span className="text-xs text-slate-400">Pendaftar Akun</span>
+          <span className="text-xs text-slate-300">Pendaftar Akun</span>
           <p className="text-2xl font-black text-sky-400">28</p>
-          <p className="text-[10px] text-slate-500">Konversi 15.2%</p>
+          <p className="text-[10px] text-slate-400">Konversi 15.2%</p>
         </div>
 
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-1.5">
-          <span className="text-xs text-slate-400">Pelanggan Aktif</span>
+          <span className="text-xs text-slate-300">Pelanggan Aktif</span>
           <p className="text-2xl font-black text-purple-400">6</p>
-          <p className="text-[10px] text-slate-500">Langganan Pro & Agency</p>
+          <p className="text-[10px] text-slate-400">Langganan Pro & Agency</p>
         </div>
 
         <div className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 space-y-1.5">

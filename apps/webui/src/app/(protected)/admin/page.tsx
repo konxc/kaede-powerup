@@ -151,17 +151,17 @@ export default async function AdminPage() {
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
             <input
               placeholder="Email / Nama Tenant (e.g. guru@smauii.sch.id)"
-              className="h-9 rounded-lg border border-white/10 bg-white/5 px-3 text-white placeholder:text-slate-600 focus:outline-none"
+              className="h-9 rounded-lg border border-white/15 bg-white/5 px-3 text-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-400"
             />
-            <select className="h-9 rounded-lg border border-white/10 bg-slate-900 px-3 text-white focus:outline-none">
+            <select className="h-9 rounded-lg border border-white/15 bg-slate-900 px-3 text-white focus:outline-none">
               <option value="hermes-whatsapp">Hermes WhatsApp (24/7 Bot)</option>
               <option value="openclaw">OpenClaw (Server Drone)</option>
             </select>
-            <select className="h-9 rounded-lg border border-white/10 bg-slate-900 px-3 text-white focus:outline-none">
+            <select className="h-9 rounded-lg border border-white/15 bg-slate-900 px-3 text-white focus:outline-none">
               <option value="srv1">Host: srv1.konxc.space</option>
               <option value="srv2">Host: srv2.koneksi.co.id</option>
             </select>
-            <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold h-9">
+            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-9 shadow-md shadow-emerald-500/20">
               <Zap className="mr-1.5 size-3.5" /> Launch Container
             </Button>
           </div>
@@ -272,7 +272,7 @@ export default async function AdminPage() {
                 defaultValue="50"
                 className="w-20 h-8 rounded-lg border border-white/10 bg-white/5 px-3 text-xs text-white text-center font-mono"
               />
-              <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold h-8 text-xs">
+              <Button size="sm" className="bg-amber-600 hover:bg-amber-500 text-white font-bold h-8 text-xs shadow-md shadow-amber-500/20">
                 Buat Kupon
               </Button>
             </div>

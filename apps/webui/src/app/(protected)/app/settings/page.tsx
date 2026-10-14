@@ -33,11 +33,11 @@ export default function SettingsPage() {
               <input
                 defaultValue="smauii-koneksi"
                 disabled
-                className="w-full h-9 rounded-lg border border-white/10 bg-slate-900 px-3 text-slate-500 font-mono"
+                className="w-full h-9 rounded-lg border border-white/10 bg-slate-900 px-3 text-slate-400 font-mono"
               />
             </div>
           </div>
-          <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs">
+          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20">
             Simpan Perubahan
           </Button>
         </div>

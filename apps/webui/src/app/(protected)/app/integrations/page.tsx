@@ -82,8 +82,8 @@ export default function IntegrationsPage() {
 
                 <div>
                   <h3 className="font-bold text-white text-base">{item.name}</h3>
-                  <span className="text-[10px] font-mono text-slate-500 uppercase">{item.category}</span>
-                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">{item.desc}</p>
+                  <span className="text-[10px] font-mono text-slate-400 font-semibold uppercase">{item.category}</span>
+                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
 
@@ -93,8 +93,8 @@ export default function IntegrationsPage() {
                   variant={isConnected ? 'outline' : 'default'}
                   className={`w-full text-xs h-8 ${
                     isConnected
-                      ? 'border-white/10 text-slate-300 hover:text-white'
-                      : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold'
+                      ? 'border-white/15 text-slate-200 hover:text-white'
+                      : 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-md shadow-emerald-500/20'
                   }`}
                 >
                   {isConnected ? 'Konfigurasi' : 'Hubungkan'}

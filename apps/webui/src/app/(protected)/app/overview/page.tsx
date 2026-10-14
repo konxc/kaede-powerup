@@ -63,7 +63,7 @@ export default async function OverviewPage() {
             </Button>
           </Link>
           <Link href="/app/workspaces">
-            <Button className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs h-9">
+            <Button className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-9 shadow-md shadow-emerald-500/20">
               <Plus className="mr-1.5 size-3.5" /> Workspace Baru
             </Button>
           </Link>
@@ -73,39 +73,39 @@ export default async function OverviewPage() {
       {/* 4 Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-2">
-          <div className="flex items-center justify-between text-slate-400">
+          <div className="flex items-center justify-between text-slate-300">
             <span className="text-xs font-medium">Workspaces Aktif</span>
             <Building2 className="size-4 text-emerald-400" />
           </div>
           <p className="text-3xl font-black text-white">{workspaceRows.length}</p>
-          <p className="text-[11px] text-slate-500">Multi-tenant scope</p>
+          <p className="text-[11px] text-slate-400">Multi-tenant scope</p>
         </div>
 
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-2">
-          <div className="flex items-center justify-between text-slate-400">
+          <div className="flex items-center justify-between text-slate-300">
             <span className="text-xs font-medium">Projects & Repos</span>
             <FolderGit2 className="size-4 text-sky-400" />
           </div>
           <p className="text-3xl font-black text-white">{projectRows.length}</p>
-          <p className="text-[11px] text-slate-500">Living KB terindeks</p>
+          <p className="text-[11px] text-slate-400">Living KB terindeks</p>
         </div>
 
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-2">
-          <div className="flex items-center justify-between text-slate-400">
+          <div className="flex items-center justify-between text-slate-300">
             <span className="text-xs font-medium">In-Flight Trello Cards</span>
             <Trello className="size-4 text-amber-400" />
           </div>
           <p className="text-3xl font-black text-white">7</p>
-          <p className="text-[11px] text-slate-500">Terkoneksi via webhook</p>
+          <p className="text-[11px] text-slate-400">Terkoneksi via webhook</p>
         </div>
 
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-2">
-          <div className="flex items-center justify-between text-slate-400">
+          <div className="flex items-center justify-between text-slate-300">
             <span className="text-xs font-medium">Headless Containers</span>
             <Bot className="size-4 text-purple-400" />
           </div>
           <p className="text-3xl font-black text-white">{containerRows.length}</p>
-          <p className="text-[11px] text-slate-500">Hermes / OpenClaw active</p>
+          <p className="text-[11px] text-slate-400">Hermes / OpenClaw active</p>
         </div>
       </div>
 
@@ -165,11 +165,11 @@ export default async function OverviewPage() {
             <div className="p-3 rounded-xl bg-white/5 border border-white/5 space-y-1.5">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="font-bold text-emerald-300">Antigravity CLI</span>
-                <span className="text-slate-500 flex items-center gap-1">
+                <span className="text-slate-400 flex items-center gap-1">
                   <Clock className="size-3" /> Baru saja
                 </span>
               </div>
-              <p className="text-slate-300 text-[11px]">
+              <p className="text-slate-200 text-[11px]">
                 Selesai merefaktor komponen Public WebUI & mendeploy ke Vercel production.
               </p>
             </div>
@@ -177,11 +177,11 @@ export default async function OverviewPage() {
             <div className="p-3 rounded-xl bg-white/5 border border-white/5 space-y-1.5">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="font-bold text-sky-300">Hermes WhatsApp Agent</span>
-                <span className="text-slate-500 flex items-center gap-1">
+                <span className="text-slate-400 flex items-center gap-1">
                   <Clock className="size-3" /> 14m lalu
                 </span>
               </div>
-              <p className="text-slate-300 text-[11px]">
+              <p className="text-slate-200 text-[11px]">
                 Menerima brief dari tim marketing SMA UII dan membuat kartu di "Sprint Backlog".
               </p>
             </div>
@@ -189,11 +189,11 @@ export default async function OverviewPage() {
             <div className="p-3 rounded-xl bg-white/5 border border-white/5 space-y-1.5">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="font-bold text-amber-300">Trello State Machine</span>
-                <span className="text-slate-500 flex items-center gap-1">
+                <span className="text-slate-400 flex items-center gap-1">
                   <Clock className="size-3" /> 28m lalu
                 </span>
               </div>
-              <p className="text-slate-300 text-[11px]">
+              <p className="text-slate-200 text-[11px]">
                 Kartu "Implementasi Auth Group" dipindahkan ke Today oleh operator Sandiko.
               </p>
             </div>
