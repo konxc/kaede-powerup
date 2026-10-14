@@ -334,4 +334,147 @@ Pastikan update singkat (max 2 menit/orang).
 Jika ada blocker, segera escalate ke Tech Lead.`,
     defaultLabels: ['standup'],
   },
+
+  'seo-article': {
+    name: 'seo-article',
+    descriptionTemplate: `## SEO Article: {{task}}
+
+### Target Keyword & Intent
+- **Primary Keyword:** {{keyword}}
+- **Search Intent:** Informational / Commercial / Transactional
+- **Target Audience:** {{role}}
+
+### Article Specification
+- **Target Slug:** /{{task}}
+- **Canonical URL:** {{reference}}
+- **Pillar / Topic Cluster:** {{feature}}
+
+### Outline & Content Structure
+1. **Hook & Problem Statement (H1)**: {{want}}
+2. **Core Solution & Educational Content (H2)**: {{benefit}}
+3. **Step-by-step Implementation / Case Study (H2-H3)**
+4. **Conclusion & Call to Action (CTA)**: {{ctaLink}}
+
+### References & Sources
+{{reference}}`,
+    checklistTemplates: [
+      'Keyword research verified in keywords-matrix.md',
+      'Primary keyword placed in H1, first 100 words, and title tag',
+      'Meta title (50-60 chars) and meta description (150-160 chars) written',
+      'Internal links added to related topic cluster articles',
+      'All images optimized (WebP format) with descriptive alt-text',
+      'Brand voice & tone validated against .openkb/brand/',
+      'Readability & grammar check complete (short paragraphs, bullet points)',
+      'Draft published in CMS / WordPress with canonical URL',
+    ],
+    commentTemplate: `Panduan artikel SEO **{{task}}**:
+
+1. Pastikan keyword "{{keyword}}" terdistribusi alami (tidak keyword stuffing).
+2. Cek panduan brand di .openkb/brand/voice-and-tone.md.
+3. Publish draft via WordPress MCP setelah review selesai.`,
+    defaultLabels: ['seo', 'content'],
+  },
+
+  'social-media-post': {
+    name: 'social-media-post',
+    descriptionTemplate: `## Social Media: {{task}}
+
+### Post Information
+- **Platform:** {{platform}}
+- **Publication Schedule:** {{publishDate}}
+- **Target Audience:** {{role}}
+
+### Copywriting & Angles
+**Hook:**
+{{want}}
+
+**Core Body / Carousel Slide Content:**
+{{benefit}}
+
+**Call to Action (CTA):**
+{{ctaLink}}
+
+### Visual & Media Assets
+- **Design / Canva / Asset Link:** {{assetUrl}}
+- **Format:** Carousel / Single Post / Short Video / Reel`,
+    checklistTemplates: [
+      'Copywriting hook approved (passes 3-second attention check)',
+      'Visual asset created according to brand guidelines',
+      'CTA link tested with proper UTM tracking parameters',
+      'Hashtags researched and relevant mentions tagged',
+      'Brand voice & visual consistency checked against .openkb',
+      'Scheduled in publishing tool or published to live platform',
+    ],
+    commentTemplate: `Panduan konten sosmed **{{task}}**:
+
+1. Periksa aspect ratio visual (1:1 feed / 9:16 story/reels).
+2. Gunakan UTM link di bio/caption: {{ctaLink}}
+3. Cek engagement & respon komentar dalam 1 jam pertama rilis.`,
+    defaultLabels: ['social-media', 'creative'],
+  },
+
+  'lead-funnel': {
+    name: 'lead-funnel',
+    descriptionTemplate: `## Lead Funnel: {{task}}
+
+### Funnel Strategy
+- **Funnel Stage:** {{funnelStage}}
+- **Target Audience:** {{role}}
+- **Core Offer / Lead Magnet:** {{offer}}
+
+### Conversion Architecture
+- **Traffic Source:** Ads (Meta/Google/TikTok) / Organic Content
+- **Landing Page URL:** {{reference}}
+- **Closing Destination:** WhatsApp / CRM / Checkout ({{ctaLink}})
+
+### Core Problem & Benefit
+- **Problem Faced:** {{want}}
+- **Desired Transformation:** {{benefit}}`,
+    checklistTemplates: [
+      'Landing page copy aligned with ad creative message',
+      'Opt-in form / WhatsApp lead trigger tested & verified',
+      'Tracking pixel, Conversions API & UTM events firing correctly',
+      'Lead magnet / offer delivery tested end-to-end',
+      'Auto-responder follow up sequence active',
+      'A/B testing hook variations prepared',
+    ],
+    commentTemplate: `Panduan kampanye funnel **{{task}}**:
+
+1. Pastikan pesan landing page dan iklan selaras (message match).
+2. Verifikasi nomor WhatsApp tujuan aktif dan auto-responder menyapa prospek.
+3. Monitor conversion rate dan Cost Per Lead (CPL).`,
+    defaultLabels: ['marketing', 'funnel'],
+  },
+
+  'web-copy': {
+    name: 'web-copy',
+    descriptionTemplate: `## Web Copy: {{task}}
+
+### Page Objective
+- **Page / Section:** {{feature}}
+- **Target Persona:** {{role}}
+- **Primary Goal:** {{want}}
+
+### Value Proposition & Objection Handling
+- **Main Benefit:** {{benefit}}
+- **Key Objections Addressed:** Price, Trust, Implementation Time
+- **Call to Action (CTA):** {{ctaLink}}
+
+### References & Wireframe
+{{reference}}`,
+    checklistTemplates: [
+      'Hero section headline passes the 5-second clarity test',
+      'Value proposition clearly distinguishes USP from competitors',
+      'Social proof, testimonials, and trust badges positioned effectively',
+      'Benefit-driven copy with scannable subheaders & bullets',
+      'Friction points eliminated on form fields and CTA buttons',
+      'Mobile typography and readability validated',
+    ],
+    commentTemplate: `Panduan copywriting web **{{task}}**:
+
+1. Gunakan voice & tone dari .openkb/brand/voice-and-tone.md.
+2. Fokus pada benefit bagi pembaca (WIIFM: What's in it for me).
+3. Pastikan tombol CTA kontras dan kata kerja berorientasi tindakan.`,
+    defaultLabels: ['copywriting', 'web'],
+  },
 };

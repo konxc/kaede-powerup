@@ -70,6 +70,18 @@ Ikuti 3 langkah berikut untuk mulai menggunakan Trello MCP:
   <p class="text-xs text-kaede-muted mt-1">Arsitektur KAEDE, concern separation, orchestration layer, ecosystem overview.</p>
 </a>
 
+<a href="playbook-template.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-warning/20 text-kaede-warning mb-2 text-sm font-bold">📄</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Template Playbook</h3>
+  <p class="text-xs text-kaede-muted mt-1">Template universal SOP tim, alur kerja, dan kolaborasi AI Agent.</p>
+</a>
+
+<a href="openkb-specification.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-2 text-sm font-bold">📚</div>
+  <h3 class="text-sm font-semibold text-kaede-text">Spesifikasi OpenKB</h3>
+  <p class="text-xs text-kaede-muted mt-1">Hierarki 4-layer knowledge base universal & standar konteks digital agency untuk AI agent.</p>
+</a>
+
 </div>
 
 ## Tentang Trello MCP

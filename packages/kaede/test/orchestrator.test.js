@@ -341,6 +341,37 @@ describe('parsePlaybook', () => {
         assert.deepEqual(step.dependsOn, ['card:0']);
       }
     });
+
+    it('generates plan for digital agency intent "buat artikel seo"', () => {
+      const { generatePlan } = require('../src/orchestrator.ts');
+      const plan = generatePlan('buat artikel seo', pb, {
+        task: 'Otomasi Agensi dengan AI Agent',
+        keyword: 'otomasi agensi ai',
+        list: 'Sprint',
+      });
+      assert.equal(plan.length, 1);
+      assert.equal(plan[0].action, 'create_card');
+      assert.equal(plan[0].params.name, 'Otomasi Agensi dengan AI Agent');
+      assert.ok(plan[0].params.desc.includes('SEO Article'));
+      assert.ok(plan[0].params.desc.includes('otomasi agensi ai'));
+      assert.deepEqual(plan[0].params.labels, ['seo', 'content']);
+      assert.ok(plan[0].params.checklist.length >= 6);
+    });
+
+    it('generates plan for digital agency intent "buat konten sosmed"', () => {
+      const { generatePlan } = require('../src/orchestrator.ts');
+      const plan = generatePlan('buat konten sosmed', pb, {
+        task: '3 Alasan Pakai KAEDE',
+        platform: 'TikTok',
+        list: 'To Do',
+      });
+      assert.equal(plan.length, 1);
+      assert.equal(plan[0].action, 'create_card');
+      assert.equal(plan[0].params.name, '3 Alasan Pakai KAEDE');
+      assert.ok(plan[0].params.desc.includes('Social Media'));
+      assert.ok(plan[0].params.desc.includes('TikTok'));
+      assert.deepEqual(plan[0].params.labels, ['social-media', 'creative']);
+    });
   });
 
   // ── executePlan ──

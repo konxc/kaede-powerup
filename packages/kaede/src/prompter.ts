@@ -91,6 +91,23 @@ export function inferFromGoal(goal: string): Partial<{
   const result: ReturnType<typeof inferFromGoal> = {};
 
   if (
+    lower.includes('seo') || lower.includes('artikel') || lower.includes('blog')
+  ) {
+    result.templateName = 'seo-article';
+  } else if (
+    lower.includes('sosmed') || lower.includes('social media') ||
+    lower.includes('instagram') || lower.includes('tiktok') || lower.includes('konten')
+  ) {
+    result.templateName = 'social-media-post';
+  } else if (
+    lower.includes('funnel') || lower.includes('leads') || lower.includes('prospek')
+  ) {
+    result.templateName = 'lead-funnel';
+  } else if (
+    lower.includes('copywriting') || lower.includes('landing page') || lower.includes('web copy')
+  ) {
+    result.templateName = 'web-copy';
+  } else if (
     lower.includes('feature') || lower.includes('fitur') ||
     lower.includes('user story') || lower.includes('implement')
   ) {
@@ -100,10 +117,10 @@ export function inferFromGoal(goal: string): Partial<{
     lower.includes('fix') || lower.includes('issue')
   ) {
     result.templateName = 'bug';
-    } else if (
-      lower.includes('task') || lower.includes('tugas') ||
-      lower.includes('create') || lower.includes('bikin') || lower.includes('buat')
-    ) {
+  } else if (
+    lower.includes('task') || lower.includes('tugas') ||
+    lower.includes('create') || lower.includes('bikin') || lower.includes('buat')
+  ) {
     result.templateName = 'task';
   } else if (
     lower.includes('chore') || lower.includes('maintenance') ||

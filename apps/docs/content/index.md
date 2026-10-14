@@ -82,6 +82,12 @@ Follow these 3 steps to start using Trello MCP:
   <p class="text-xs text-kaede-muted mt-1">Universal playbook template for team SOPs, workflow, and AI Agent collaboration.</p>
 </a>
 
+<a href="openkb-specification.html" class="glass rounded-xl p-4 no-underline hover:border-kaede-primary transition-colors block border border-transparent">
+  <div class="flex items-center justify-center size-9 rounded-lg bg-kaede-primary/20 text-kaede-primary mb-2 text-sm font-bold">📚</div>
+  <h3 class="text-sm font-semibold text-kaede-text">OpenKB Specification</h3>
+  <p class="text-xs text-kaede-muted mt-1">4-layer universal knowledge base hierarchy & digital agency context standard for AI agents.</p>
+</a>
+
 </div>
 
 ## About Trello MCP

@@ -35,6 +35,7 @@ export function handleBundleContext(args: Record<string, unknown>): Record<strin
     labels: ctx.playbook?.conventions?.labels || [],
     openkbTerms: ctx.openkb.glossary?.length || 0,
     openkbDecisions: ctx.openkb.decisions?.length || 0,
+    hasBrandVoice: !!ctx.openkb.brandVoice,
     hasMCP: !!(ctx.opencode as Record<string, unknown>)?.mcp,
   };
   if (args.boardName) result.boardName = args.boardName as string;

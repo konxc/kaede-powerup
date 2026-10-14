@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bun
+#!/usr/bin/env bun
 // Port langsung dari JS, tipenya sedang diperbaiki bertahap
 
 import { readFileSync, existsSync } from 'fs';
@@ -70,12 +70,37 @@ function loadEnv(path: string): Record<string, string> {
 }
 
 function getAuth(): Auth | null {
-  const searchPaths = [
+  const searchPaths: string[] = [];
+
+  // 1. Explicit secrets path
+  if (process.env.KAEDE_SECRETS_PATH) {
+    searchPaths.push(resolve(process.env.KAEDE_SECRETS_PATH));
+  }
+
+  // 2. Profile-specific secrets path
+  let activeProfile = process.env.KAEDE_PROFILE || null;
+  if (!activeProfile) {
+    const actFile = resolve(homedir(), '.config', 'kaede', 'active_profile');
+    if (existsSync(actFile)) {
+      try {
+        activeProfile = readFileSync(actFile, 'utf-8').trim() || null;
+      } catch {}
+    }
+  }
+  if (activeProfile) {
+    searchPaths.push(resolve(homedir(), '.config', 'kaede', 'profiles', `${activeProfile}.env`));
+  }
+
+  // 3. Project-level and global secrets
+  searchPaths.push(
+    resolve(process.cwd(), '.kaede.env'),
+    resolve(process.cwd(), '.kaede', 'secrets.env'),
+    resolve(process.cwd(), 'secrets.env'),
     resolve(ROOT, 'secrets.env'),
     resolve(ROOT, '..', 'secrets.env'),
     resolve(homedir(), '.config', 'kaede', 'secrets.env'),
-    resolve(process.cwd(), 'secrets.env'),
-  ];
+  );
+
   let merged: Record<string, string> = {};
   for (const p of searchPaths) {
     const exists = existsSync(p);

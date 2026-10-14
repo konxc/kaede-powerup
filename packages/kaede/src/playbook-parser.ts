@@ -165,6 +165,11 @@ export function bundleContext(paths: BundlePaths): BundleContextResult {
         const dl = readFileSync(decisionPath, 'utf-8');
         context.openkb.decisions = dl.split('\n').filter((l) => l.startsWith('## '));
       }
+      const voicePath = resolve(paths.openkb, 'brand', 'voice-and-tone.md');
+      if (existsSync(voicePath)) {
+        const vt = readFileSync(voicePath, 'utf-8');
+        context.openkb.brandVoice = vt.slice(0, 500);
+      }
     } catch {
       // openkb opsional, silent
     }

@@ -37,6 +37,6 @@ export interface BundlePaths {
 
 export interface BundleContextResult {
   playbook: PlaybookResult | null;
-  openkb: { glossary: string[]; decisions: string[] };
+  openkb: { glossary: string[]; decisions: string[]; brandVoice?: string };
   opencode: Record<string, unknown> | null;
 }

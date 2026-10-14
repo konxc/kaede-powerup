@@ -10,7 +10,20 @@ export type CardTemplateDef = {
   defaultLabels?: string[];
 };
 
-export type BuiltInTemplate = 'feature' | 'bug' | 'task' | 'chore' | 'onboarding' | 'user-story' | 'sprint-planning' | 'sprint-retro' | 'daily-standup';
+export type BuiltInTemplate =
+  | 'feature'
+  | 'bug'
+  | 'task'
+  | 'chore'
+  | 'onboarding'
+  | 'user-story'
+  | 'sprint-planning'
+  | 'sprint-retro'
+  | 'daily-standup'
+  | 'seo-article'
+  | 'social-media-post'
+  | 'lead-funnel'
+  | 'web-copy';
 
 export type TemplateVars = {
   task: string;
@@ -24,6 +37,14 @@ export type TemplateVars = {
   convention?: string;
   priority?: string;
   sprint?: string;
+  keyword?: string;
+  platform?: string;
+  funnelStage?: string;
+  targetAudience?: string;
+  publishDate?: string;
+  assetUrl?: string;
+  ctaLink?: string;
+  offer?: string;
   [key: string]: string | undefined;
 };
 

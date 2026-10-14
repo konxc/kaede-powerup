@@ -13,6 +13,15 @@ import {
   writeGlobalSecrets,
   globalSecretsPath,
   promptTokenViaLocalServer,
+  profilesDir,
+  activeProfilePath,
+  getActiveProfile,
+  profileSecretsPath,
+  saveProfile,
+  loadProfile,
+  listProfiles,
+  switchProfile,
+  deleteProfile,
   type Secrets,
 } from './kaede-auth';
 
@@ -23,13 +32,44 @@ const KAEDE_SRC = resolve(KAEDE_DIR, 'packages', 'kaede', 'src');
 
 type EnvVars = Secrets;
 
-function getSecrets(): EnvVars {
-  const global = resolve(homedir(), '.config', 'kaede', 'secrets.env');
-  const local = resolve(process.cwd(), 'secrets.env');
-  const dev = resolve(KAEDE_DIR, 'secrets.env');
+function getRequestedProfile(): string | null {
+  const profileArgIdx = process.argv.indexOf('--profile');
+  if (profileArgIdx !== -1 && process.argv[profileArgIdx + 1] && !process.argv[profileArgIdx + 1].startsWith('-')) {
+    return process.argv[profileArgIdx + 1];
+  }
+  return process.env.KAEDE_PROFILE || getActiveProfile(homedir()) || null;
+}
+
+function getSecrets(profileOverride?: string): EnvVars {
+  const profile = profileOverride || getRequestedProfile();
+  const searchPaths: string[] = [];
+
+  // 1. Explicit or active profile secrets
+  if (profile) {
+    searchPaths.push(profileSecretsPath(homedir(), profile));
+  }
+
+  // 2. Custom secrets path if env var set
+  if (process.env.KAEDE_SECRETS_PATH) {
+    searchPaths.push(resolve(process.env.KAEDE_SECRETS_PATH));
+  }
+
+  // 3. Local project secrets (.kaede.env, .kaede/secrets.env, secrets.env)
+  searchPaths.push(
+    resolve(process.cwd(), '.kaede.env'),
+    resolve(process.cwd(), '.kaede', 'secrets.env'),
+    resolve(process.cwd(), 'secrets.env'),
+  );
+
+  // 4. Dev repo secrets
+  searchPaths.push(resolve(KAEDE_DIR, 'secrets.env'));
+
+  // 5. Global secrets (~/.config/kaede/secrets.env)
+  searchPaths.push(globalSecretsPath(homedir()));
 
   let merged: EnvVars = {};
-  for (const p of [dev, local, global]) {
+  for (let i = searchPaths.length - 1; i >= 0; i--) {
+    const p = searchPaths[i];
     merged = { ...merged, ...loadEnv(p) };
   }
   return merged;
@@ -46,16 +86,19 @@ function ask(query: string): Promise<string> {
 
 // ─── Commands ───
 
-// ─── Auth (login/status/logout/token) ───
+// ─── Auth (login/status/logout/token/switch/list/save/delete) ───
 
-async function authLogin(opts: { manual?: boolean }): Promise<void> {
-  const secrets = getSecrets();
+async function authLogin(opts: { manual?: boolean; profile?: string }): Promise<void> {
+  const secrets = getSecrets(opts.profile);
   let key = secrets.TRELLO_API_KEY || '';
 
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
   console.log('  \x1b[35m║        KAEDE — Auth Login            ║\x1b[0m');
   console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  if (opts.profile) {
+    console.log(`  \x1b[36mTarget Profile: ${opts.profile}\x1b[0m`);
+  }
   console.log('');
 
   if (!key) {
@@ -105,11 +148,14 @@ async function authLogin(opts: { manual?: boolean }): Promise<void> {
     return;
   }
 
-  const path = writeGlobalSecrets(homedir(), { TRELLO_API_KEY: key, TRELLO_TOKEN: token });
+  const path = writeGlobalSecrets(homedir(), { TRELLO_API_KEY: key, TRELLO_TOKEN: token }, opts.profile);
   console.log(`  \x1b[32m  ✓ Saved to ${path}\x1b[0m`);
   const who = info.member ? `${info.member.fullName} (@${info.member.username})` : info.id;
   console.log('');
   console.log(`  \x1b[32m  ✅  Logged in as ${who}\x1b[0m`);
+  if (opts.profile) {
+    console.log(`  \x1b[36m     Profile: ${opts.profile} (active)\x1b[0m`);
+  }
   if (info.expires && info.expires !== 'never') {
     console.log(`  \x1b[90m     Expires: ${info.expires}\x1b[0m`);
   }
@@ -117,12 +163,16 @@ async function authLogin(opts: { manual?: boolean }): Promise<void> {
 }
 
 async function authStatus(): Promise<void> {
-  const secrets = getSecrets();
+  const profile = getRequestedProfile();
+  const secrets = getSecrets(profile || undefined);
+  const activeProf = getActiveProfile(homedir());
+
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
   console.log('  \x1b[35m║        KAEDE — Auth Status           ║\x1b[0m');
   console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
   console.log('');
+  console.log(`  Profile     \x1b[36m${activeProf ? `${activeProf} (active)` : '(default)'}\x1b[0m`);
 
   if (!secrets.TRELLO_API_KEY || !secrets.TRELLO_TOKEN) {
     console.log('  \x1b[33m  Not logged in.\x1b[0m');
@@ -139,13 +189,83 @@ async function authStatus(): Promise<void> {
     console.log(`  Token       \x1b[90m${maskToken(secrets.TRELLO_TOKEN)}\x1b[0m`);
     console.log(`  Expires     \x1b[90m${info.expires}\x1b[0m`);
     console.log(`  Scope       \x1b[90mread, write, account\x1b[0m`);
-    console.log(`  Source      \x1b[90m${globalSecretsPath(homedir())}\x1b[0m`);
+    console.log(`  Source      \x1b[90m${activeProf ? profileSecretsPath(homedir(), activeProf) : globalSecretsPath(homedir())}\x1b[0m`);
   } catch (err) {
     console.log('  \x1b[31m  Token invalid atau expired:\x1b[0m');
     console.log('  \x1b[90m  ' + (err as Error).message + '\x1b[0m');
     console.log('  \x1b[90m  Run `kaede auth login` untuk memperbarui.\x1b[0m');
   }
   console.log('');
+}
+
+async function authSwitch(profileName: string): Promise<void> {
+  if (!profileName) {
+    console.log('  \x1b[31m  ✗ Harap sebutkan nama profil: `kaede auth switch <name>`\x1b[0m');
+    return;
+  }
+  const res = switchProfile(homedir(), profileName);
+  if (res.success) {
+    console.log(`  \x1b[32m  ✓ Berhasil beralih ke profil "${profileName}".\x1b[0m`);
+    console.log(`  \x1b[90m    Kredensial disinkronkan ke ${res.path}\x1b[0m`);
+  } else {
+    console.log(`  \x1b[31m  ✗ ${res.error}\x1b[0m`);
+    console.log('  \x1b[90m    Gunakan `kaede auth list` untuk melihat profil yang tersedia,\x1b[0m');
+    console.log(`  \x1b[90m    atau \`kaede auth save ${profileName}\` untuk menyimpan kredensial saat ini.\x1b[0m`);
+  }
+}
+
+async function authList(): Promise<void> {
+  const profiles = listProfiles(homedir());
+  const active = getActiveProfile(homedir());
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║        KAEDE — Auth Profiles         ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
+  console.log('');
+
+  if (profiles.length === 0) {
+    console.log('  \x1b[90m  Belum ada profil tersimpan di ~/.config/kaede/profiles/.\x1b[0m');
+    console.log('  \x1b[90m  Gunakan `kaede auth save <name>` untuk menyimpan konfigurasi saat ini sebagai profil.\x1b[0m');
+    console.log('');
+    return;
+  }
+
+  for (const p of profiles) {
+    const prefix = p.active ? '\x1b[32m  * \x1b[1m' : '    ';
+    const suffix = p.active ? ' (active)\x1b[0m' : '\x1b[0m';
+    console.log(`${prefix}${p.name}${suffix}`);
+  }
+  console.log('');
+  console.log('  \x1b[90m  Beralih profil: `kaede auth switch <name>`\x1b[0m');
+  console.log('');
+}
+
+async function authSave(profileName: string): Promise<void> {
+  if (!profileName) {
+    console.log('  \x1b[31m  ✗ Harap sebutkan nama profil: `kaede auth save <name>`\x1b[0m');
+    return;
+  }
+  const secrets = getSecrets();
+  if (!secrets.TRELLO_API_KEY && !secrets.TRELLO_TOKEN) {
+    console.log('  \x1b[31m  ✗ Tidak ada kredensial aktif untuk disimpan.\x1b[0m');
+    return;
+  }
+  const path = saveProfile(homedir(), profileName, secrets);
+  console.log(`  \x1b[32m  ✓ Kredensial disimpan ke profil "${profileName}" (${path}).\x1b[0m`);
+}
+
+async function authDelete(profileName: string): Promise<void> {
+  if (!profileName) {
+    console.log('  \x1b[31m  ✗ Harap sebutkan nama profil: `kaede auth delete <name>`\x1b[0m');
+    return;
+  }
+  const ok = deleteProfile(homedir(), profileName);
+  if (ok) {
+    console.log(`  \x1b[32m  ✓ Profil "${profileName}" berhasil dihapus.\x1b[0m`);
+  } else {
+    console.log(`  \x1b[33m  ⚠ Profil "${profileName}" tidak ditemukan.\x1b[0m`);
+  }
 }
 
 async function authLogout(): Promise<void> {
@@ -190,9 +310,14 @@ async function cmdAuth(): Promise<void> {
   const sub = args[0] || 'login';
   const manual = args.includes('--manual');
   const raw = args.includes('--raw');
+  const profileIdx = args.indexOf('--profile');
+  const profile = profileIdx !== -1 && args[profileIdx + 1] && !args[profileIdx + 1].startsWith('-')
+    ? args[profileIdx + 1]
+    : undefined;
+
   switch (sub) {
     case 'login':
-      await authLogin({ manual });
+      await authLogin({ manual, profile });
       break;
     case 'status':
       await authStatus();
@@ -203,8 +328,20 @@ async function cmdAuth(): Promise<void> {
     case 'token':
       await authToken({ raw });
       break;
+    case 'switch':
+      await authSwitch(args[1]);
+      break;
+    case 'list':
+      await authList();
+      break;
+    case 'save':
+      await authSave(args[1]);
+      break;
+    case 'delete':
+      await authDelete(args[1]);
+      break;
     default:
-      console.log('  Usage: kaede auth <login|status|logout|token> [--manual] [--raw]');
+      console.log('  Usage: kaede auth <login|status|logout|token|switch|list|save|delete> [--manual] [--raw] [--profile <name>]');
   }
 }
 
@@ -1571,6 +1708,138 @@ async function cmdTestTools(): Promise<void> {
   console.log('');
 }
 
+// ── Check Copy & Brand Voice ──
+
+async function cmdCheckCopy(): Promise<void> {
+  const filePath = process.argv[3];
+  if (!filePath) {
+    console.log('');
+    console.log('  \x1b[31m  ✗ Harap sebutkan path file markdown: `kaede check-copy <file.md>`\x1b[0m');
+    console.log('  \x1b[90m    Contoh: kaede check-copy article.md --channel seo-article\x1b[0m');
+    console.log('');
+    return;
+  }
+
+  const resolved = resolve(process.cwd(), filePath);
+  if (!existsSync(resolved)) {
+    console.log(`  \x1b[31m  ✗ File tidak ditemukan: ${resolved}\x1b[0m`);
+    return;
+  }
+
+  const content = readFileSync(resolved, 'utf-8');
+  const channelIdx = process.argv.indexOf('--channel');
+  const channel = channelIdx !== -1 ? process.argv[channelIdx + 1] : undefined;
+
+  const { validateBrandVoice } = await import(resolve(KAEDE_DIR, 'packages', 'kaede', 'src', 'brand-voice'));
+  const res = validateBrandVoice(content, { channel: channel as any });
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║        KAEDE — Brand Voice & Copy Check      ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════════════╝\x1b[0m');
+  console.log('');
+  console.log(`  File        \x1b[36m${filePath}\x1b[0m`);
+  console.log(`  Persona     \x1b[33m${res.persona}\x1b[0m`);
+  console.log(`  Channel     \x1b[90m${res.channel}\x1b[0m`);
+  console.log(`  Words       \x1b[90m${res.metrics.wordCount} kata (~${res.metrics.readingTimeMinutes} mnt baca)\x1b[0m`);
+
+  const scoreColor = res.score >= 80 ? '\x1b[32m' : res.score >= 60 ? '\x1b[33m' : '\x1b[31m';
+  console.log(`  Score       ${scoreColor}${res.score} / 100 ${res.compliant ? '✓ PASSED' : '✗ NEEDS REVISION'}\x1b[0m`);
+  console.log('');
+
+  if (res.passedChecks.length > 0) {
+    console.log('  \x1b[32mPassed Checks:\x1b[0m');
+    for (const p of res.passedChecks) {
+      console.log(`    \x1b[32m✓\x1b[0m ${p}`);
+    }
+    console.log('');
+  }
+
+  if (res.violations.length > 0) {
+    console.log('  \x1b[31mItems Needing Attention:\x1b[0m');
+    for (const v of res.violations) {
+      const badge = v.severity === 'error' ? '\x1b[31m[ERROR]\x1b[0m' : v.severity === 'warning' ? '\x1b[33m[WARN]\x1b[0m' : '\x1b[36m[TIP]\x1b[0m';
+      console.log(`    ${badge} ${v.message}`);
+      if (v.snippet) console.log(`      \x1b[90mSnippet: "${v.snippet}"\x1b[0m`);
+      if (v.suggestion) console.log(`      \x1b[32mSaran: ${v.suggestion}\x1b[0m`);
+    }
+    console.log('');
+  }
+}
+
+// ── Agent-to-Agent Handoff ──
+
+async function cmdHandoff(): Promise<void> {
+  const cardId = process.argv[3];
+  if (!cardId || cardId.startsWith('--')) {
+    console.log('');
+    console.log('  \x1b[31m  ✗ Harap sebutkan cardId: `kaede handoff <cardId> --to <agent> --action <action>`\x1b[0m');
+    console.log('  \x1b[90m    Contoh: kaede handoff EozizbLs --to agent-hermes --action publish_draft --execute\x1b[0m');
+    console.log('');
+    return;
+  }
+
+  const toIdx = process.argv.indexOf('--to');
+  const actionIdx = process.argv.indexOf('--action');
+  const instructionsIdx = process.argv.indexOf('--instructions');
+  const shouldExecute = process.argv.includes('--execute') || process.argv.includes('--post');
+
+  const targetAgent = toIdx !== -1 ? process.argv[toIdx + 1] : '';
+  const action = actionIdx !== -1 ? process.argv[actionIdx + 1] : '';
+  const instructions = instructionsIdx !== -1 ? process.argv[instructionsIdx + 1] : undefined;
+
+  if (!targetAgent || !action) {
+    console.log('  \x1b[31m  ✗ Flags --to <agent> dan --action <action> wajib diisi.\x1b[0m');
+    return;
+  }
+
+  const { createHandoffDirective } = await import(resolve(KAEDE_DIR, 'packages', 'kaede', 'src', 'agent-handoff'));
+  const { comment, directive } = createHandoffDirective({
+    targetAgent,
+    cardId,
+    action,
+    instructions,
+  });
+
+  console.log('');
+  console.log('  \x1b[35m╔══════════════════════════════════════════════╗\x1b[0m');
+  console.log('  \x1b[35m║        KAEDE — Agent-to-Agent Handoff        ║\x1b[0m');
+  console.log('  \x1b[35m╚══════════════════════════════════════════════╝\x1b[0m');
+  console.log('');
+  console.log(`  ID          \x1b[36m${directive.id}\x1b[0m`);
+  console.log(`  Card ID     \x1b[36m${cardId}\x1b[0m`);
+  console.log(`  Target      \x1b[33m@${targetAgent}\x1b[0m`);
+  console.log(`  Action      \x1b[32m${action}\x1b[0m`);
+  console.log('');
+
+  if (shouldExecute) {
+    console.log('  \x1b[90m  Posting handoff comment to Trello card...\x1b[0m');
+    const secrets = getSecrets();
+    if (!secrets.TRELLO_API_KEY || !secrets.TRELLO_TOKEN) {
+      console.log('  \x1b[31m  ✗ Trello credentials not found. Run `kaede auth login` first.\x1b[0m');
+      return;
+    }
+    const api = 'https://api.trello.com/1';
+    const auth = `key=${secrets.TRELLO_API_KEY}&token=${secrets.TRELLO_TOKEN}`;
+    const res = await fetch(`${api}/cards/${cardId}/actions/comments?${auth}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: comment }),
+    });
+    if (res.ok) {
+      console.log('  \x1b[32m  ✓ Handoff directive successfully posted to Trello card!\x1b[0m');
+    } else {
+      console.log(`  \x1b[31m  ✗ Failed to post comment: ${res.statusText}\x1b[0m`);
+    }
+  } else {
+    console.log('  \x1b[90mGenerated Directive Comment (pass --execute to post directly):\x1b[0m');
+    console.log('  ────────────────────────────────────────────────────────────');
+    console.log(comment);
+    console.log('  ────────────────────────────────────────────────────────────');
+  }
+  console.log('');
+}
+
 // ── Help ──
 
 function cmdHelp(): void {
@@ -1583,7 +1852,7 @@ function cmdHelp(): void {
   console.log('');
   console.log('  \x1b[37mCommands:\x1b[0m');
   console.log('    \x1b[36msetup\x1b[0m     \x1b[90mOnboarding lengkap: auth OAuth + MCP config + verifikasi. Flags: --yes, --no-mcp, --no-init\x1b[0m');
-  console.log('    \x1b[36mauth\x1b[0m      \x1b[90mAuth Trello: login | status | logout | token [--manual] [--raw]\x1b[0m');
+  console.log('    \x1b[36mauth\x1b[0m      \x1b[90mAuth Trello: login | status | logout | token | switch | list | save | delete [--manual] [--raw] [--profile <name>]\x1b[0m');
   console.log('    \x1b[36mtoday\x1b[0m     \x1b[90mTampilkan task Trello hari ini\x1b[0m');
   console.log(
     '    \x1b[36minit\x1b[0m      \x1b[90mInit KAEDE di project. Flags: --playbook <path>, --tech <stack>, --db <type>\x1b[0m',
@@ -1600,6 +1869,8 @@ function cmdHelp(): void {
   console.log('    \x1b[36mstart\x1b[0m     \x1b[90mStart API server (HTTP bridge for frontend) [port]\x1b[0m');
   console.log('    \x1b[36mtest-tools\x1b[0m \x1b[90mUji koneksi MCP tools (butuh Trello credentials)\x1b[0m');
   console.log('    \x1b[36mtemplate\x1b[0m  \x1b[90mCard templates: list, show <name>, apply <name> [--task "x"]\x1b[0m');
+  console.log('    \x1b[36mcheck-copy\x1b[0m \x1b[90mValidasi markdown copy terhadap Brand Voice & Tone (<file.md> [--channel <name>])\x1b[0m');
+  console.log('    \x1b[36mhandoff\x1b[0m    \x1b[90mAgent-to-agent handoff event (<cardId> --to <agent> --action <act> [--execute])\x1b[0m');
   console.log('    \x1b[36mreport\x1b[0m    \x1b[90mSprint report: sprint --board <id> [--name "Sprint X"] [--list "Done,Review"]\x1b[0m');
   console.log('    \x1b[36marchive\x1b[0m   \x1b[90mArchive sprint: sprint --board <id> [--list "Done"] [--action all|closed]\x1b[0m');
   console.log('    \x1b[36minstall\x1b[0m   \x1b[90mInstall KAEDE globally via bun link\x1b[0m');
@@ -1618,6 +1889,8 @@ function cmdHelp(): void {
   console.log('    bun scripts/kaede.ts auth status');
   console.log('    bun scripts/kaede.ts auth logout');
   console.log('    bun scripts/kaede.ts auth token --raw             # untuk scripting');
+  console.log('    bun scripts/kaede.ts check-copy article.md --channel seo-article');
+  console.log('    bun scripts/kaede.ts handoff EozizbLs --to agent-hermes --action publish_draft');
   console.log('    bun scripts/kaede.ts today');
   console.log('    bun scripts/kaede.ts env | iex                 # Windows PowerShell');
   console.log('    bun scripts/kaede.ts env --bash | source /dev/stdin  # Linux/Mac');
@@ -1686,6 +1959,13 @@ async function main(): Promise<void> {
       break;
     case 'template':
       await cmdTemplate();
+      break;
+    case 'check-copy':
+    case 'brand-voice':
+      await cmdCheckCopy();
+      break;
+    case 'handoff':
+      await cmdHandoff();
       break;
     case 'report':
       await cmdReport();

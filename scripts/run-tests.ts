@@ -10,6 +10,8 @@ const testFiles = [
   'packages/kaede/test/enforcer.test.js',
   'packages/kaede/test/netlify-proxy.test.js',
   'packages/kaede/test/kaede-auth.test.js',
+  'packages/kaede/test/brand-voice.test.js',
+  'packages/kaede/test/agent-handoff.test.js',
   'apps/webui/src/lib/github-app.test.ts',
 ];
 

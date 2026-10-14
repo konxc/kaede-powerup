@@ -55,6 +55,12 @@ import {
   handleParseCardComments,
   handleCheckLabelConsistency,
 } from './tool-handlers/git-github';
+import { handleValidateBrandVoice } from './tool-handlers/brand-voice';
+import {
+  handleHandoffTask,
+  handleGetHandoffDirectives,
+  handleUpdateHandoffStatus,
+} from './tool-handlers/handoff';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -795,6 +801,73 @@ const TOOLS: ToolSchema[] = [
     },
     ['labels', 'status'],
   ),
+
+  toolSchema(
+    'validate_brand_voice',
+    'Validate copy or markdown text against brand voice guidelines and forbidden words rules in .openkb/brand/voice-and-tone.md.',
+    {
+      text: { type: 'string', description: 'Content text to validate' },
+      openkbPath: { type: 'string', description: 'Optional path to .openkb directory' },
+      brandVoicePath: { type: 'string', description: 'Optional explicit path to voice-and-tone.md' },
+      persona: { type: 'string', description: 'Optional target persona override' },
+      channel: {
+        type: 'string',
+        enum: ['seo-article', 'social-media-post', 'lead-funnel', 'web-copy', 'general'],
+        description: 'Content channel type',
+      },
+      customForbiddenWords: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Additional forbidden words to check',
+      },
+      minWords: { type: 'number', description: 'Minimum word count requirement' },
+      maxWords: { type: 'number', description: 'Maximum word count requirement' },
+    },
+    ['text'],
+  ),
+
+  toolSchema(
+    'handoff_task',
+    'Dispatch a structured agent-to-agent handoff event (kaede-handoff/v1) by posting an actionable machine-and-human readable directive comment on a Trello card.',
+    {
+      cardId: { type: 'string', description: 'Trello card ID or shortLink' },
+      targetAgent: { type: 'string', description: 'Target agent identifier (e.g. "agent-hermes", "opencode", "wordpress-publisher")' },
+      action: { type: 'string', description: 'Action for target agent (e.g. "publish_draft", "review_pr", "notify_lead_via_whatsapp")' },
+      sourceAgent: { type: 'string', description: 'Source agent identifier (defaults to "kaede-orchestrator")' },
+      cardTitle: { type: 'string', description: 'Optional card title for context' },
+      instructions: { type: 'string', description: 'Detailed instructions for the target agent' },
+      payload: { type: 'object', description: 'Arbitrary structured data needed by target agent' },
+      execute: { type: 'boolean', description: 'Whether to post comment directly to Trello card (default: true)' },
+    },
+    ['cardId', 'targetAgent', 'action'],
+  ),
+
+  toolSchema(
+    'get_handoff_directives',
+    'Retrieve and parse structured agent-to-agent handoff directives (kaede-handoff/v1) and their current status from a Trello card.',
+    {
+      cardId: { type: 'string', description: 'Trello card ID or shortLink' },
+    },
+    ['cardId'],
+  ),
+
+  toolSchema(
+    'update_handoff_status',
+    'Update status of an active agent-to-agent handoff directive on a Trello card.',
+    {
+      cardId: { type: 'string', description: 'Trello card ID or shortLink' },
+      handoffId: { type: 'string', description: 'Handoff directive ID (e.g. "handoff-1728...")' },
+      status: {
+        type: 'string',
+        enum: ['pending', 'in_progress', 'completed', 'failed', 'cancelled'],
+        description: 'New handoff status',
+      },
+      message: { type: 'string', description: 'Optional progress or error message' },
+      updaterAgent: { type: 'string', description: 'Agent name reporting the update (e.g. "agent-hermes")' },
+      execute: { type: 'boolean', description: 'Whether to post comment directly to Trello card (default: true)' },
+    },
+    ['cardId', 'handoffId', 'status'],
+  ),
 ];
 
 type ToolHandler = (args: Record<string, unknown>) => unknown;
@@ -853,6 +926,12 @@ const TOOL_HANDLERS: Record<string, ToolHandler> = {
   parse_acceptance_criteria: handleParseAcceptanceCriteria,
   parse_card_comments: handleParseCardComments,
   check_label_consistency: handleCheckLabelConsistency,
+
+  // Brand Voice & Agent Handoff
+  validate_brand_voice: handleValidateBrandVoice,
+  handoff_task: handleHandoffTask,
+  get_handoff_directives: handleGetHandoffDirectives,
+  update_handoff_status: handleUpdateHandoffStatus,
 };
 
 const missingHandlers = TOOLS.filter((t) => !TOOL_HANDLERS[t.name]).map((t) => t.name);

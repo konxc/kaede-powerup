@@ -2,8 +2,8 @@
  * KAEDE Auth helpers — shared by `kaede auth` command group and `kaede setup`
  * onboarding. Pure functions are exported for unit testing (test/kaede-auth.test.js).
  */
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
-import { resolve } from 'path';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
+import { resolve, basename } from 'path';
 
 export const TRELLO_API_BASE = 'https://api.trello.com/1';
 export const TRELLO_AUTHORIZE_BASE = 'https://trello.com/1/authorize';
@@ -35,11 +35,116 @@ export function globalSecretsPath(home: string): string {
   return resolve(home, '.config', 'kaede', 'secrets.env');
 }
 
+/** Direktori profil konfigurasi `~/.config/kaede/profiles` */
+export function profilesDir(home: string): string {
+  return resolve(home, '.config', 'kaede', 'profiles');
+}
+
+/** Path file penanda profil aktif `~/.config/kaede/active_profile` */
+export function activeProfilePath(home: string): string {
+  return resolve(home, '.config', 'kaede', 'active_profile');
+}
+
+/** Dapatkan nama profil yang sedang aktif (jika ada) */
+export function getActiveProfile(home: string): string | null {
+  const p = activeProfilePath(home);
+  if (!existsSync(p)) return null;
+  const name = readFileSync(p, 'utf-8').trim();
+  return name || null;
+}
+
+/** Path ke file secrets profil tertentu `~/.config/kaede/profiles/<name>.env` */
+export function profileSecretsPath(home: string, profile: string): string {
+  const safeName = profile.replace(/[^a-zA-Z0-9_-]/g, '_');
+  return resolve(profilesDir(home), `${safeName}.env`);
+}
+
+/** Muat secrets dari profil tertentu */
+export function loadProfile(home: string, profile: string): Secrets {
+  return loadEnv(profileSecretsPath(home, profile));
+}
+
+/** Simpan atau merge secrets ke dalam profil tertentu */
+export function saveProfile(home: string, profile: string, partial: Partial<Secrets>): string {
+  const path = profileSecretsPath(home, profile);
+  const existing = existsSync(path) ? loadEnv(path) : {};
+
+  for (const [k, v] of Object.entries(partial)) {
+    if (v === undefined || v === null) delete existing[k];
+    else existing[k] = v;
+  }
+
+  const lines = [
+    `# KAEDE Profile: ${profile}`,
+    '# Keep this file secret! Do NOT commit to git.',
+    '',
+    ...Object.entries(existing)
+      .filter(([, v]) => v !== undefined && v !== '')
+      .map(([k, v]) => `${k}=${v}`),
+    '',
+  ];
+
+  mkdirSync(resolve(path, '..'), { recursive: true });
+  writeFileSync(path, lines.join('\n'), 'utf-8');
+  return path;
+}
+
+/** Daftar semua profil yang tersimpan */
+export function listProfiles(home: string): Array<{ name: string; active: boolean; path: string }> {
+  const dir = profilesDir(home);
+  if (!existsSync(dir)) return [];
+  const active = getActiveProfile(home);
+  const entries = readdirSync(dir);
+  const profiles: Array<{ name: string; active: boolean; path: string }> = [];
+
+  for (const entry of entries) {
+    if (entry.endsWith('.env')) {
+      const name = basename(entry, '.env');
+      profiles.push({
+        name,
+        active: name === active,
+        path: resolve(dir, entry),
+      });
+    }
+  }
+  return profiles.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Beralih profil aktif: menyalin isi profil ke secrets.env dan mencatat active_profile */
+export function switchProfile(home: string, profile: string): { success: boolean; error?: string; path?: string } {
+  const targetPath = profileSecretsPath(home, profile);
+  if (!existsSync(targetPath)) {
+    return { success: false, error: `Profil "${profile}" tidak ditemukan di ${targetPath}.` };
+  }
+
+  const profileSecrets = loadEnv(targetPath);
+  const globalPath = writeGlobalSecrets(home, profileSecrets);
+  mkdirSync(resolve(activeProfilePath(home), '..'), { recursive: true });
+  writeFileSync(activeProfilePath(home), profile.trim() + '\n', 'utf-8');
+
+  return { success: true, path: globalPath };
+}
+
+/** Hapus profil */
+export function deleteProfile(home: string, profile: string): boolean {
+  const targetPath = profileSecretsPath(home, profile);
+  if (existsSync(targetPath)) {
+    unlinkSync(targetPath);
+    if (getActiveProfile(home) === profile) {
+      const act = activeProfilePath(home);
+      if (existsSync(act)) unlinkSync(act);
+    }
+    return true;
+  }
+  return false;
+}
+
 /**
  * Merge `partial` ke file secrets global lalu tulis ulang.
  * Nilai `undefined`/`null` berarti menghapus kunci tersebut.
+ * Jika `profile` diberikan, juga disimpan ke profil tersebut.
  */
-export function writeGlobalSecrets(home: string, partial: Partial<Secrets>): string {
+export function writeGlobalSecrets(home: string, partial: Partial<Secrets>, profile?: string): string {
   const path = globalSecretsPath(home);
   const existing = existsSync(path) ? loadEnv(path) : {};
 
@@ -60,6 +165,13 @@ export function writeGlobalSecrets(home: string, partial: Partial<Secrets>): str
 
   mkdirSync(resolve(path, '..'), { recursive: true });
   writeFileSync(path, lines.join('\n'), 'utf-8');
+
+  if (profile) {
+    saveProfile(home, profile, partial);
+    mkdirSync(resolve(activeProfilePath(home), '..'), { recursive: true });
+    writeFileSync(activeProfilePath(home), profile.trim() + '\n', 'utf-8');
+  }
+
   return path;
 }
 

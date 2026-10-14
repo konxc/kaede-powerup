@@ -108,6 +108,26 @@ describe('Prompt Builder & Smart Defaults', () => {
       assert.equal(r.templateName, 'onboarding');
     });
 
+    it('infers seo-article template', () => {
+      const r = inferFromGoal('Buat artikel SEO optimasi database');
+      assert.equal(r.templateName, 'seo-article');
+    });
+
+    it('infers social-media-post template', () => {
+      const r = inferFromGoal('Siapkan konten sosmed instagram reel');
+      assert.equal(r.templateName, 'social-media-post');
+    });
+
+    it('infers lead-funnel template', () => {
+      const r = inferFromGoal('Setup lead funnel promo akhir tahun');
+      assert.equal(r.templateName, 'lead-funnel');
+    });
+
+    it('infers web-copy template', () => {
+      const r = inferFromGoal('Tulis copywriting landing page produk');
+      assert.equal(r.templateName, 'web-copy');
+    });
+
     it('returns empty when no match', () => {
       const r = inferFromGoal('Random goal without keywords');
       assert.equal(r.templateName, undefined);

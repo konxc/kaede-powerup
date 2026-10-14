@@ -11,6 +11,15 @@ import {
   maskToken,
   trelloValidateToken,
   revokeToken,
+  profilesDir,
+  activeProfilePath,
+  getActiveProfile,
+  profileSecretsPath,
+  saveProfile,
+  loadProfile,
+  listProfiles,
+  switchProfile,
+  deleteProfile,
 } from '../../../scripts/kaede-auth.ts';
 
 const HOME = resolve(tmpdir(), 'kaede-auth-test-home');
@@ -138,4 +147,80 @@ test('revokeToken: 200 / 404 dianggap sukses', async () => {
 test('existsSync setelah writeGlobalSecrets true', () => {
   const path = writeGlobalSecrets(HOME, { TRELLO_API_KEY: 'k' });
   expect(existsSync(path)).toBe(true);
+});
+
+test('profile paths and activeProfile handling', () => {
+  expect(profilesDir(HOME)).toBe(resolve(HOME, '.config', 'kaede', 'profiles'));
+  expect(activeProfilePath(HOME)).toBe(resolve(HOME, '.config', 'kaede', 'active_profile'));
+  expect(getActiveProfile(HOME)).toBeNull();
+
+  expect(profileSecretsPath(HOME, 'konxc')).toBe(resolve(HOME, '.config', 'kaede', 'profiles', 'konxc.env'));
+});
+
+test('saveProfile, loadProfile, and listProfiles', () => {
+  saveProfile(HOME, 'konxc', { TRELLO_API_KEY: 'k_konxc', TRELLO_TOKEN: 't_konxc' });
+  saveProfile(HOME, 'smauii', { TRELLO_API_KEY: 'k_smauii', TRELLO_TOKEN: 't_smauii' });
+
+  const p1 = loadProfile(HOME, 'konxc');
+  expect(p1.TRELLO_API_KEY).toBe('k_konxc');
+  expect(p1.TRELLO_TOKEN).toBe('t_konxc');
+
+  const p2 = loadProfile(HOME, 'smauii');
+  expect(p2.TRELLO_API_KEY).toBe('k_smauii');
+  expect(p2.TRELLO_TOKEN).toBe('t_smauii');
+
+  const list = listProfiles(HOME);
+  expect(list.length).toBe(2);
+  expect(list[0].name).toBe('konxc');
+  expect(list[1].name).toBe('smauii');
+  expect(list[0].active).toBe(false);
+});
+
+test('switchProfile activates profile and updates secrets.env', () => {
+  saveProfile(HOME, 'konxc', { TRELLO_API_KEY: 'key_konxc', TRELLO_TOKEN: 'tok_konxc' });
+  saveProfile(HOME, 'sandiko', { TRELLO_API_KEY: 'key_sandiko', TRELLO_TOKEN: 'tok_sandiko' });
+
+  const res = switchProfile(HOME, 'konxc');
+  expect(res.success).toBe(true);
+  expect(getActiveProfile(HOME)).toBe('konxc');
+
+  const globalEnv = loadEnv(globalSecretsPath(HOME));
+  expect(globalEnv.TRELLO_API_KEY).toBe('key_konxc');
+  expect(globalEnv.TRELLO_TOKEN).toBe('tok_konxc');
+
+  const list = listProfiles(HOME);
+  const konxcEntry = list.find((p) => p.name === 'konxc');
+  expect(konxcEntry?.active).toBe(true);
+
+  // Switch to sandiko
+  switchProfile(HOME, 'sandiko');
+  expect(getActiveProfile(HOME)).toBe('sandiko');
+  const globalEnv2 = loadEnv(globalSecretsPath(HOME));
+  expect(globalEnv2.TRELLO_API_KEY).toBe('key_sandiko');
+
+  // Switch to non-existent profile returns error
+  const failRes = switchProfile(HOME, 'ghost');
+  expect(failRes.success).toBe(false);
+  expect(failRes.error).toContain('tidak ditemukan');
+});
+
+test('deleteProfile removes profile file and clears active if active', () => {
+  saveProfile(HOME, 'to_delete', { TRELLO_API_KEY: 'kd' });
+  switchProfile(HOME, 'to_delete');
+  expect(getActiveProfile(HOME)).toBe('to_delete');
+
+  const ok = deleteProfile(HOME, 'to_delete');
+  expect(ok).toBe(true);
+  expect(getActiveProfile(HOME)).toBeNull();
+  expect(listProfiles(HOME).length).toBe(0);
+
+  expect(deleteProfile(HOME, 'not_there')).toBe(false);
+});
+
+test('writeGlobalSecrets with profile argument sets active profile', () => {
+  writeGlobalSecrets(HOME, { TRELLO_API_KEY: 'k_prof', TRELLO_TOKEN: 't_prof' }, 'klubfisika');
+  expect(getActiveProfile(HOME)).toBe('klubfisika');
+  const prof = loadProfile(HOME, 'klubfisika');
+  expect(prof.TRELLO_API_KEY).toBe('k_prof');
+  expect(prof.TRELLO_TOKEN).toBe('t_prof');
 });

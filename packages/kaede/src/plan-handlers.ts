@@ -264,6 +264,14 @@ function fillCardFromTemplate(card: BatchCard, args: Record<string, unknown>, go
     reference: (args.reference as string) || '',
     priority: (args.priority as string) || '',
     assignee: (args.assignee as string) || '',
+    keyword: (args.keyword as string) || (args.kataKunci as string) || '',
+    platform: (args.platform as string) || 'Instagram',
+    funnelStage: (args.funnelStage as string) || (args.tahapFunnel as string) || 'TOFU',
+    targetAudience: (args.targetAudience as string) || (args.target as string) || '',
+    publishDate: (args.publishDate as string) || (args.tanggalTayang as string) || (card.due || ''),
+    assetUrl: (args.assetUrl as string) || (args.linkAset as string) || '',
+    ctaLink: (args.ctaLink as string) || (args.linkCta as string) || '',
+    offer: (args.offer as string) || (args.penawaran as string) || '',
   };
 
   const generated = generateCardFromTemplate(tplName, vars);
@@ -275,6 +283,88 @@ function fillCardFromTemplate(card: BatchCard, args: Record<string, unknown>, go
 
   return resolved;
 }
+
+// ── Digital Agency Plan Handlers ──
+
+onPlan(['buat artikel seo', 'artikel seo', 'konten seo', 'tulis artikel', 'buat artikel'], (pb, args) => {
+  const task = (args.task as string) || (args.name as string) || 'New SEO Article';
+  const listName = (args.list as string) || pb.workflow.lists[0] || '';
+  const filled = fillCardFromTemplate({ task, list: listName }, { ...args, template: 'seo-article' }, 'seo');
+  return [
+    {
+      action: 'create_card',
+      params: {
+        name: filled.task,
+        desc: filled.desc || '',
+        listName,
+        labels: filled.labels || ['seo', 'content'],
+        comment: filled.comment || '',
+        checklist: filled.checklist || [],
+      },
+      description: `Buat kartu artikel SEO "${filled.task}" di list "${listName}"`,
+    },
+  ];
+});
+
+onPlan(['buat konten sosmed', 'konten sosmed', 'post sosmed', 'instagram post', 'tiktok post', 'konten instagram'], (pb, args) => {
+  const task = (args.task as string) || (args.name as string) || 'New Social Media Post';
+  const listName = (args.list as string) || pb.workflow.lists[0] || '';
+  const filled = fillCardFromTemplate({ task, list: listName }, { ...args, template: 'social-media-post' }, 'sosmed');
+  return [
+    {
+      action: 'create_card',
+      params: {
+        name: filled.task,
+        desc: filled.desc || '',
+        listName,
+        labels: filled.labels || ['social-media', 'creative'],
+        comment: filled.comment || '',
+        checklist: filled.checklist || [],
+      },
+      description: `Buat kartu konten sosmed "${filled.task}" di list "${listName}"`,
+    },
+  ];
+});
+
+onPlan(['buat funnel', 'materi funnel', 'lead funnel', 'setup funnel'], (pb, args) => {
+  const task = (args.task as string) || (args.name as string) || 'New Lead Funnel';
+  const listName = (args.list as string) || pb.workflow.lists[0] || '';
+  const filled = fillCardFromTemplate({ task, list: listName }, { ...args, template: 'lead-funnel' }, 'funnel');
+  return [
+    {
+      action: 'create_card',
+      params: {
+        name: filled.task,
+        desc: filled.desc || '',
+        listName,
+        labels: filled.labels || ['marketing', 'funnel'],
+        comment: filled.comment || '',
+        checklist: filled.checklist || [],
+      },
+      description: `Buat kartu lead funnel "${filled.task}" di list "${listName}"`,
+    },
+  ];
+});
+
+onPlan(['buat web copy', 'copy landing page', 'web copy', 'buat copywriting'], (pb, args) => {
+  const task = (args.task as string) || (args.name as string) || 'New Web Copy';
+  const listName = (args.list as string) || pb.workflow.lists[0] || '';
+  const filled = fillCardFromTemplate({ task, list: listName }, { ...args, template: 'web-copy' }, 'copywriting');
+  return [
+    {
+      action: 'create_card',
+      params: {
+        name: filled.task,
+        desc: filled.desc || '',
+        listName,
+        labels: filled.labels || ['copywriting', 'web'],
+        comment: filled.comment || '',
+        checklist: filled.checklist || [],
+      },
+      description: `Buat kartu web copy "${filled.task}" di list "${listName}"`,
+    },
+  ];
+});
 
 // ── Composite Plan Handlers (Batch, Multi-board) ──
 
