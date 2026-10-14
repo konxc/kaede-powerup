@@ -6,9 +6,21 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { CommandPalette } from '@/components/layout/command-palette';
-import { MenuIcon, GithubIcon, SearchIcon, Shield, Users, BarChart3, BookOpen } from 'lucide-react';
+import { PublicNavbar } from '@/components/layout/public-navbar';
+import { PublicFooter } from '@/components/layout/public-footer';
+import {
+  MenuIcon,
+  GithubIcon,
+  SearchIcon,
+  Shield,
+  Users,
+  BarChart3,
+  BookOpen,
+  Globe,
+  Bot,
+} from 'lucide-react';
 
-const NAV_ITEMS = [
+const DASHBOARD_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
   { href: '/teams', label: 'Teams', icon: Users },
   { href: '/roles', label: 'Roles', icon: Shield },
@@ -33,23 +45,43 @@ function NavLink({ href, children, className }: { href: string; children: React.
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [commandOpen, setCommandOpen] = React.useState(false);
 
+  // Check if current route is a public marketing/documentation page
+  const isPublicRoute =
+    pathname === '/' ||
+    pathname === '/pricing' ||
+    pathname === '/solutions' ||
+    pathname === '/about' ||
+    pathname.startsWith('/legal');
+
+  if (isPublicRoute) {
+    return (
+      <div className="min-h-screen bg-[#0B0F17] text-white flex flex-col selection:bg-emerald-500/30 selection:text-emerald-200">
+        <PublicNavbar />
+        <main className="flex-1">{children}</main>
+        <PublicFooter />
+      </div>
+    );
+  }
+
+  // Dashboard / Workspace Console View
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5 font-bold text-foreground hover:opacity-90 transition-opacity">
-              <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold shadow-md shadow-primary/20">
+              <div className="size-8 rounded-lg bg-emerald-500 flex items-center justify-center text-slate-950 text-sm font-bold shadow-md shadow-emerald-500/20">
                 K
               </div>
               <span className="hidden sm:inline text-foreground tracking-wide font-extrabold text-base">
-                KAEDE
+                KAEDE <span className="text-xs font-normal text-muted-foreground">Workspace</span>
               </span>
             </Link>
             <nav className="hidden md:flex items-center gap-1">
-              {NAV_ITEMS.map((item) => (
+              {DASHBOARD_NAV_ITEMS.map((item) => (
                 <NavLink key={item.href} href={item.href}>
                   {item.label}
                 </NavLink>
@@ -58,6 +90,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Link back to public site */}
+            <Link
+              href="/"
+              className="hidden lg:flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-md hover:bg-accent/50 transition-colors"
+            >
+              <Globe className="size-3.5 text-emerald-400" />
+              <span>Public Portal</span>
+            </Link>
+
             {/* Command Palette Trigger Button (Linear Style) */}
             <button
               onClick={() => setCommandOpen(true)}
@@ -70,7 +111,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </kbd>
             </button>
 
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-medium text-emerald-400">
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-medium text-emerald-400">
               <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Live Sync</span>
             </div>
@@ -92,13 +133,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </SheetTrigger>
               <SheetContent side="left" className="w-72 bg-slate-950 text-slate-100 border-border">
                 <div className="flex items-center gap-2 mb-8 mt-2">
-                  <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
+                  <div className="size-8 rounded-lg bg-emerald-500 flex items-center justify-center text-slate-950 text-sm font-bold">
                     K
                   </div>
-                  <span className="font-bold text-lg">KAEDE Studio</span>
+                  <span className="font-bold text-lg">KAEDE Workspace</span>
                 </div>
                 <nav className="flex flex-col gap-2">
-                  {NAV_ITEMS.map((item) => (
+                  <Link
+                    href="/"
+                    className="flex items-center gap-3 px-3 py-2 text-sm text-emerald-400 hover:bg-white/5 rounded-md"
+                  >
+                    <Globe className="size-4" />
+                    <span>Back to Public Portal</span>
+                  </Link>
+                  {DASHBOARD_NAV_ITEMS.map((item) => (
                     <NavLink key={item.href} href={item.href} className="text-base py-2">
                       <div className="flex items-center gap-3">
                         <item.icon className="size-5 text-primary" />
