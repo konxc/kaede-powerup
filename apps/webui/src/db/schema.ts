@@ -207,3 +207,75 @@ export const workspaceIndexRuns = sqliteTable('workspace_index_runs', {
 }, (table) => ({
   projectIndex: index('workspace_index_runs_project_idx').on(table.projectId),
 }));
+
+// ── Coupons & Promotional Discounts ──
+export const coupons = sqliteTable('coupons', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  code: text('code').notNull().unique(),
+  discountType: text('discount_type').notNull().default('percent'), // 'percent' | 'fixed'
+  discountValue: integer('discount_value').notNull().default(20),
+  maxUses: integer('max_uses').default(100),
+  usedCount: integer('used_count').default(0),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }),
+  status: text('status').notNull().default('active'), // 'active' | 'expired'
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+});
+
+// ── Billing Transactions (Midtrans + Stripe) ──
+export const billingTransactions = sqliteTable('billing_transactions', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  gateway: text('gateway').notNull(), // 'midtrans' | 'stripe' | 'manual'
+  gatewayTransactionId: text('gateway_transaction_id'),
+  amount: integer('amount').notNull(),
+  currency: text('currency').notNull().default('IDR'), // 'IDR' | 'USD'
+  paymentType: text('payment_type').default('qris'), // 'qris', 'bank_transfer', 'credit_card'
+  status: text('status').notNull().default('pending'), // 'pending', 'settlement', 'expire', 'failed'
+  itemType: text('item_type').notNull().default('subscription'), // 'subscription', 'agent_container'
+  couponCode: text('coupon_code'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  settledAt: integer('settled_at', { mode: 'timestamp' }),
+}, (table) => ({
+  userIndex: index('billing_transactions_user_idx').on(table.userId),
+  workspaceIndex: index('billing_transactions_workspace_idx').on(table.workspaceId),
+}));
+
+// ── Affiliate & Referrals ──
+export const affiliateCommissions = sqliteTable('affiliate_commissions', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  affiliateUserId: text('affiliate_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  referredUserId: text('referred_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  transactionId: text('transaction_id').references(() => billingTransactions.id),
+  commissionAmount: integer('commission_amount').notNull().default(0),
+  commissionRate: integer('commission_rate').notNull().default(20), // 20%
+  status: text('status').notNull().default('pending'), // 'pending', 'approved', 'paid'
+  paidAt: integer('paid_at', { mode: 'timestamp' }),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+}, (table) => ({
+  affiliateIndex: index('affiliate_commissions_affiliate_idx').on(table.affiliateUserId),
+}));
+
+// ── Agent Containers (Shared Docker Hosting Fleet for Hermes & OpenClaw) ──
+export const agentContainers = sqliteTable('agent_containers', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  agentType: text('agent_type').notNull().default('hermes-whatsapp'), // 'hermes-whatsapp' | 'openclaw'
+  dockerContainerId: text('docker_container_id'),
+  dockerHostServer: text('docker_host_server').default('srv1.konxc.space'),
+  assignedPort: integer('assigned_port'),
+  status: text('status').notNull().default('provisioning'), // 'provisioning', 'running', 'stopped', 'error'
+  whatsappConnected: integer('whatsapp_connected', { mode: 'boolean' }).default(false),
+  whatsappQrCode: text('whatsapp_qr_code'),
+  allocatedCpu: text('allocated_cpu').default('1.0'),
+  allocatedRam: text('allocated_ram').default('1GB'),
+  isManualProvisioned: integer('is_manual_provisioned', { mode: 'boolean' }).default(false),
+  provisionedByAdminId: text('provisioned_by_admin_id'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+}, (table) => ({
+  workspaceIndex: index('agent_containers_workspace_idx').on(table.workspaceId),
+  userIndex: index('agent_containers_user_idx').on(table.userId),
+}));
+
