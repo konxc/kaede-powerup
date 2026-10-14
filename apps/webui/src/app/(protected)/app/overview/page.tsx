@@ -44,10 +44,6 @@ export default async function OverviewPage() {
       {/* Top Banner / Welcome */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-semibold text-emerald-400 mb-2">
-            <Sparkles className="size-3" />
-            <span>Mission Control</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             System Overview & Operations
           </h1>
@@ -158,7 +154,6 @@ export default async function OverviewPage() {
               <Bot className="size-4 text-purple-400" />
               Live Agent Activity
             </h2>
-            <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
           </div>
 
           <div className="space-y-3 text-xs">

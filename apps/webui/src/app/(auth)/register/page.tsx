@@ -24,10 +24,6 @@ export default async function RegisterPage(props: {
   return (
     <div className="space-y-3.5 sm:space-y-4">
       <div className="space-y-1">
-        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-semibold text-emerald-400 mb-0.5">
-          <Sparkles className="size-3" />
-          <span>Mulai Uji Coba Gratis</span>
-        </div>
         <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
           Daftarkan Workspace KAEDE
         </h1>

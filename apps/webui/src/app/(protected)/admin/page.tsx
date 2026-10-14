@@ -64,25 +64,11 @@ export default async function AdminPage() {
             <ShieldCheck className="size-7" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-white tracking-tight">Landlord Super Admin Console</h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-slate-950">
-                MASTER CONTROL
-              </span>
-            </div>
+            <h1 className="text-2xl font-black text-white tracking-tight">Landlord Super Admin Console</h1>
             <p className="text-xs text-amber-200/80 mt-0.5">
-              Operator Logged In: <strong className="text-white">{userEmail || 'admin@konxc.space'}</strong> · PT Koneksi Jaringan Indonesia
+              Operator: <strong className="text-white">{userEmail || 'admin@konxc.space'}</strong> · PT Koneksi Jaringan Indonesia
             </p>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-semibold">
-            ● Gateway Live
-          </span>
-          <span className="px-3 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs text-purple-400 font-semibold">
-            Docker Fleet Ready
-          </span>
         </div>
       </div>
 

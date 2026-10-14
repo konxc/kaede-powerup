@@ -53,7 +53,7 @@ const NAV_GROUPS = [
     title: 'Agentic Ops',
     items: [
       { href: '/app/agents', label: 'Agent Fleet', icon: Bot },
-      { href: '/app/hosting', label: 'Cloud Hosting', icon: Server, badge: 'Docker' },
+      { href: '/app/hosting', label: 'Cloud Hosting', icon: Server },
       { href: '/app/integrations', label: 'Integrations', icon: Workflow },
     ],
   },
@@ -61,7 +61,7 @@ const NAV_GROUPS = [
     title: 'Finansial & Mitra',
     items: [
       { href: '/app/billing', label: 'Billing & Invoices', icon: CreditCard },
-      { href: '/app/affiliate', label: 'Program Afiliasi', icon: Users, badge: '20%' },
+      { href: '/app/affiliate', label: 'Program Afiliasi', icon: Users },
     ],
   },
   {
@@ -153,19 +153,14 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                 </p>
                 <Link
                   href="/admin"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                     pathname.startsWith('/admin')
                       ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 shadow-sm'
                       : 'text-amber-400 hover:text-amber-200 hover:bg-amber-500/10'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <ShieldCheck className="size-4 text-amber-400" />
-                    <span>Super Admin</span>
-                  </div>
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-white shrink-0">
-                    VIP
-                  </span>
+                  <ShieldCheck className="size-4 text-amber-400 shrink-0" />
+                  <span>Super Admin</span>
                 </Link>
               </div>
             )}
@@ -271,12 +266,6 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
 
           {/* Right Header Tools */}
           <div className="flex items-center gap-3">
-            {/* Live Indicator */}
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/40 text-[10px] font-semibold text-emerald-300">
-              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Edge Live</span>
-            </div>
-
             {/* Command Palette Trigger */}
             <button
               onClick={() => setCommandOpen(true)}
@@ -288,15 +277,6 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                 ⌘K
               </kbd>
             </button>
-
-            {/* Back to Public Web Link */}
-            <Link
-              href="/"
-              className="hidden lg:flex items-center gap-1 text-xs text-slate-300 hover:text-white px-2 py-1 rounded hover:bg-white/5 transition-colors"
-            >
-              <Globe className="size-3.5 text-emerald-400" />
-              <span>Public</span>
-            </Link>
           </div>
         </header>
 

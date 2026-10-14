@@ -37,7 +37,7 @@ export default async function ProfilePage() {
               <p className="text-xs text-slate-400 mt-0.5">
                 GitHub: <code className="text-emerald-300">@{githubUser || 'connected'}</code>
               </p>
-              <p className="text-xs text-slate-500 mt-0.5">{user?.email}</p>
+              <p className="text-xs text-slate-300 mt-0.5">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default async function ProfilePage() {
                 <p className="text-slate-400 text-[11px]">Terhubung sebagai @{githubUser || 'user'}</p>
               </div>
             </div>
-            <span className="text-emerald-400 font-semibold text-xs">● Active Verified</span>
+            <span className="text-emerald-400 font-semibold text-xs">Terhubung</span>
           </div>
         </div>
       </div>

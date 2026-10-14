@@ -32,12 +32,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="hidden lg:flex flex-1 h-full overflow-hidden relative bg-gradient-to-br from-[#0F172A] via-[#080C14] to-[#04070D] border-l border-white/10 p-8 lg:p-12 xl:p-16 flex-col justify-between">
         <div className="hero-glow absolute inset-0 pointer-events-none opacity-40" />
 
-        <div className="relative z-10 flex items-center justify-between shrink-0">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
-            <Sparkles className="size-3.5" />
-            <span>Agentic Operating System</span>
-          </div>
-          <span className="text-xs font-mono text-slate-400">v1.4 Production</span>
+        <div className="relative z-10 flex items-center justify-between shrink-0 text-xs text-slate-400">
+          <span className="font-semibold text-slate-300">KAEDE Context Engine</span>
+          <span className="font-mono text-[11px] text-slate-500">PT Koneksi Jaringan Indonesia</span>
         </div>
 
         <div className="relative z-10 space-y-5 max-w-lg my-auto py-4">

@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
+import Credentials from 'next-auth/providers/credentials';
 
 const ADMIN_EMAILS = ['admin@konxc.space', 'konxcid@gmail.com'];
 const ADMIN_GITHUB_USERNAMES = ['sandikodev', 'konxc'];
@@ -15,6 +16,23 @@ const providers = [
         name: profile.name || profile.login,
         email: profile.email,
         image: profile.avatar_url,
+      };
+    },
+  }),
+  Credentials({
+    id: 'dev-simulation',
+    name: 'Developer Simulation',
+    credentials: {
+      email: { label: 'Email', type: 'email' },
+    },
+    async authorize(credentials) {
+      const email = ((credentials?.email as string) || 'admin@konxc.space').toLowerCase();
+      const isSuperAdmin = email === 'admin@konxc.space' || email.includes('konxc');
+      return {
+        id: isSuperAdmin ? 'usr_super_admin' : 'usr_dev_member',
+        name: isSuperAdmin ? 'Sandiko (@konxc)' : 'Operator SMA UII',
+        email: email,
+        image: isSuperAdmin ? 'https://github.com/konxc.png' : 'https://github.com/identicons/smauii.png',
       };
     },
   }),
@@ -34,6 +52,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       if (user) {
         token.sub = user.id ?? token.sub;
+      }
+
+      if (account?.provider === 'dev-simulation') {
+        const isSuperAdmin = token.email === 'admin@konxc.space' || (token.email && token.email.includes('konxc'));
+        identityToken.githubUsername = isSuperAdmin ? 'konxc' : 'smauii';
+        identityToken.githubId = isSuperAdmin ? '9999999' : '1111111';
+        identityToken.role = isSuperAdmin ? 'admin' : 'developer';
+        return token;
       }
 
       const profileData = profile && typeof profile === 'object'

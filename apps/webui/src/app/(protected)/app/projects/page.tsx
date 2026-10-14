@@ -71,7 +71,7 @@ export default async function ProjectsPage() {
                 </div>
 
                 <div className="pt-2 flex items-center justify-between text-xs">
-                  <span className="text-[11px] text-slate-400">AST Graph Verified</span>
+                  <span className="text-[11px] font-mono text-slate-400">Ref: #{project.id.slice(0, 8)}</span>
                   <Link href={`/workspaces/${project.workspaceId}`} className="text-emerald-400 hover:underline flex items-center gap-1 font-semibold">
                     Manage Index <ExternalLink className="size-3" />
                   </Link>

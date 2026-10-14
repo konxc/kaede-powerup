@@ -9,6 +9,16 @@ async function signInWithGitHub() {
   await signIn('github', { redirectTo: '/app/overview' });
 }
 
+async function simulateLandlordAdmin() {
+  'use server';
+  await signIn('dev-simulation', { email: 'admin@konxc.space', redirectTo: '/app/overview' });
+}
+
+async function simulateMemberUser() {
+  'use server';
+  await signIn('dev-simulation', { email: 'guru@smauii.sch.id', redirectTo: '/app/overview' });
+}
+
 export default async function LoginPage(props: { searchParams: Promise<{ callbackUrl?: string }> }) {
   const session = await auth();
   if (session?.user) {
@@ -38,6 +48,33 @@ export default async function LoginPage(props: { searchParams: Promise<{ callbac
             <Github className="mr-2 size-4 sm:size-5" /> Lanjutkan dengan GitHub
           </Button>
         </form>
+
+        {/* Quick Simulation Dev Login */}
+        <div className="p-2.5 rounded-xl border border-white/10 bg-white/5 space-y-2">
+          <p className="text-[11px] font-semibold text-slate-300">
+            Simulasi Akun (Testing):
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <form action={simulateLandlordAdmin}>
+              <Button
+                type="submit"
+                variant="outline"
+                className="w-full h-8 text-[11px] border-emerald-500/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20 font-semibold"
+              >
+                👑 Landlord Admin
+              </Button>
+            </form>
+            <form action={simulateMemberUser}>
+              <Button
+                type="submit"
+                variant="outline"
+                className="w-full h-8 text-[11px] border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 font-medium"
+              >
+                🏢 Member SMA UII
+              </Button>
+            </form>
+          </div>
+        </div>
 
         <div className="relative my-2.5 sm:my-3">
           <div className="absolute inset-0 flex items-center">
