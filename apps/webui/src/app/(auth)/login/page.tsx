@@ -19,38 +19,38 @@ export default async function LoginPage(props: { searchParams: Promise<{ callbac
   const callbackUrl = searchParams.callbackUrl || '/app/overview';
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+    <div className="space-y-4 sm:space-y-5">
+      <div className="space-y-1.5">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
           Masuk ke KAEDE Agent Desktop
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400">
+        <p className="text-xs text-slate-400 leading-relaxed">
           Hubungkan identitas GitHub Anda untuk mengakses workspace, Trello state machine, dan agent fleet.
         </p>
       </div>
 
-      <div className="space-y-4 pt-2">
+      <div className="space-y-3 pt-1">
         <form action={signInWithGitHub}>
           <Button
             type="submit"
-            className="w-full h-11 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
+            className="w-full h-10 sm:h-11 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition-all"
           >
-            <Github className="mr-2 size-5" /> Lanjutkan dengan GitHub
+            <Github className="mr-2 size-4 sm:size-5" /> Lanjutkan dengan GitHub
           </Button>
         </form>
 
-        <div className="relative my-4">
+        <div className="relative my-2.5 sm:my-3">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-white/10" />
           </div>
-          <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
-            <span className="bg-[#0B0F17] px-3 text-slate-500">atau akun developer</span>
+          <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
+            <span className="bg-[#0B0F17] px-2.5 text-slate-500">atau akun developer</span>
           </div>
         </div>
 
         {/* Email Magic Link Placeholder */}
-        <div className="space-y-3">
-          <label className="text-xs text-slate-400 font-medium" htmlFor="email-input">
+        <div className="space-y-2">
+          <label className="text-[11px] sm:text-xs text-slate-400 font-medium" htmlFor="email-input">
             Email Bisnis / Institusi
           </label>
           <div className="flex gap-2">
@@ -58,23 +58,23 @@ export default async function LoginPage(props: { searchParams: Promise<{ callbac
               id="email-input"
               type="email"
               placeholder="nama@perusahaan.com / nama@smauii.sch.id"
-              className="h-10 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500"
+              className="h-9 sm:h-10 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500"
             />
-            <Button variant="outline" className="border-white/10 text-white text-xs h-10 px-4">
+            <Button variant="outline" className="border-white/10 text-white text-xs h-9 sm:h-10 px-3.5 sm:px-4">
               <Mail className="mr-1.5 size-3.5" /> Kirim Link
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="p-3.5 rounded-xl border border-white/10 bg-white/5 flex items-start gap-2.5 text-xs text-slate-400">
+      <div className="p-2.5 sm:p-3 rounded-xl border border-white/10 bg-white/5 flex items-start gap-2.5 text-[11px] sm:text-xs text-slate-400 leading-relaxed">
         <ShieldCheck className="size-4 text-emerald-400 mt-0.5 shrink-0" />
         <span>
           Login ini hanya membaca identitas publik GitHub Anda. Akses repositori privat baru diberikan setelah Anda menyetujui GitHub App secara eksplisit.
         </span>
       </div>
 
-      <div className="text-center text-xs text-slate-400 pt-4 border-t border-white/10">
+      <div className="text-center text-xs text-slate-400 pt-3 sm:pt-4 border-t border-white/10">
         Belum memiliki akun?{' '}
         <Link href="/register" className="text-emerald-400 hover:underline font-semibold">
           Daftar Workspace Baru →

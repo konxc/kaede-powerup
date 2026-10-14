@@ -24,7 +24,6 @@ import {
   SearchIcon,
   ChevronDown,
   LogOut,
-  ExternalLink,
   Globe,
   Sparkles,
 } from 'lucide-react';
@@ -78,16 +77,15 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
   const pathname = usePathname();
   const [commandOpen, setCommandOpen] = React.useState(false);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
   const isAdmin = user.role === 'admin' || user.email === 'admin@konxc.space';
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-slate-100 flex flex-col md:flex-row">
-      {/* ── DESKTOP SIDEBAR ── */}
-      <aside className="hidden md:flex w-64 flex-col justify-between border-r border-white/10 bg-[#0B0F17] p-4 shrink-0">
-        <div className="space-y-6">
-          {/* Logo & Workspace Selector */}
-          <div className="space-y-3 pb-3 border-b border-white/10">
+    <div className="h-screen h-[100dvh] w-full overflow-hidden bg-[#080C14] text-slate-100 flex flex-col md:flex-row">
+      {/* ── DESKTOP SIDEBAR (FIXED SHELL, INTERNAL SCROLL) ── */}
+      <aside className="hidden md:flex w-64 h-full flex-col justify-between border-r border-white/10 bg-[#0B0F17] p-4 shrink-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {/* Logo & Workspace Selector (Shrink-0) */}
+          <div className="space-y-3 pb-3 border-b border-white/10 shrink-0">
             <Link href="/" className="flex items-center gap-2.5 px-2">
               <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-500 font-extrabold text-slate-950 text-xs shadow-md shadow-emerald-500/20">
                 K
@@ -107,13 +105,13 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                   </div>
                   <span className="text-xs font-semibold text-white truncate">SMA UII / Koneksi</span>
                 </div>
-                <ChevronDown className="size-3.5 text-slate-500" />
+                <ChevronDown className="size-3.5 text-slate-500 shrink-0" />
               </button>
             </div>
           </div>
 
-          {/* Navigation Groups */}
-          <nav className="space-y-5">
+          {/* Navigation Groups (Scrollable within sidebar without ugly browser scrollbar) */}
+          <nav className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden space-y-5 pt-3 pr-1">
             {NAV_GROUPS.map((group) => (
               <div key={group.title} className="space-y-1">
                 <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
@@ -137,7 +135,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                         <span className="truncate">{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 shrink-0">
                           {item.badge}
                         </span>
                       )}
@@ -165,7 +163,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                     <ShieldCheck className="size-4 text-amber-400" />
                     <span>Super Admin</span>
                   </div>
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 shrink-0">
                     VIP
                   </span>
                 </Link>
@@ -174,8 +172,8 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
           </nav>
         </div>
 
-        {/* User Card at bottom of sidebar */}
-        <div className="pt-4 border-t border-white/10">
+        {/* User Card at bottom of sidebar (Shrink-0) */}
+        <div className="pt-4 border-t border-white/10 shrink-0">
           <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
             <div className="min-w-0 flex items-center gap-2.5">
               {user.image ? (
@@ -193,7 +191,7 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
               title="Sign Out"
-              className="text-slate-400 hover:text-rose-400 p-1 rounded transition-colors"
+              className="text-slate-400 hover:text-rose-400 p-1 rounded transition-colors shrink-0"
             >
               <LogOut className="size-3.5" />
             </button>
@@ -201,10 +199,10 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
         </div>
       </aside>
 
-      {/* ── MAIN CONTENT AREA ── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Top Navbar Header */}
-        <header className="sticky top-0 z-40 h-14 border-b border-white/10 bg-[#0B0F17]/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
+      {/* ── MAIN CONTENT AREA (FIXED HEIGHT, INNER OVERFLOW SCROLL ONLY) ── */}
+      <div className="flex-1 flex flex-col h-full min-w-0 min-h-0 overflow-hidden">
+        {/* Top Header (Shrink-0) */}
+        <header className="shrink-0 h-14 border-b border-white/10 bg-[#0B0F17]/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Mobile Sheet Trigger */}
             <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -213,14 +211,14 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                   <MenuIcon className="size-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-72 bg-[#0B0F17] text-white border-white/10 p-5">
-                <div className="flex items-center gap-2.5 mb-6">
+              <SheetContent side="left" className="w-72 bg-[#0B0F17] text-white border-white/10 p-5 flex flex-col h-full">
+                <div className="flex items-center gap-2.5 mb-6 shrink-0">
                   <div className="size-7 rounded-lg bg-emerald-500 font-bold text-slate-950 flex items-center justify-center text-xs">
                     K
                   </div>
                   <span className="font-extrabold text-base">KAEDE Console</span>
                 </div>
-                <nav className="space-y-4">
+                <nav className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden space-y-4 pr-1">
                   {NAV_GROUPS.map((group) => (
                     <div key={group.title} className="space-y-1">
                       <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
@@ -249,6 +247,15 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
                     </Link>
                   )}
                 </nav>
+                <div className="pt-4 border-t border-white/10 shrink-0">
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10"
+                  >
+                    <LogOut className="size-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
               </SheetContent>
             </Sheet>
 
@@ -293,8 +300,10 @@ export function ProtectedShell({ user, children }: ProtectedShellProps) {
           </div>
         </header>
 
-        {/* Content Body */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        {/* ── SCROLLABLE MAIN CONTENT (ONLY THIS SCROLLS) ── */}
+        <main className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
 
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
