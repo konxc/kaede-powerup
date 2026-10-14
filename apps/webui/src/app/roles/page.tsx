@@ -1,3 +1,44 @@
+import { and, eq, inArray } from 'drizzle-orm';
+import { FileKey2, Shield } from 'lucide-react';
+import { PageHeader } from '@/components/layout/page-header';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { auth } from '@/lib/auth';
+import { db } from '@/db';
+import { workspaceContextDocuments, workspaceProjects, workspaces } from '@/db/schema';
+import { getAccessibleWorkspaceIdsForUser } from '@/lib/workspace-access';
+
+export default async function RolesPage() {
+  const session = await auth();
+  if (!session?.user?.id) return <div className="container mx-auto px-4"><PageHeader title="Roles" description="Sign in untuk melihat policy role dari workspace Anda." /></div>;
+  const workspaceIds = await getAccessibleWorkspaceIdsForUser(session.user.id);
+  const projects = workspaceIds.length
+    ? await db.select({ project: workspaceProjects, workspaceName: workspaces.name })
+        .from(workspaceProjects)
+        .innerJoin(workspaces, eq(workspaceProjects.workspaceId, workspaces.id))
+        .where(and(inArray(workspaceProjects.workspaceId, workspaceIds), eq(workspaceProjects.status, 'active')))
+    : [];
+  const ids = projects.map(({ project }) => project.id);
+  const documents = ids.length ? await db.select().from(workspaceContextDocuments).where(and(eq(workspaceContextDocuments.sourceKind, 'playbook'), inArray(workspaceContextDocuments.projectId, ids))) : [];
+
+  return (
+    <div className="container mx-auto px-4">
+      <PageHeader title="Roles" description="Policy role yang bersumber dari playbook project aktif." />
+      {!projects.length ? <p className="rounded-md border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">Belum ada project aktif yang memiliki playbook ter-index.</p> : null}
+      {projects.map(({ project, workspaceName }) => {
+        const projectDocuments = documents.filter((document) => document.projectId === project.id);
+        return (
+          <Card key={project.id} className="mb-6">
+            <CardHeader><CardTitle className="flex items-center gap-2"><Shield className="size-4" /> {project.fullName}</CardTitle><p className="text-sm text-muted-foreground">{workspaceName} · role policy source</p></CardHeader>
+            <CardContent className="space-y-3">
+              {projectDocuments.length ? projectDocuments.map((document) => <details key={document.id} className="rounded-md border border-border"><summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-medium"><FileKey2 className="size-4" />{document.path}</summary><pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap border-t border-border p-4 text-xs">{document.content}</pre></details>) : <p className="text-sm text-muted-foreground">Playbook project ini belum ter-index.</p>}
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+/* Legacy mockup retained temporarily for migration reference.
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -157,3 +198,4 @@ export default function RolesPage() {
     </div>
   );
 }
+*/

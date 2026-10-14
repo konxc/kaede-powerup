@@ -1,5 +1,6 @@
 # Next.js build output & cache
 .next/
+tsconfig.tsbuildinfo
 out/
 build/
 dist/

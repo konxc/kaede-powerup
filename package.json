@@ -9,7 +9,7 @@
   "description": "KAEDE — Trello Power-Up, MCP Server & CLI Orchestrator for AI Agent ecosystem",
   "type": "module",
   "scripts": {
-    "dev": "bun run build:mcp && bun run dev:static",
+    "dev": "bun run build:mcp && bun scripts/dev.ts",
     "dev:static": "bun run --filter @kaede/static dev",
     "dev:webui": "bun run --filter @kaede/webui dev",
     "dev:docs": "bun run --filter @kaede/docs dev",
@@ -44,7 +44,6 @@
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.0",
     "@types/bun": "^1.3.14",
-    "concurrently": "^10.0.3",
     "netlify-cli": "^26.1.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^6.0.3"

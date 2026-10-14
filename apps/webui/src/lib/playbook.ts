@@ -1,5 +1,17 @@
-import matter from 'gray-matter';
 import type { RoleDefinition, Role, PlaybookConfig, AccessMatrixEntry } from './types';
+
+function parseFrontmatter(markdown: string) {
+  const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  if (!match) return { data: {}, content: markdown };
+
+  const data: Record<string, string> = {};
+  match[1].split('\n').forEach((line) => {
+    const [key, ...val] = line.split(':');
+    if (key && val.length) data[key.trim()] = val.join(':').trim();
+  });
+
+  return { data, content: match[2].trim() };
+}
 
 const DEFAULT_ROLES: RoleDefinition[] = [
   {
@@ -169,7 +181,7 @@ const DEFAULT_ACCESS_MATRIX: AccessMatrixEntry[] = [
 ];
 
 export function parsePlaybook(content: string): PlaybookConfig {
-  const { data: frontmatter, content: body } = matter(content);
+  const { data: frontmatter, content: body } = parseFrontmatter(content);
 
   const roles: RoleDefinition[] = DEFAULT_ROLES;
   const workflow = DEFAULT_WORKFLOW;

@@ -17,11 +17,42 @@ const providers = [
 ];
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  trustHost: true,
+  session: { strategy: 'jwt' },
   providers,
+  pages: {
+    signIn: '/',
+  },
   callbacks: {
-    async session({ session, user }) {
+    async jwt({ token, user, profile, account }) {
+      const identityToken = token as typeof token & { githubId?: string; githubUsername?: string };
+
+      if (user) {
+        token.sub = user.id ?? token.sub;
+      }
+
+      const profileData = profile && typeof profile === 'object'
+        ? profile as { id?: string | number; login?: string }
+        : undefined;
+
+      if (profileData?.id) identityToken.githubId = String(profileData.id);
+      if (profileData?.login) identityToken.githubUsername = profileData.login;
+
+      if (account?.provider === 'github' && !identityToken.githubId) {
+        identityToken.githubId = String(user?.id ?? token.sub ?? '');
+      }
+
+      return token;
+    },
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = user.id;
+        const identityToken = token as typeof token & { githubId?: string; githubUsername?: string };
+        session.user.id = token.sub ?? session.user.id;
+        Object.assign(session.user, {
+          githubId: identityToken.githubId || '',
+          githubUsername: identityToken.githubUsername || '',
+        });
       }
       return session;
     },

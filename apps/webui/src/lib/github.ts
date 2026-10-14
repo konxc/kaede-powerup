@@ -1,69 +1,65 @@
-import { Octokit } from '@octokit/rest';
-import type { TeamMember, Project } from './types';
+/**
+ * Native GitHub API client — no @octokit/rest dependency.
+ * Uses web-standard fetch() under Bun/Node.js.
+ */
 
-const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
-});
+const BASE = 'https://api.github.com';
+
+function headers(): HeadersInit {
+  return {
+    'Authorization': `Bearer ${process.env.GITHUB_TOKEN ?? ''}`,
+    'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': 'KAEDE-App',
+  };
+}
+
+async function gh<T>(path: string, opts?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, { ...opts, headers: { ...headers(), ...opts?.headers } });
+  if (!res.ok) throw new Error(`GitHub ${res.status}: ${res.statusText} (${path})`);
+  return res.json() as Promise<T>;
+}
 
 export async function getOrgMembers(org: string) {
-  const { data } = await octokit.orgs.listMembers({ org });
-  return data;
+  return gh<unknown[]>(`/orgs/${org}/members`);
 }
 
 export async function getOrgTeams(org: string) {
-  const { data } = await octokit.teams.list({ org });
-  return data;
+  return gh<unknown[]>(`/orgs/${org}/teams`);
 }
 
 export async function getTeamMembers(org: string, teamSlug: string) {
-  const { data } = await octokit.teams.listMembersInOrg({ org, team_slug: teamSlug });
-  return data;
+  return gh<unknown[]>(`/orgs/${org}/teams/${teamSlug}/members`);
 }
 
 export async function addMemberToTeam(org: string, teamSlug: string, username: string) {
-  await octokit.teams.addOrUpdateMembershipForUserInOrg({
-    org,
-    team_slug: teamSlug,
-    username,
-  });
+  await gh(`/orgs/${org}/teams/${teamSlug}/memberships/${username}`, { method: 'PUT' });
 }
 
 export async function removeMemberFromTeam(org: string, teamSlug: string, username: string) {
-  await octokit.teams.removeMembershipForUserInOrg({
-    org,
-    team_slug: teamSlug,
-    username,
-  });
+  await gh(`/orgs/${org}/teams/${teamSlug}/memberships/${username}`, { method: 'DELETE' });
 }
 
 export async function getRepoCollaborators(owner: string, repo: string) {
-  const { data } = await octokit.repos.listCollaborators({ owner, repo });
-  return data;
+  return gh<unknown[]>(`/repos/${owner}/${repo}/collaborators`);
 }
 
 export async function inviteCollaborator(owner: string, repo: string, username: string, permission: 'admin' | 'write' | 'read') {
-  await octokit.repos.addCollaborator({
-    owner,
-    repo,
-    username,
-    permission,
+  await gh(`/repos/${owner}/${repo}/collaborators/${username}`, {
+    method: 'PUT',
+    body: JSON.stringify({ permission }),
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
 export async function removeCollaborator(owner: string, repo: string, username: string) {
-  await octokit.repos.removeCollaborator({
-    owner,
-    repo,
-    username,
-  });
+  await gh(`/repos/${owner}/${repo}/collaborators/${username}`, { method: 'DELETE' });
 }
 
 export async function getFileContent(owner: string, repo: string, path: string, ref?: string) {
   try {
-    const { data } = await octokit.repos.getContent({ owner, repo, path, ref });
-    if ('content' in data) {
-      return Buffer.from(data.content, 'base64').toString('utf-8');
-    }
+    const qs = ref ? `?ref=${ref}` : '';
+    const data = await gh<{ content?: string }>(`/repos/${owner}/${repo}/contents/${path}${qs}`);
+    if (data.content) return Buffer.from(data.content, 'base64').toString('utf-8');
     return null;
   } catch {
     return null;
