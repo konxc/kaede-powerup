@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = join(__dirname, '..', '..', '..');
@@ -64,6 +65,7 @@ interface PageEntry {
 
 const PAGES_EN: PageEntry[] = [
   { id: 'index', label: 'Overview', icon: ICONS.overview },
+  { id: 'installation', label: 'Installation', icon: ICONS.server },
   { id: 'api-key', label: 'API Key', icon: ICONS.api },
   { id: 'mcp-server', label: 'MCP Server', icon: ICONS.server },
   { id: 'opencode', label: 'OpenCode', icon: ICONS.code },
@@ -77,6 +79,7 @@ const PAGES_EN: PageEntry[] = [
 
 const PAGES_ID: PageEntry[] = [
   { id: 'index', label: 'Ikhtisar', icon: ICONS.overview },
+  { id: 'installation', label: 'Instalasi', icon: ICONS.server },
   { id: 'api-key', label: 'API Key', icon: ICONS.api },
   { id: 'mcp-server', label: 'Server MCP', icon: ICONS.server },
   { id: 'opencode', label: 'OpenCode', icon: ICONS.code },
@@ -247,68 +250,31 @@ async function main(): Promise<void> {
   // Ensure output directory exists
   mkdirSync(OUT_DIR, { recursive: true });
 
-  // Copy CSS + append docs-only responsive utilities
-  const cssPath = resolveCss();
-  if (cssPath) {
-    const cssOutDir = join(OUT_DIR, 'css');
-    mkdirSync(cssOutDir, { recursive: true });
-    const cssContent = readFileSync(cssPath, 'utf-8');
+// ── Tailwind CSS compilation for Docs ──
+function buildDocsCss(): void {
+  const cssOutDir = join(OUT_DIR, 'css');
+  mkdirSync(cssOutDir, { recursive: true });
+  const cssOutFile = join(cssOutDir, 'style.css');
 
-    // These utilities are used by docs template but not compiled into Power-Up CSS
-    const docsOnlyUtilities = `
-/* ── Docs-only responsive & layout utilities ── */
-@media (min-width: 1024px) {
-  .lg\\:block { display: block !important; }
-  .lg\\:flex { display: flex !important; }
-  .lg\\:hidden { display: none !important; }
-  .lg\\:mb-0 { margin-bottom: 0 !important; }
+  try {
+    execSync(
+      `npx @tailwindcss/cli -i "${WEB_CSS_SRC}" -o "${cssOutFile}" --content "${join(DOCS_DIR, '**', '*.{md,html}')}" --content "${join(WORKSPACE_ROOT, 'apps', 'static', 'public', 'js', 'components.js')}"`,
+      { stdio: 'ignore' }
+    );
+    if (existsSync(cssOutFile)) {
+      console.log(`\x1b[36m  ✓\x1b[0m Compiled Tailwind CSS for docs \u2192 ${cssOutFile.replace(WORKSPACE_ROOT, '.')}`);
+      return;
+    }
+  } catch (e) {
+    console.warn('  \x1b[33m  ⚠ Tailwind CLI fallback\x1b[0m');
+  }
+
+  const rawCss = existsSync(WEB_CSS_SRC) ? readFileSync(WEB_CSS_SRC, 'utf-8') : '';
+  writeFileSync(cssOutFile, rawCss, 'utf-8');
 }
 
-/* Fix icon sizing & aspect-ratio (mencegah icon gepeng) */
-.size-3\\.5 { width: 0.875rem !important; height: 0.875rem !important; min-width: 0.875rem !important; min-height: 0.875rem !important; flex-shrink: 0 !important; }
-.size-4 { width: 1rem !important; height: 1rem !important; min-width: 1rem !important; min-height: 1rem !important; flex-shrink: 0 !important; }
-.size-5 { width: 1.25rem !important; height: 1.25rem !important; min-width: 1.25rem !important; min-height: 1.25rem !important; flex-shrink: 0 !important; }
-.size-6 { width: 1.5rem !important; height: 1.5rem !important; min-width: 1.5rem !important; min-height: 1.5rem !important; flex-shrink: 0 !important; }
-.size-7 { width: 1.75rem !important; height: 1.75rem !important; min-width: 1.75rem !important; min-height: 1.75rem !important; flex-shrink: 0 !important; }
-.size-8 { width: 2rem !important; height: 2rem !important; min-width: 2rem !important; min-height: 2rem !important; flex-shrink: 0 !important; }
-.size-10 { width: 2.5rem !important; height: 2.5rem !important; min-width: 2.5rem !important; min-height: 2.5rem !important; flex-shrink: 0 !important; }
-.size-12 { width: 3rem !important; height: 3rem !important; min-width: 3rem !important; min-height: 3rem !important; flex-shrink: 0 !important; }
-.size-16 { width: 4rem !important; height: 4rem !important; min-width: 4rem !important; min-height: 4rem !important; flex-shrink: 0 !important; }
-
-/* Sticky sidebar & layout fixes */
-.sticky { position: sticky !important; }
-.top-16 { top: 4rem !important; }
-.top-20 { top: 5rem !important; }
-.top-24 { top: 6rem !important; }
-.w-56 { width: 14rem !important; flex-shrink: 0 !important; }
-.w-64 { width: 16rem !important; flex-shrink: 0 !important; }
-.max-h-\\[calc\\(100vh-5rem\\)\\] { max-height: calc(100vh - 5rem) !important; }
-.max-h-\\[calc\\(100vh-6rem\\)\\] { max-height: calc(100vh - 6rem) !important; }
-
-.mb-0 { margin-bottom: 0 !important; }
-.mb-12 { margin-bottom: 3rem !important; }
-.mb-16 { margin-bottom: 4rem !important; }
-.pt-24 { padding-top: 6rem !important; }
-.pb-16 { padding-bottom: 4rem !important; }
-.mr-2 { margin-right: 0.5rem !important; }
-.p-4 { padding: 1rem !important; }
-.p-6 { padding: 1.5rem !important; }
-.p-10 { padding: 2.5rem !important; }
-.mt-1 { margin-top: 0.25rem !important; }
-.mt-6 { margin-top: 1.5rem !important; }
-.gap-8 { gap: 2rem !important; }
-.self-start { align-self: flex-start !important; }
-.shrink-0 { flex-shrink: 0 !important; }
-.inline-flex { display: inline-flex !important; }
-.items-start { align-items: flex-start !important; }
-.justify-around { justify-content: space-around !important; }
-.truncate { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
-.overflow-y-auto { overflow-y: auto !important; }
-.z-50 { z-index: 50 !important; }
-`;
-    writeFileSync(join(cssOutDir, 'style.css'), cssContent + docsOnlyUtilities, 'utf-8');
-    console.log(`\x1b[36m  ✓\x1b[0m Copied css/style.css + docs utilities`);
-  }
+  // Build Tailwind CSS for docs
+  buildDocsCss();
 
   // Copy components.js
   if (existsSync(COMPONENTS_SRC)) {

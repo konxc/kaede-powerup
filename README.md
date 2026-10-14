@@ -39,32 +39,78 @@
 
 ```
 ├── apps/
-│   └── web/                 # Trello Power-Up & Web Dashboard (Vite + Tailwind v4)
+│   ├── static/              # Trello Power-Up & Web Dashboard (Vite + Tailwind v4)
+│   │   └── public/          #   install.sh / install.ps1 (community installer)
+│   ├── docs/                # Dokumentasi (Markdown → HTML, gh-pages)
+│   └── webui/               # Dashboard Workspace (Next.js + Drizzle + NextAuth)
 ├── packages/
 │   ├── README.md            # Dokumentasi arsitektur packages
-│   ├── mcp-server-trello/   # [Submodule] Git submodule → delorenj/mcp-server-trello
-│   └── kaede-trello/        # Library Trello MCP (42 tools standalone)
-├── src/                     # KAEDE Orchestrator MCP (backend engine)
-│   ├── kaede-mcp-server.ts  # Entry point MCP server
-│   ├── orchestrator.ts      # Intent engine barrel
-│   ├── intent-handlers/     # Domain intent handlers
-│   ├── plan-executors/      # Domain plan executors
-│   ├── tool-handlers/       # Domain tool handlers
-│   └── services/            # Domain service classes
-├── apps/docs/content/                    # Dokumentasi & Laporan (Markdown & reports)
-│   ├── IMPLEMENTATION-SUMMARY.md
-│   ├── SUMMARY.md
-│   └── pr-submissions/      # PR submission drafts
-├── dist/                    # Build output (gitignored)
+│   ├── kaede/               # @kaede/core — Orchestrator engine + tests
+│   │   └── src/             #   kaede-mcp-server.ts (entry), orchestrator, services…
+│   ├── kaede-trello/        # Library Trello MCP (47 tools standalone)
+│   └── mcp-server-trello/   # [Submodule] → delorenj/mcp-server-trello
+├── dist/                    # Build output MCP (gitignored)
 ├── scripts/
-│   ├── kaede.ts            # CLI tool (setup, today, init, env, status)
-│   ├── build-docs.ts       # Build docs: Markdown → HTML
-│   └── build-mcp.ts        # Compile MCP server via bun build
+│   ├── kaede.ts             # CLI tool (setup, init, install, today, env, status…)
+│   ├── dev.ts               # Concurrent dev runner (static + webui)
+│   ├── build-mcp.ts         # Compile MCP servers via bun build
+│   ├── build-release.ts     # Cross-platform release build
+│   └── run-tests.ts         # Full test runner
 ├── .opencode/               # Konfigurasi & aturan AI Agent
 ├── netlify.toml             # Konfigurasi deploy Netlify & functions
 ├── package.json             # Root monorepo package.json (workspaces)
-└── secrets.env              # Trello credentials (gitignored, dipindah ke global)
+└── secrets.env              # Trello credentials (gitignored, disimpan global)
 ```
+
+
+---
+
+## Instalasi
+
+### Global (rekomendasi) — CLI + MCP servers + OpenCode config
+
+**Linux / macOS:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/konxc/kaede-powerup/main/apps/static/public/install.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+iwr -Uri https://raw.githubusercontent.com/konxc/kaede-powerup/main/apps/static/public/install.ps1 | iex
+```
+
+Installer akan clone repo ke `~/.kaede`, build kedua MCP server, menyalin **seluruh** source tree (tanpa memangkas komponen), mendaftarkan `mcp.trello` + `mcp.kaede` ke `~/.config/opencode/opencode.json`, dan me-link command `kaede`.
+
+Pastikan `~/.bun/bin` ada di `PATH`, lalu:
+
+```bash
+kaede --help
+kaede setup          # auth Trello + verifikasi
+kaede status --mcp   # tes koneksi MCP
+```
+
+### Manual (dari source)
+
+```bash
+git clone https://github.com/konxc/kaede-powerup ~/.kaede
+cd ~/.kaede
+bun install
+bun scripts/kaede.ts install
+```
+
+### Di server (agentic coding, headless)
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+export PATH="$HOME/.bun/bin:$PATH"   # tambahkan ke ~/.bashrc
+curl -fsSL https://raw.githubusercontent.com/konxc/kaede-powerup/main/apps/static/public/install.sh | bash
+kaede auth login --manual            # tanpa browser: paste API Key + Token
+kaede status --mcp
+```
+
+Lalu di dalam project: `kaede init .` dan jalankan OpenCode. Panduan lengkap: [`apps/docs/content/installation.md`](apps/docs/content/installation.md) (EN) | [`id/installation.md`](apps/docs/content/id/installation.md) (ID).
 
 ---
 

@@ -47,6 +47,7 @@ clone_or_update() {
       info "Updating..."
       cd "$INSTALL_DIR"
       git pull --rebase
+      git submodule update --init --recursive || warn "Submodule update skipped"
       ok "Updated to latest"
     else
       ok "Already up to date. Use --update to pull latest"
@@ -56,6 +57,7 @@ clone_or_update() {
     info "Installing to $INSTALL_DIR ..."
     mkdir -p "$(dirname "$INSTALL_DIR")"
     git clone --depth 1 "$REPO" "$INSTALL_DIR"
+    git -C "$INSTALL_DIR" submodule update --init --recursive || warn "Submodule init skipped (packages/mcp-server-trello)"
     ok "Cloned kaede-powerup"
   fi
 }
@@ -88,6 +90,12 @@ print_next() {
   echo -e "  ${DIM}    ~/.config/opencode/opencode.json (global MCP)${NC}"
   echo -e "  ${DIM}    ~/.config/kaede/secrets.env${NC}"
   echo ""
+  if ! echo ":$PATH:" | grep -q ":$HOME/.bun/bin:"; then
+    warn "~/.bun/bin is NOT on your PATH — the \`kaede\` command won't be found."
+    echo -e "  ${DIM}    Add this to ~/.bashrc / ~/.zshrc:${NC}"
+    echo -e "  ${CYAN}      export PATH=\"\$HOME/.bun/bin:\$PATH\"${NC}"
+    echo ""
+  fi
 }
 
 uninstall() {

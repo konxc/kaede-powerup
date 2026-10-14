@@ -14,6 +14,8 @@ Once the Trello MCP server is running, the next step is connecting it to **OpenC
 
 ## 1. Add MCP Server to OpenCode
 
+> **Already handled by KAEDE?** `kaede install` writes this file for you — it registers `mcp.trello` (local `~/.kaede/dist/mcp-server.js`) and `mcp.kaede` in `~/.config/opencode/opencode.json`. The snippet below is the manual / upstream (`bunx`) variant.
+
 Edit your `.opencode/opencode.json` in your repository:
 
 ```json

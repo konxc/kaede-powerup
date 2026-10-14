@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { homedir } from 'os';
@@ -19,6 +19,7 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const KAEDE_DIR = process.env.KAEDE_DIR ? resolve(process.env.KAEDE_DIR) : resolve(__dirname, '..');
 const KAEDE_GLOBAL_DIR = resolve(homedir(), '.kaede');
+const KAEDE_SRC = resolve(KAEDE_DIR, 'packages', 'kaede', 'src');
 
 type EnvVars = Secrets;
 
@@ -221,9 +222,12 @@ async function ensureMcpConfig(opts: { repair?: boolean; force?: boolean }): Pro
     console.log('  \x1b[36m  Building & menyalin MCP servers...\x1b[0m');
     for (const [label, src, out] of [
       ['Trello MCP', 'packages/kaede-trello/src/mcp-server.ts', 'dist/mcp-server.js'],
-      ['KAEDE Orchestrator MCP', 'src/kaede-mcp-server.ts', 'dist/kaede-mcp-server.js'],
+      ['KAEDE Orchestrator MCP', 'packages/kaede/src/kaede-mcp-server.ts', 'dist/kaede-mcp-server.js'],
     ] as Array<[string, string, string]>) {
       try {
+        if (!existsSync(resolve(KAEDE_DIR, src))) {
+          throw new Error(`source not found: ${src}`);
+        }
         execSync(`bun build --target bun ${src} --outfile ${out}`, {
           cwd: KAEDE_DIR,
           stdio: 'inherit',
@@ -231,8 +235,9 @@ async function ensureMcpConfig(opts: { repair?: boolean; force?: boolean }): Pro
         mkdirSync(resolve(globalDir, 'dist'), { recursive: true });
         writeFileSync(resolve(globalDir, out), readFileSync(resolve(KAEDE_DIR, out), 'utf-8'), 'utf-8');
         console.log(`  \x1b[32m  \u2713 ${label} ready\x1b[0m`);
-      } catch {
-        console.log(`  \x1b[33m  \u26a0  ${label} build skipped (bun not found?)\x1b[0m`);
+      } catch (err) {
+        console.log(`  \x1b[31m  \u2717 ${label} build failed: ${(err as Error).message}\x1b[0m`);
+        throw err;
       }
     }
   }
@@ -466,22 +471,24 @@ async function cmdInit(): Promise<void> {
   const sharedDir = resolve(opencodeDir, 'SHARED');
   mkdirSync(sharedDir, { recursive: true });
 
-  // 3. Write opencode.json
+  // 3. Resolve the MCP dist dir. Prefer the global install (~/.kaede/dist) so the
+  // generated project keeps working even if the source checkout moves or is deleted.
+  const distDir = existsSync(resolve(KAEDE_GLOBAL_DIR, 'dist', 'mcp-server.js'))
+    ? resolve(KAEDE_GLOBAL_DIR, 'dist')
+    : resolve(KAEDE_DIR, 'dist');
+
+  // 4. Write opencode.json
   const config = {
-    agent: {
-      name: projectName || targetDir.split(/[\\/]/).pop() || 'my-project',
-      version: '1.0.0',
-    },
     mcp: {
       trello: {
         type: 'local',
-        command: ['bun', resolve(KAEDE_DIR, 'dist', 'mcp-server.js')],
+        command: ['bun', resolve(distDir, 'mcp-server.js')],
         enabled: true,
         timeout: 30000,
       },
       kaede: {
         type: 'local',
-        command: ['bun', resolve(KAEDE_DIR, 'dist', 'kaede-mcp-server.js')],
+        command: ['bun', resolve(distDir, 'kaede-mcp-server.js')],
         enabled: true,
         timeout: 60000,
       },
@@ -797,7 +804,7 @@ async function cmdStatus(): Promise<void> {
     console.log('');
     console.log('  \x1b[36m  Testing MCP connection...\x1b[0m');
     try {
-      const { TrelloMCPClient } = await import(resolve(KAEDE_DIR, 'src/trello-client'));
+      const { TrelloMCPClient } = await import(resolve(KAEDE_SRC, 'trello-client'));
       const client = new TrelloMCPClient();
       await client.connect();
       const boards = await client.listBoards();
@@ -842,7 +849,7 @@ async function cmdPlaybook(): Promise<void> {
   const content = readFileSync(path, 'utf-8');
 
   if (subcmd === 'parse') {
-    const { parsePlaybook } = await import(resolve(KAEDE_DIR, 'src/orchestrator'));
+    const { parsePlaybook } = await import(resolve(KAEDE_SRC, 'orchestrator'));
     const result = parsePlaybook(content);
 
     console.log('');
@@ -897,7 +904,7 @@ async function cmdOrchestrate(): Promise<void> {
   const opencodeDir = getOpt('--opencode') || resolve(process.cwd(), '.opencode');
   const detail = args.includes('--detail') || args.includes('-d');
 
-  const { bundleContext } = await import(resolve(KAEDE_DIR, 'src/orchestrator'));
+  const { bundleContext } = await import(resolve(KAEDE_SRC, 'orchestrator'));
 
   const ctx = bundleContext({
     playbook: playbookPath,
@@ -1005,9 +1012,9 @@ async function cmdRun(): Promise<void> {
 
   if (playbookPath && existsSync(playbookPath)) {
     const { parsePlaybook, executeIntent } = await import(
-      resolve(KAEDE_DIR, 'src/orchestrator')
+      resolve(KAEDE_SRC, 'orchestrator')
     );
-    const { TrelloMCPClient } = await import(resolve(KAEDE_DIR, 'src/trello-client'));
+    const { TrelloMCPClient } = await import(resolve(KAEDE_SRC, 'trello-client'));
 
     const content = readFileSync(playbookPath, 'utf-8');
     const playbook = parsePlaybook(content);
@@ -1129,7 +1136,7 @@ async function cmdTemplate(): Promise<void> {
   }
 
   const { listTemplates, getTemplate, applyTemplate, loadTemplatesFromDir } = await import(
-    resolve(KAEDE_DIR, 'src/templates')
+    resolve(KAEDE_SRC, 'templates')
   );
 
   if (subcmd === 'list') {
@@ -1280,8 +1287,8 @@ async function cmdReport(): Promise<void> {
   console.log('  \x1b[35m╚══════════════════════════════════════╝\x1b[0m');
   console.log('');
 
-  const { TrelloMCPClient } = await import(resolve(KAEDE_DIR, 'src/trello-client'));
-  const { generateSprintReport } = await import(resolve(KAEDE_DIR, 'src/orchestrator'));
+  const { TrelloMCPClient } = await import(resolve(KAEDE_SRC, 'trello-client'));
+  const { generateSprintReport } = await import(resolve(KAEDE_SRC, 'orchestrator'));
 
   const client = new TrelloMCPClient();
   try {
@@ -1388,32 +1395,59 @@ async function cmdInstall(): Promise<void> {
   const globalDir = KAEDE_GLOBAL_DIR;
   const kaedeConfigDir = resolve(homedir(), '.config', 'kaede');
 
-  // 1. Copy scripts & docs ke ~/.kaede/ (dist MCP servers dibangun oleh ensureMcpConfig)
+  // 1. Copy the complete source tree to ~/.kaede/ (tanpa mereduksi komponen apa pun)
   console.log(`  \x1b[36m  Installing to ${globalDir}...\x1b[0m`);
-  mkdirSync(resolve(globalDir, 'scripts'), { recursive: true });
-  mkdirSync(resolve(globalDir, 'docs'), { recursive: true });
+  mkdirSync(globalDir, { recursive: true });
+
+  const EXCLUDE_DIRS = new Set([
+    'node_modules', '.git', '.next', '.netlify', '.playwright-mcp',
+    '.sisyphus', '.tmp', '.tmp-gh-pages', '.worktree-gh-pages',
+  ]);
+  const EXCLUDE_REL = new Set(['dist/release']);
+  const EXCLUDE_FILES = new Set(['secrets.env', 'bun.lock']);
+
+  const copyTree = (from: string, to: string, rel = ''): void => {
+    for (const entry of readdirSync(from)) {
+      const relPath = rel ? `${rel}/${entry}` : entry;
+      const src = resolve(from, entry);
+      const dest = resolve(to, entry);
+      if (statSync(src).isDirectory()) {
+        if (EXCLUDE_DIRS.has(entry) || EXCLUDE_REL.has(relPath)) continue;
+        mkdirSync(dest, { recursive: true });
+        copyTree(src, dest, relPath);
+      } else {
+        if (EXCLUDE_FILES.has(relPath)) continue;
+        writeFileSync(dest, readFileSync(src));
+      }
+    }
+  };
 
   try {
-    const cp = (src: string, dest: string) => {
-      const content = readFileSync(resolve(KAEDE_DIR, src), 'utf-8');
-      writeFileSync(resolve(globalDir, dest), content, 'utf-8');
-    };
-    cp('scripts/kaede.ts', 'scripts/kaede.ts');
-    cp('scripts/kaede-auth.ts', 'scripts/kaede-auth.ts');
-    cp('apps/docs/content/playbook-template.md', 'apps/docs/content/playbook-template.md');
-    console.log('  \x1b[32m  \u2713 Files copied to ~/.kaede/\x1b[0m');
+    if (resolve(KAEDE_DIR) === resolve(globalDir)) {
+      console.log('  \x1b[32m  \u2713 Running from install root, source copy not needed\x1b[0m');
+    } else {
+      copyTree(KAEDE_DIR, globalDir);
+      console.log('  \x1b[32m  \u2713 Complete source tree copied to ~/.kaede/\x1b[0m');
+    }
   } catch (err) {
-    console.log(`  \x1b[33m  \u26a0  File copy failed: ${(err as Error).message}\x1b[0m`);
+    console.log(`  \x1b[31m  \u2717 Copy failed: ${(err as Error).message}\x1b[0m`);
+    throw err;
   }
 
   // 2. Build MCP servers, salin dist, & daftarkan global OpenCode MCP config
   await ensureMcpConfig({ repair: false, force: true });
 
-  // 3. bun link (global `kaede` command)
+  // 3. bun link (global `kaede` command) — run from the install root so the
+  //    global command always points at ~/.kaede, not the source checkout.
   console.log('  \x1b[36m  Linking globally via bun link...\x1b[0m');
   try {
-    execSync('bun link', { cwd: KAEDE_DIR, stdio: 'inherit' });
+    execSync('bun link', { cwd: globalDir, stdio: 'inherit' });
     console.log('  \x1b[32m  \u2713 \x1b[0m\x1b[36mkaede\x1b[0m\x1b[32m command available globally\x1b[0m');
+    try {
+      const { existsSync } = await import('fs');
+      const link = resolve(homedir(), '.bun', 'bin', 'kaede');
+      if (!existsSync(link)) console.log('  \x1b[33m  \u26a0  kaede symlink missing at ~/.bun/bin/kaede\x1b[0m');
+    } catch {}
   } catch {
     console.log('  \x1b[33m  \u26a0  bun link failed, creating fallback script...\x1b[0m');
     // Fallback: create a wrapper script
@@ -1444,16 +1478,16 @@ async function cmdInstall(): Promise<void> {
   console.log('  \x1b[90m     Two MCP servers registered globally in\x1b[0m');
   console.log('  \x1b[90m     ~/.config/opencode/opencode.json:\x1b[0m');
   console.log(
-    '  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    \u2014 kaede-trello (44 tools, fallback jika upstream tidak tersedia)\x1b[0m',
+    '  \x1b[90m       \x1b[36mmcp.trello\x1b[0m    \u2014 kaede-trello (47 tools, fallback jika upstream tidak tersedia)\x1b[0m',
   );
-  console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     \u2014 18 orchestration tools\x1b[0m');
+  console.log('  \x1b[90m       \x1b[36mmcp.kaede\x1b[0m     \u2014 45 orchestration tools\x1b[0m');
   console.log('');
 }
 
 // ── Start API Server ──
 
 async function cmdStart(): Promise<void> {
-  const { startApiServer } = await import(resolve(KAEDE_DIR, 'src/api-server'));
+  const { startApiServer } = await import(resolve(KAEDE_SRC, 'api-server'));
   const server = await startApiServer(parseInt(process.argv[3], 10) || 3456);
 
   process.on('SIGINT', () => {
@@ -1477,7 +1511,7 @@ async function cmdTestTools(): Promise<void> {
     return;
   }
 
-  const { TrelloMCPClient } = await import(resolve(KAEDE_DIR, 'src/trello-client'));
+  const { TrelloMCPClient } = await import(resolve(KAEDE_SRC, 'trello-client'));
 
   console.log('');
   console.log('  \x1b[35m╔══════════════════════════════════════╗\x1b[0m');

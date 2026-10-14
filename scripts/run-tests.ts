@@ -10,6 +10,7 @@ const testFiles = [
   'packages/kaede/test/enforcer.test.js',
   'packages/kaede/test/netlify-proxy.test.js',
   'packages/kaede/test/kaede-auth.test.js',
+  'apps/webui/src/lib/github-app.test.ts',
 ];
 
 let exitCode = 0;

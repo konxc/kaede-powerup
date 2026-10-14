@@ -11,6 +11,12 @@
 
 </div>
 
+## Which Trello MCP Server?
+
+KAEDE ships its own **kaede-trello** MCP server (built from `packages/kaede-trello`, **47 tools**, works offline, reads credentials from `~/.config/kaede/secrets.env` with no manual env vars). `kaede install` registers `mcp.trello` → `~/.kaede/dist/mcp-server.js` automatically — you normally don't need to do anything here.
+
+The upstream **@delorenj/mcp-server-trello** server is the base library KAEDE extends. Use the options below only if you want to run upstream directly (e.g. without KAEDE's extra tools) or are contributing upstream. Both speak the same MCP protocol, so the rest of this page applies to either.
+
 ## Installation
 
 ### Option A: Using Bunx (Easiest)

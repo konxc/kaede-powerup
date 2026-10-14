@@ -12,8 +12,8 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '..');
-const SERVER_PATH = resolve(ROOT, 'packages', 'kaede-trello', 'src', 'mcp-server.ts');
+const ROOT = resolve(__dirname, '..'); // packages/kaede
+const SERVER_PATH = resolve(ROOT, '..', 'kaede-trello', 'src', 'mcp-server.ts'); // packages/kaede-trello/src/mcp-server.ts
 
 // ── Mock Data ──
 

@@ -54,7 +54,7 @@ const BUNDLE_DIR = resolve(RELEASE_DIR, 'bundle');
 for (const d of [RELEASE_DIR, BIN_DIR, BUNDLE_DIR]) if (!existsSync(d)) mkdirSync(d, { recursive: true });
 
 const SERVERS = [
-  { name: 'kaede-mcp-server', label: 'Orchestrator MCP', entry: 'src/kaede-mcp-server.ts' },
+  { name: 'kaede-mcp-server', label: 'Orchestrator MCP', entry: 'packages/kaede/src/kaede-mcp-server.ts' },
   { name: 'kaede-trello-mcp', label: 'Trello MCP Library', entry: 'packages/kaede-trello/src/mcp-server.ts' },
   { name: 'kaede-cli', label: 'CLI', entry: 'scripts/kaede.ts' },
 ];

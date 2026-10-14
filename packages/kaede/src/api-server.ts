@@ -3,7 +3,7 @@ import { resolve, extname } from 'path';
 import { readFileSync, existsSync, statSync } from 'fs';
 import type { PlaybookResult, PlanStep, BoardSnapshot, EnforceResult } from './types';
 
-const PUBLIC_DIR = resolve(import.meta.dir, '..', 'apps', 'web', 'dist');
+const PUBLIC_DIR = resolve(import.meta.dir, '..', '..', '..', 'apps', 'static', 'dist');
 
 const MIME_TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',

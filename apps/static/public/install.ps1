@@ -65,6 +65,7 @@ function CloneOrUpdate {
       Write-Info "Updating..."
       Push-Location $InstallDir
       git pull --rebase
+      git submodule update --init --recursive 2>$null
       Pop-Location
       Write-Ok "Updated to latest"
     } else {
@@ -77,6 +78,7 @@ function CloneOrUpdate {
     if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
     git clone --depth 1 $Repo $InstallDir 2>$null
     if (-not $?) { Write-Fail "Clone failed" }
+    git -C $InstallDir submodule update --init --recursive 2>$null
     Write-Ok "Cloned kaede-powerup"
   }
 }
