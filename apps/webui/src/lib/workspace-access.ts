@@ -13,6 +13,31 @@ export async function getAccessibleWorkspaceIdsForUser(githubUserId: string) {
   return [...new Set(rows.map((row) => row.workspaceId))];
 }
 
+export async function ensurePersonalWorkspaceForUser(userId: string, githubUserId: string, userName?: string | null) {
+  const existingIds = await getAccessibleWorkspaceIdsForUser(githubUserId);
+  if (existingIds.length > 0) return existingIds;
+
+  const defaultName = `${userName || githubUserId || 'Developer'}'s Personal`;
+  const [personalWs] = await db.insert(workspaces).values({
+    name: defaultName,
+    operatorGithubId: githubUserId,
+    createdByGithubId: userId,
+    sourceType: 'personal',
+    sourceGithubLogin: githubUserId,
+    sourceStatus: 'active',
+  }).returning();
+
+  await db.insert(workspaceMembers).values({
+    workspaceId: personalWs.id,
+    userId,
+    githubUserId,
+    role: 'owner',
+    status: 'active',
+  });
+
+  return [personalWs.id];
+}
+
 export async function getOwnedWorkspace(workspaceId: string, githubUserId: string) {
   const [workspace] = await db.select().from(workspaces).where(eq(workspaces.id, workspaceId)).limit(1);
   if (!workspace) return null;

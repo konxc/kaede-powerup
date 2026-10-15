@@ -26,7 +26,14 @@ export default async function ProtectedLayout({
   }> = [];
 
   try {
-    const accessibleWorkspaceIds = githubUserId ? await getAccessibleWorkspaceIdsForUser(githubUserId) : [];
+    let accessibleWorkspaceIds = githubUserId ? await getAccessibleWorkspaceIdsForUser(githubUserId) : [];
+    if (accessibleWorkspaceIds.length === 0 && session.user.id) {
+      accessibleWorkspaceIds = await ensurePersonalWorkspaceForUser(
+        session.user.id,
+        githubUserId,
+        session.user.name
+      );
+    }
     if (accessibleWorkspaceIds.length) {
       userWorkspaces = await db
         .select({

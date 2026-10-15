@@ -116,28 +116,53 @@ export function ProtectedShell({ user, workspaces = [], children }: ProtectedShe
                 <DropdownMenuTrigger asChild>
                   <button className="w-full flex items-center justify-between gap-2 p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-left transition-colors">
                     <div className="min-w-0 flex items-center gap-2">
-                      <div className="size-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold shrink-0">
-                        {activeWorkspace.name[0] || 'W'}
+                      <div className={`size-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                        activeWorkspace.sourceType === 'organization'
+                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      }`}>
+                        {activeWorkspace.sourceType === 'organization' ? 'T' : 'P'}
                       </div>
-                      <span className="text-xs font-semibold text-white truncate">
-                        {activeWorkspace.name}
-                      </span>
+                      <div className="min-w-0 flex flex-col text-left">
+                        <span className="text-xs font-semibold text-white truncate leading-tight">
+                          {activeWorkspace.name}
+                        </span>
+                        <span className="text-[9px] text-slate-400 font-mono">
+                          {activeWorkspace.sourceType === 'organization' ? 'Team' : 'Personal'}
+                        </span>
+                      </div>
                     </div>
                     <ChevronDown className="size-3.5 text-slate-400 shrink-0" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 bg-[#0F172A] border-white/10 text-slate-200">
+                <DropdownMenuContent align="start" className="w-60 bg-[#0F172A] border-white/10 text-slate-200">
                   <DropdownMenuLabel className="text-[10px] uppercase font-bold text-slate-400">
-                    Ruang Kerja Aktif
+                    Daftar Ruang Kerja (Workspaces)
                   </DropdownMenuLabel>
-                  {workspaces.map((ws) => (
-                    <DropdownMenuItem key={ws.id} asChild>
-                      <Link href={`/workspaces/${ws.id}`} className="cursor-pointer text-xs font-medium flex items-center gap-2 py-1.5">
-                        <Building2 className="size-3.5 text-emerald-400" />
-                        <span className="truncate">{ws.name}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
+                  {workspaces.map((ws) => {
+                    const isTeam = ws.sourceType === 'organization';
+                    return (
+                      <DropdownMenuItem key={ws.id} asChild>
+                        <Link href={`/workspaces/${ws.id}`} className="cursor-pointer text-xs font-medium flex items-center justify-between gap-2 py-1.5">
+                          <div className="flex items-center gap-2 min-w-0">
+                            {isTeam ? (
+                              <Building2 className="size-3.5 text-purple-400 shrink-0" />
+                            ) : (
+                              <User className="size-3.5 text-emerald-400 shrink-0" />
+                            )}
+                            <span className="truncate">{ws.name}</span>
+                          </div>
+                          <span className={`text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border shrink-0 font-bold ${
+                            isTeam
+                              ? 'bg-purple-500/10 text-purple-300 border-purple-500/20'
+                              : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
+                          }`}>
+                            {isTeam ? 'Team' : 'Personal'}
+                          </span>
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
                   <DropdownMenuSeparator className="bg-white/10" />
                   <DropdownMenuItem asChild>
                     <Link href="/app/settings" className="cursor-pointer text-xs flex items-center gap-2 py-1.5">
