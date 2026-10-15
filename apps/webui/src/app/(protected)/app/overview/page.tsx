@@ -88,11 +88,13 @@ export default async function OverviewPage() {
 
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-2">
           <div className="flex items-center justify-between text-slate-300">
-            <span className="text-xs font-medium">In-Flight Trello Cards</span>
+            <span className="text-xs font-medium">Prioritas Proyek</span>
             <Trello className="size-4 text-amber-400" />
           </div>
-          <p className="text-3xl font-black text-white">7</p>
-          <p className="text-[11px] text-slate-400">Terkoneksi via webhook</p>
+          <p className="text-3xl font-black text-white">
+            {projectRows.reduce((acc, p) => acc + (p.priorityScore || 0), 0) || projectRows.length * 10}
+          </p>
+          <p className="text-[11px] text-slate-400">Total skor bobot backlog</p>
         </div>
 
         <div className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-2">
