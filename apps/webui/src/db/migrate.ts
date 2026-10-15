@@ -201,6 +201,61 @@ const tableStatements = [
     requested_at INTEGER NOT NULL,
     finished_at INTEGER
   );`,
+  `CREATE TABLE IF NOT EXISTS coupons (
+    id TEXT PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    discount_type TEXT NOT NULL DEFAULT 'percent',
+    discount_value INTEGER NOT NULL DEFAULT 20,
+    max_uses INTEGER DEFAULT 100,
+    used_count INTEGER DEFAULT 0,
+    expires_at INTEGER,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at INTEGER NOT NULL
+  );`,
+  `CREATE TABLE IF NOT EXISTS billing_transactions (
+    id TEXT PRIMARY KEY,
+    workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+    gateway TEXT NOT NULL,
+    gateway_transaction_id TEXT,
+    amount INTEGER NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'IDR',
+    payment_type TEXT DEFAULT 'qris',
+    status TEXT NOT NULL DEFAULT 'pending',
+    item_type TEXT NOT NULL DEFAULT 'subscription',
+    coupon_code TEXT,
+    created_at INTEGER NOT NULL,
+    settled_at INTEGER
+  );`,
+  `CREATE TABLE IF NOT EXISTS affiliate_commissions (
+    id TEXT PRIMARY KEY,
+    affiliate_user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+    referred_user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+    transaction_id TEXT REFERENCES billing_transactions(id),
+    commission_amount INTEGER NOT NULL DEFAULT 0,
+    commission_rate INTEGER NOT NULL DEFAULT 20,
+    status TEXT NOT NULL DEFAULT 'pending',
+    paid_at INTEGER,
+    created_at INTEGER NOT NULL
+  );`,
+  `CREATE TABLE IF NOT EXISTS agent_containers (
+    id TEXT PRIMARY KEY,
+    workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+    agent_type TEXT NOT NULL DEFAULT 'hermes-whatsapp',
+    docker_container_id TEXT,
+    docker_host_server TEXT DEFAULT 'srv1.konxc.space',
+    assigned_port INTEGER,
+    status TEXT NOT NULL DEFAULT 'provisioning',
+    whatsapp_connected INTEGER DEFAULT 0,
+    whatsapp_qr_code TEXT,
+    allocated_cpu TEXT DEFAULT '1.0',
+    allocated_ram TEXT DEFAULT '1GB',
+    is_manual_provisioned INTEGER DEFAULT 0,
+    provisioned_by_admin_id TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  );`,
 ];
 
 // Run after `convergeColumns`: an index cannot reference a column that is still missing.
@@ -217,6 +272,11 @@ const indexStatements = [
   `CREATE UNIQUE INDEX IF NOT EXISTS workspace_projects_workspace_repo_unique ON workspace_projects(workspace_id, repository_id);`,
   `CREATE INDEX IF NOT EXISTS workspace_context_documents_project_idx ON workspace_context_documents(project_id);`,
   `CREATE INDEX IF NOT EXISTS workspace_index_runs_project_idx ON workspace_index_runs(project_id);`,
+  `CREATE INDEX IF NOT EXISTS billing_transactions_user_idx ON billing_transactions(user_id);`,
+  `CREATE INDEX IF NOT EXISTS billing_transactions_workspace_idx ON billing_transactions(workspace_id);`,
+  `CREATE INDEX IF NOT EXISTS affiliate_commissions_affiliate_idx ON affiliate_commissions(affiliate_user_id);`,
+  `CREATE INDEX IF NOT EXISTS agent_containers_workspace_idx ON agent_containers(workspace_id);`,
+  `CREATE INDEX IF NOT EXISTS agent_containers_user_idx ON agent_containers(user_id);`,
 ];
 
 async function migrate() {

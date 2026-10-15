@@ -50,10 +50,28 @@ export default async function AdminPage() {
     );
   }
 
-  // Fetch real database summaries
-  const allWorkspaces = await db.select().from(workspaces);
-  const allContainers = await db.select().from(agentContainers);
-  const allCoupons = await db.select().from(coupons);
+  // Fetch real database summaries safely
+  let allWorkspaces: any[] = [];
+  let allContainers: any[] = [];
+  let allCoupons: any[] = [];
+
+  try {
+    if (workspaces) allWorkspaces = await db.select().from(workspaces);
+  } catch (err) {
+    console.warn('[AdminPage] Failed to fetch workspaces:', err);
+  }
+
+  try {
+    if (agentContainers) allContainers = await db.select().from(agentContainers);
+  } catch (err) {
+    console.warn('[AdminPage] Failed to fetch agentContainers:', err);
+  }
+
+  try {
+    if (coupons) allCoupons = await db.select().from(coupons);
+  } catch (err) {
+    console.warn('[AdminPage] Failed to fetch coupons:', err);
+  }
 
   return (
     <div className="space-y-10 max-w-7xl mx-auto">
